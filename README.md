@@ -27,7 +27,7 @@ Follow these steps to load the data into your SurrealDB instance:
     *   Download a pre-trained embedding model, such as the **GloVe model**, from:
         *   [https://nlp.stanford.edu/projects/glove/](https://nlp.stanford.edu/projects/glove/)
         *  Or download the specific version from [https://www.kaggle.com/datasets/watts2/glove6b50dtxt](https://www.kaggle.com/datasets/watts2/glove6b50dtxt) which is the `glove.6B.50d.txt` file.
-    *   The scripts use this model to generate vector embeddings for ingredients and other text data in the dataset. This step is similar to how the `surrealDB_Embedding_Model` repo uses it [3].
+    *   The scripts use this model to generate vector embeddings for ingredients and other text data in the dataset. This step is similar to how the `surrealDB_Embedding_Model` repo uses it.
 2.  **Download the recipe data**: Download the dataset from [https://www.kaggle.com/datasets/shuyangli94/food-com-recipes-and-user-interactions](https://www.kaggle.com/datasets/shuyangli94/food-com-recipes-and-user-interactions). The scripts expect this data to be in the data directory.
 3.  **Set up your SurrealDB database**: Either install a local instance of SurrealDB or use Surreal Cloud.
 4.  **Environment Variables**: Ensure your SurrealDB credentials are set as environment variables.
@@ -81,7 +81,7 @@ This dataset was created for the following research:
 *   **Citation:** Shuyang Li, Chris Callison-Burch, and Benjamin Van Durme. 2019. [From Recipes to Actions: Generating Procedural Text from Web Data](https://aclanthology.org/D19-1613/). In *Proceedings of the 2019 Conference on Empirical Methods in Natural Language Processing and the 9th International Joint Conference on Natural Language Processing (EMNLP-IJCNLP)*, pages 6083–6093, Hong Kong, China. Association for Computational Linguistics.
 
 ## Code Similarities
-This repository reuses a lot of the code from the `surrealDB_Embedding_Model` repository [3, 4]. Specifically the following modules:
+This repository reuses a lot of the code from the `surrealDB_Embedding_Model` repository. Specifically the following modules:
     * constants.py
     * database.py
     * embeddings.py
