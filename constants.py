@@ -19,9 +19,7 @@ class Constants():
         #The path to your SurrealDB instance
         #The the SurrealDB namespace and database to upload the model to
         self.DB_PARAMS = Database(
-            #"wss://test-med-069pe77i4lv4j3mhm6bc7t5u9g.aws-use1.surreal.cloud",
-            #"wss://test-4xl-069pe79vptv4jcpim0vdloso0o.aws-use1.surreal.cloud",
-            "ws://0.0.0.0:8080",
+            "ws://0.0.0.0:8000",
             os.getenv(self.DB_USER_ENV_VAR),
             os.getenv(self.DB_PASS_ENV_VAR),
             "embedding_example",
