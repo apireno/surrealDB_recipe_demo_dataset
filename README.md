@@ -36,7 +36,7 @@ Follow these steps to load the data into your SurrealDB instance:
     *   Alternatively, you can use the command line interface and supply your surreal connection details when prompted.
     * CLI options:
       * -h, --help            show this help message and exit
-      * -url URL, --url URL   Path to your SurrealDB instance (Default: ws://0.0.0.0:8080)
+      * -url URL, --url URL   Path to your SurrealDB instance (Default: ws://0.0.0.0:8000)
       * -ns NAMESPACE, --namespace NAMESPACE
                         SurrealDB namespace to create and install the model (Default: embedding_example)
       * -db DATABASE, --database DATABASE
