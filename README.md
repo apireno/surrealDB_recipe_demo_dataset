@@ -38,11 +38,11 @@ Follow these steps to load the data into your SurrealDB instance:
       * -h, --help            show this help message and exit
       * -url URL, --url URL   Path to your SurrealDB instance (Default: ws://0.0.0.0:8000)
       * -ns NAMESPACE, --namespace NAMESPACE
-                        SurrealDB namespace to create and install the model (Default: embedding_example)
+                        SurrealDB namespace to create and install the data (Default: embedding_example)
       * -db DATABASE, --database DATABASE
-                        SurrealDB database to create and install the model (Default: embedding_example)
+                        SurrealDB database to create and install the data (Default: embedding_example)
       * -mp MODEL_PATH, --model_path MODEL_PATH
-                        Your model file (Default: .//glove.6B.50d.txt)
+                        Your embeddings model file (Default: .//glove.6B.50d.txt)
       * -ingf INGREDIENTS_FILE, --ingredients_file INGREDIENTS_FILE
                         Your master ingredients file (Default: .//extracted_ingredients_list.txt)
       * -recf RECIPES_FILE, --recipes_file RECIPES_FILE
