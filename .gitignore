@@ -1,4 +1,8 @@
 # Ignore large files
-./data/glove.6B.50d.txt
-./data/RAW_recipes.csv
-./data/RAW_recipes.csv
+data/RAW_interactions.csv
+data/RAW_recipes.csv
+data/glove.6B.50d.txt
+
+#ingore directories
+surrealDB_recipe_demo_dataset/__pycache__/
+.DS_Store
