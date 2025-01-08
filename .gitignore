@@ -4,5 +4,5 @@ data/RAW_recipes.csv
 data/glove.6B.50d.txt
 
 #ingore directories
-surrealDB_recipe_demo_dataset/__pycache__/
+**/__pycache__/
 .DS_Store
