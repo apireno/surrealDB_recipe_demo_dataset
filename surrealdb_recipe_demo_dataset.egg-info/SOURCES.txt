@@ -1,0 +1,9 @@
+README.md
+pyproject.toml
+setup.py
+surrealdb_recipe_demo_dataset.egg-info/PKG-INFO
+surrealdb_recipe_demo_dataset.egg-info/SOURCES.txt
+surrealdb_recipe_demo_dataset.egg-info/__init__.py
+surrealdb_recipe_demo_dataset.egg-info/dependency_links.txt
+surrealdb_recipe_demo_dataset.egg-info/requires.txt
+surrealdb_recipe_demo_dataset.egg-info/top_level.txt

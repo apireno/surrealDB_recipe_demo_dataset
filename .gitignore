@@ -1,0 +1,4 @@
+# Ignore large files
+./data/glove.6B.50d.txt
+./data/RAW_recipes.csv
+./data/RAW_recipes.csv

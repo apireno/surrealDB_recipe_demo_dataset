@@ -8,5 +8,6 @@ setup(
     install_requires=[
         "surrealdb",
         "torch",
+        "surrealdb_embedding_model @ git+https://github.com/apireno/surrealDB_Embedding_Model.git"
     ]
 )

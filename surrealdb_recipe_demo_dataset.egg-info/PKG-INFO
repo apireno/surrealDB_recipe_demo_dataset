@@ -1,0 +1,5 @@
+Metadata-Version: 2.1
+Name: surrealdb_recipe_demo_dataset
+Version: 0.1.0
+Requires-Dist: surrealdb
+Requires-Dist: torch
