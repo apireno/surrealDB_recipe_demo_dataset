@@ -30,8 +30,8 @@ class RecipeDataSurqlDDL:
         REMOVE TABLE IF EXISTS review;
         DEFINE TABLE review TYPE RELATION IN reviewer OUT recipe SCHEMAFULL;
         DEFINE FIELD time ON review TYPE object;
-        DEFINE FIELD time.submitted ON review TYPE string DEFAULT time::now();
-        DEFINE FIELD time.updated ON review TYPE string VALUE time::now();
+        DEFINE FIELD time.submitted ON review TYPE datetime DEFAULT time::now();
+        DEFINE FIELD time.updated ON review TYPE datetime VALUE time::now();
         DEFINE FIELD rating ON review TYPE number;
         DEFINE FIELD review_text ON review TYPE string;
         DEFINE FIELD review_text_embedding ON review TYPE option<array<float>>;
@@ -343,8 +343,8 @@ class RecipeDataSurqlDDL:
     DEFINE FIELD description_embedding ON TABLE recipe TYPE option<array<float>>;
     DEFINE FIELD nutrition ON recipe TYPE option<array<number>>;
     DEFINE FIELD time ON recipe TYPE object;
-    DEFINE FIELD time.submitted ON recipe TYPE string DEFAULT time::now();
-    DEFINE FIELD time.updated ON recipe TYPE string VALUE time::now();
+    DEFINE FIELD time.submitted ON recipe TYPE datetime DEFAULT time::now();
+    DEFINE FIELD time.updated ON recipe TYPE datetime VALUE time::now();
 
 
 

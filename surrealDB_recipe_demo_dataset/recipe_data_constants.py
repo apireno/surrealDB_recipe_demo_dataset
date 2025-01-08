@@ -51,8 +51,8 @@ class RecipeArgsLoader(ArgsLoader):
         self.recipe_data_constants = recipe_data_constants
         self.recipe_data_constants.AddArgs(self.parser)
         #for developing edit the settings here to avoid using CLI
-        #self.db_constants.DB_PARAMS.url = "ws://0.0.0.0:8080"
-        #self.db_constants.DB_PARAMS.database = "test2"
+        self.db_constants.DB_PARAMS.url = "ws://0.0.0.0:8080"
+        self.db_constants.DB_PARAMS.database = "test2"
 
     def LoadArgs(self):
         
