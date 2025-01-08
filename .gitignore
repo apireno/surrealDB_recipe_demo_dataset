@@ -6,3 +6,4 @@ data/glove.6B.50d.txt
 #ingore directories
 **/__pycache__/
 .DS_Store
+src/surrealdb-embedding-model
