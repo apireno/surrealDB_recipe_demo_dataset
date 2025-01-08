@@ -1,4 +1,4 @@
-from embeddings import EmbeddingModel
+from surrealDB_embedding_model.embeddings import EmbeddingModel
 from surrealdb import AsyncSurrealDB
 
 class SurqlReferenceData:

@@ -1,0 +1,1 @@
+-e git+https://github.com/apireno/surrealDB_Embedding_Model.git#egg=surrealDB_embedding_model

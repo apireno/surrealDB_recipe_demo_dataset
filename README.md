@@ -31,9 +31,11 @@ Follow these steps to load the data into your SurrealDB instance:
 2.  **Download the recipe data**: Download the dataset from [https://www.kaggle.com/datasets/shuyangli94/food-com-recipes-and-user-interactions](https://www.kaggle.com/datasets/shuyangli94/food-com-recipes-and-user-interactions). The scripts expect this data to be in the data directory.
 3.  **Set up your SurrealDB database**: Either install a local instance of SurrealDB or use Surreal Cloud.
 4.  **Environment Variables**: Ensure your SurrealDB credentials are set as environment variables.
-5.  **Update `constants.py` (or use CLI inputs)**:
-    *   Modify the `constants.py` file to include the path to your downloaded GloVe model, recipe data, sampling ration and SurrealDB connection details.
-    *   Alternatively, you can use the command line interface and supply your surreal connection details when prompted.
+5.  **Ensure the embedding module depedency is installed**: 
+    * execute `pip install -r reqirements.txt` in the root of where you downloaded this repo
+    * it should create a folder `src/surrealdb-embedding-model` and download the dependant module code there
+    * you can run `test_dependencies.py` to confirm
+5.  **CLI args and constants file `surrealDB_recipe_demo_dataset/recipe_data_constants.py`**:
     * CLI options:
       * -h, --help            show this help message and exit
       * -url URL, --url URL   Path to your SurrealDB instance (Default: ws://0.0.0.0:8000)
@@ -59,8 +61,10 @@ Follow these steps to load the data into your SurrealDB instance:
                         The sampling ratio for the recipes from 0-1 (Default: 0.001)
       * -revsr REVIEW_SAMPLE_RATIO, --review_sample_ratio REVIEW_SAMPLE_RATIO
                         The sampling ratio for the reviews from 0-1 (Default: 1.0)
-6.  **Run the scripts in order**: Execute the Python scripts sequentially, from `step_0_process_input_embedding_model.py` through `step_6_process_input_reviews.py`.
-    *   `step_0_process_input_embedding_model.py`: Processes the GloVe model to make it ready for use with the scripts.
+    *   If you are running from an IDE, edit the `recipe_data_constants.py` file to alter any settings there if more convenient.
+6.  **Run the embedding script**: If your target database doesn't have the embedding model loaded already run `src/surrealdb-embedding-model/upload_model.py`
+
+7.  **Run the scripts in order**: Execute the Python scripts sequentially, from step 1 through 6
     *   `step_1_process_ddl.py`: Creates all the database schema definitions for all the data to be ingested.
     *   `step_2_process_input_ingredients_and_actions.py`: Ingests the ingredient data into SurrealDB.
     *   `step_3_process_input_recipes.py`: Ingests the recipe data into SurrealDB.

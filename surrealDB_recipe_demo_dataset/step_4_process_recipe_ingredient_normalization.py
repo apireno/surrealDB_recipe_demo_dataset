@@ -1,20 +1,22 @@
-from database import *
-import time
+
 import asyncio
 from surrealdb import AsyncSurrealDB
+import numpy as np
+import time
+from helpers import Helpers
+from collections import defaultdict
+from surrealdb import AsyncSurrealDB
+from surrealDB_embedding_model.embedding_model_constants import EmbeddingModelConstants,DatabaseConstants,THIS_FOLDER
+from recipe_data_constants import RecipeDataConstants, RecipeArgsLoader
 from surql_recipes_steps import SurqlRecipesAndSteps
 from surql_ref_data import SurqlReferenceData
-from constants import Constants
-from helpers import Helpers
-import numpy as np
-from collections import defaultdict
 
-
-
-
-out_folder = Constants.THIS_FOLDER + "/rec_ing_normal_{0}".format(time.strftime("%Y%m%d-%H%M%S"))
-constants = Constants()
-constants.LoadArgs("Input Embeddings Model")
+out_folder = THIS_FOLDER + "/rec_ing_normal_{0}".format(time.strftime("%Y%m%d-%H%M%S"))
+db_constants = DatabaseConstants()
+embed_constants = EmbeddingModelConstants()
+recipe_constants = RecipeDataConstants()
+args_loader = RecipeArgsLoader("Recipe ingredient normalization",db_constants,embed_constants,recipe_constants)
+args_loader.LoadArgs()
 
 
 ingredient_processing_durations = []
@@ -28,9 +30,9 @@ async def process_recipe_ingredient_normalization():
 
 
     start_time = time.time()
-    async with AsyncSurrealDB(constants.DB_PARAMS.url) as db:
-        auth_token = await db.sign_in(constants.DB_PARAMS.username,constants.DB_PARAMS.password)
-        await db.use(constants.DB_PARAMS.namespace, constants.DB_PARAMS.database)
+    async with AsyncSurrealDB(db_constants.DB_PARAMS.url) as db:
+        auth_token = await db.sign_in(db_constants.DB_PARAMS.username,db_constants.DB_PARAMS.password)
+        await db.use(db_constants.DB_PARAMS.namespace, db_constants.DB_PARAMS.database)
         
         refDataProcessor =  SurqlReferenceData(db)
         list_ingredient_result = await refDataProcessor.select_all_ingredients()
@@ -99,9 +101,9 @@ async def process_recipe_ingredient_normalization():
 
     i = 0
     N = len(recipe_normalized_ingredients)
-    async with AsyncSurrealDB(constants.DB_PARAMS.url) as db:
-        auth_token = await db.sign_in(constants.DB_PARAMS.username,constants.DB_PARAMS.password)
-        await db.use(constants.DB_PARAMS.namespace, constants.DB_PARAMS.database)
+    async with AsyncSurrealDB(db_constants.DB_PARAMS.url) as db:
+        auth_token = await db.sign_in(db_constants.DB_PARAMS.username,db_constants.DB_PARAMS.password)
+        await db.use(db_constants.DB_PARAMS.namespace, db_constants.DB_PARAMS.database)
         recipeDataProcessor = SurqlRecipesAndSteps(db)
 
         for key, value in recipe_normalized_ingredients.items():
@@ -178,7 +180,37 @@ async def process_recipe_ingredient_normalization():
     max_ingredient_sql_duration_ms = max_ingredient_sql_duration * 1000
 
     
+
+    
+    print(
+        """
+        step 4 Recipe ingredient normalization                                                                                                    
+        total elapsed {elapsed_duration}                                                                                                         
+        ingredient_processing (avg,min,max) ({avg_ingredient_processing_duration},{min_ingredient_processing_duration},{max_ingredient_processing_duration})
+        recipe_update (avg,min,max) ({avg_recipe_update_duration},{min_recipe_update_duration},{max_recipe_update_duration}) 
+        ingredient_sql (avg,min,max) ({avg_ingredient_sql_duration},{min_ingredient_sql_duration},{max_ingredient_sql_duration})                                                                                    
+        """.format(
+        elapsed_duration = f"{elapsed_duration_minutes:.1f} min",
+        avg_ingredient_processing_duration = f"{avg_ingredient_processing_duration_ms:.3f} ms",
+        min_ingredient_processing_duration = f"{min_ingredient_processing_duration_ms:.3f} ms",
+        max_ingredient_processing_duration = f"{max_ingredient_processing_duration_ms:.3f} ms",
+        avg_recipe_update_duration = f"{avg_recipe_update_duration_ms:.3f} ms",
+        min_recipe_update_duration = f"{min_recipe_update_duration_ms:.3f} ms",
+        max_recipe_update_duration = f"{max_recipe_update_duration_ms:.3f} ms",
+        avg_ingredient_sql_duration = f"{avg_ingredient_sql_duration_ms:.3f} ms",
+        min_ingredient_sql_duration = f"{min_ingredient_sql_duration_ms:.3f} ms",
+        max_ingredient_sql_duration = f"{max_ingredient_sql_duration_ms:.3f} ms",
+        )) 
+
+
+
+async def main():
+
+   
     print("""
+          
+
+          
           STEP 4 normalize ingredients for recipes
           DB_PARAMS {URL} N: {NS} DB: {DB} USER: {DB_USER}
 
@@ -186,59 +218,32 @@ async def process_recipe_ingredient_normalization():
           DB_PASS_ENV_VAR {DB_PASS_ENV_VAR}
 
           MODEL_PATH {MODEL_PATH}
-          INGREDIENTS_PATH {INGREDIENTS_PATH}
-          MODEL_PATH {MODEL_PATH}
+
           RECIPE_FILE {RECIPE_FILE}
           REVIEW_FILE {REVIEW_FILE}
 
-          RECIPE_SAMPLE_RATIO {RECIPE_SAMPLE_RATIO}
-          REVIEW_SAMPLE_RATIO {REVIEW_SAMPLE_RATIO}
-
-          """.format(
-              URL = constants.DB_PARAMS.url,
-              DB_USER = constants.DB_PARAMS.username,
-              NS = constants.DB_PARAMS.namespace,
-              DB = constants.DB_PARAMS.database,
-              DB_USER_ENV_VAR = constants.DB_USER_ENV_VAR,
-              DB_PASS_ENV_VAR = constants.DB_PASS_ENV_VAR,
-              MODEL_PATH = constants.MODEL_PATH,
-              INGREDIENTS_PATH = constants.PREV_EXTRACTED_INGREDIENTS_FILE,
-              RECIPE_FILE = constants.RECIPE_FILE,
-              REVIEW_FILE = constants.REVIEW_FILE,
-              RECIPE_SAMPLE_RATIO = constants.RECIPE_SAMPLE_RATIO,
-              REVIEW_SAMPLE_RATIO = constants.REVIEW_SAMPLE_RATIO
-          )
-          )
-
-
-
-
-async def main():
-
-    print("""
-          STEP 4
-          DB_PARAMS {URL} N-{NS} DB-{DB}
           PREV_EXTRACTED_INGREDIENTS_FILE {PREV_EXTRACTED_INGREDIENTS_FILE}
-          MODEL_PATH {MODEL_PATH}
-          RECIPE_FILE {RECIPE_FILE}
-          REVIEW_FILE {REVIEW_FILE}
+
           RECIPE_SAMPLE_RATIO {RECIPE_SAMPLE_RATIO}
           REVIEW_SAMPLE_RATIO {REVIEW_SAMPLE_RATIO}
-          
-          
-          
+
           """.format(
-              URL = constants.DB_PARAMS.url,
-              NS = constants.DB_PARAMS.namespace,
-              DB = constants.DB_PARAMS.database,
-              PREV_EXTRACTED_INGREDIENTS_FILE = constants.PREV_EXTRACTED_INGREDIENTS_FILE,
-              MODEL_PATH = constants.MODEL_PATH,
-              RECIPE_FILE = constants.RECIPE_FILE,
-              REVIEW_FILE = constants.REVIEW_FILE,
-              RECIPE_SAMPLE_RATIO = constants.RECIPE_SAMPLE_RATIO,
-              REVIEW_SAMPLE_RATIO = constants.REVIEW_SAMPLE_RATIO
+              URL = db_constants.DB_PARAMS.url,
+              DB_USER = db_constants.DB_PARAMS.username,
+              NS = db_constants.DB_PARAMS.namespace,
+              DB = db_constants.DB_PARAMS.database,
+              DB_USER_ENV_VAR = db_constants.DB_USER_ENV_VAR,
+              DB_PASS_ENV_VAR = db_constants.DB_PASS_ENV_VAR,
+              MODEL_PATH = embed_constants.MODEL_PATH,
+              RECIPE_FILE = recipe_constants.RECIPE_FILE,
+              REVIEW_FILE = recipe_constants.REVIEW_FILE,
+              PREV_EXTRACTED_INGREDIENTS_FILE = recipe_constants.PREV_EXTRACTED_INGREDIENTS_FILE,
+              RECIPE_SAMPLE_RATIO = recipe_constants.RECIPE_SAMPLE_RATIO,
+              REVIEW_SAMPLE_RATIO = recipe_constants.REVIEW_SAMPLE_RATIO
+
           )
           )
+    
     await process_recipe_ingredient_normalization()
 
 

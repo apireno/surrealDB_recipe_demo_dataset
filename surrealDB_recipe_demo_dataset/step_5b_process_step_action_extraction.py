@@ -1,25 +1,25 @@
-from database import *
-import time
-from datetime import datetime,timedelta
-import ast
+
+
 import asyncio
 from surrealdb import AsyncSurrealDB
-import pandas as pd
+import numpy as np
+import time
+from helpers import Helpers
+from collections import defaultdict
+from surrealdb import AsyncSurrealDB
+from surrealDB_embedding_model.embedding_model_constants import EmbeddingModelConstants,DatabaseConstants,THIS_FOLDER
+from recipe_data_constants import RecipeDataConstants, RecipeArgsLoader
 from surql_recipes_steps import SurqlRecipesAndSteps
 from surql_ref_data import SurqlReferenceData
-from surql_ddl import SurqlDDL
-from embeddings import EmbeddingModel
-from constants import Constants
-from helpers import Helpers
-import numpy as np
-from collections import defaultdict
+
+out_folder = THIS_FOLDER + "/step_action_extraction_{0}".format(time.strftime("%Y%m%d-%H%M%S"))
+db_constants = DatabaseConstants()
+embed_constants = EmbeddingModelConstants()
+recipe_constants = RecipeDataConstants()
+args_loader = RecipeArgsLoader("Step action extraction",db_constants,embed_constants,recipe_constants)
+args_loader.LoadArgs()
 
 
-
-
-out_folder = Constants.THIS_FOLDER + "/rec_ing_normal_{0}".format(time.strftime("%Y%m%d-%H%M%S"))
-constants = Constants()
-constants.LoadArgs("Input Embeddings Model")
 
 
 action_processing_durations = []
@@ -34,9 +34,9 @@ async def process_step_action_extraction():
 
 
 
-    async with AsyncSurrealDB(constants.DB_PARAMS.url) as db:
-        auth_token = await db.sign_in(constants.DB_PARAMS.username,constants.DB_PARAMS.password)
-        await db.use(constants.DB_PARAMS.namespace, constants.DB_PARAMS.database)
+    async with AsyncSurrealDB(db_constants.DB_PARAMS.url) as db:
+        auth_token = await db.sign_in(db_constants.DB_PARAMS.username,db_constants.DB_PARAMS.password)
+        await db.use(db_constants.DB_PARAMS.namespace, db_constants.DB_PARAMS.database)
         
         refDataProcessor =  SurqlReferenceData(db)
         stepDataProcessor = SurqlRecipesAndSteps(db)
@@ -201,6 +201,10 @@ async def main():
 
 
     print("""
+          
+
+
+          
           STEP 5b extract actions from steps
           DB_PARAMS {URL} N: {NS} DB: {DB} USER: {DB_USER}
 
@@ -208,27 +212,29 @@ async def main():
           DB_PASS_ENV_VAR {DB_PASS_ENV_VAR}
 
           MODEL_PATH {MODEL_PATH}
-          INGREDIENTS_PATH {INGREDIENTS_PATH}
-          MODEL_PATH {MODEL_PATH}
+
           RECIPE_FILE {RECIPE_FILE}
           REVIEW_FILE {REVIEW_FILE}
+
+          PREV_EXTRACTED_INGREDIENTS_FILE {PREV_EXTRACTED_INGREDIENTS_FILE}
 
           RECIPE_SAMPLE_RATIO {RECIPE_SAMPLE_RATIO}
           REVIEW_SAMPLE_RATIO {REVIEW_SAMPLE_RATIO}
 
           """.format(
-              URL = constants.DB_PARAMS.url,
-              DB_USER = constants.DB_PARAMS.username,
-              NS = constants.DB_PARAMS.namespace,
-              DB = constants.DB_PARAMS.database,
-              DB_USER_ENV_VAR = constants.DB_USER_ENV_VAR,
-              DB_PASS_ENV_VAR = constants.DB_PASS_ENV_VAR,
-              MODEL_PATH = constants.MODEL_PATH,
-              INGREDIENTS_PATH = constants.PREV_EXTRACTED_INGREDIENTS_FILE,
-              RECIPE_FILE = constants.RECIPE_FILE,
-              REVIEW_FILE = constants.REVIEW_FILE,
-              RECIPE_SAMPLE_RATIO = constants.RECIPE_SAMPLE_RATIO,
-              REVIEW_SAMPLE_RATIO = constants.REVIEW_SAMPLE_RATIO
+              URL = db_constants.DB_PARAMS.url,
+              DB_USER = db_constants.DB_PARAMS.username,
+              NS = db_constants.DB_PARAMS.namespace,
+              DB = db_constants.DB_PARAMS.database,
+              DB_USER_ENV_VAR = db_constants.DB_USER_ENV_VAR,
+              DB_PASS_ENV_VAR = db_constants.DB_PASS_ENV_VAR,
+              MODEL_PATH = embed_constants.MODEL_PATH,
+              RECIPE_FILE = recipe_constants.RECIPE_FILE,
+              REVIEW_FILE = recipe_constants.REVIEW_FILE,
+              PREV_EXTRACTED_INGREDIENTS_FILE = recipe_constants.PREV_EXTRACTED_INGREDIENTS_FILE,
+              RECIPE_SAMPLE_RATIO = recipe_constants.RECIPE_SAMPLE_RATIO,
+              REVIEW_SAMPLE_RATIO = recipe_constants.REVIEW_SAMPLE_RATIO
+
           )
           )
     await process_step_action_extraction()

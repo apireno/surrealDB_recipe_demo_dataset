@@ -1,19 +1,26 @@
-from database import *
-import time
-from datetime import datetime,timedelta
+
 import asyncio
 from surrealdb import AsyncSurrealDB
 import pandas as pd
-from surql_reviews import SurqlReviewsAndReviewers
-from surql_recipes_steps import SurqlRecipesAndSteps
-from surql_ddl import SurqlDDL
-from constants import Constants
 import numpy as np
+import time
 import names
+from datetime import datetime,timedelta
+from surrealdb import AsyncSurrealDB
+from surrealDB_embedding_model.embedding_model_constants import EmbeddingModelConstants,DatabaseConstants,THIS_FOLDER
+from recipe_data_constants import RecipeDataConstants, RecipeArgsLoader
+from surql_recipes_steps import SurqlRecipesAndSteps
+from surql_reviews import SurqlReviewsAndReviewers
+from recipe_data_surql_ddl import RecipeDataSurqlDDL
 
-out_folder = Constants.THIS_FOLDER + "/ins_recipes_{0}".format(time.strftime("%Y%m%d-%H%M%S"))
-constants = Constants()
-constants.LoadArgs("Input Embeddings Model")
+
+
+out_folder = THIS_FOLDER + "/process_reviews_{0}".format(time.strftime("%Y%m%d-%H%M%S"))
+db_constants = DatabaseConstants()
+embed_constants = EmbeddingModelConstants()
+recipe_constants = RecipeDataConstants()
+args_loader = RecipeArgsLoader("Input reviews",db_constants,embed_constants,recipe_constants)
+args_loader.LoadArgs()
 
 
 reviewer_insert_durations = []
@@ -122,10 +129,10 @@ async def process_reviews(review_df,batch_size=1,total_records=0,offset=0):
 
 
 
-    async with AsyncSurrealDB(constants.DB_PARAMS.url) as db:
+    async with AsyncSurrealDB(db_constants.DB_PARAMS.url) as db:
 
-        auth_token = await db.sign_in(constants.DB_PARAMS.username,constants.DB_PARAMS.password)
-        await db.use(constants.DB_PARAMS.namespace, constants.DB_PARAMS.database)
+        auth_token = await db.sign_in(db_constants.DB_PARAMS.username,db_constants.DB_PARAMS.password)
+        await db.use(db_constants.DB_PARAMS.namespace, db_constants.DB_PARAMS.database)
 
 
         dataProcessor = SurqlReviewsAndReviewers(db)
@@ -145,48 +152,52 @@ async def process_reviews(review_df,batch_size=1,total_records=0,offset=0):
 async def main():
 
 
-
     print("""
-          STEP 6 insert reviews and reviewers
+          
+
+          
+          STEP 6 import reviews
           DB_PARAMS {URL} N: {NS} DB: {DB} USER: {DB_USER}
 
           DB_USER_ENV_VAR {DB_USER_ENV_VAR}
           DB_PASS_ENV_VAR {DB_PASS_ENV_VAR}
 
           MODEL_PATH {MODEL_PATH}
-          INGREDIENTS_PATH {INGREDIENTS_PATH}
-          MODEL_PATH {MODEL_PATH}
+
           RECIPE_FILE {RECIPE_FILE}
           REVIEW_FILE {REVIEW_FILE}
+
+          PREV_EXTRACTED_INGREDIENTS_FILE {PREV_EXTRACTED_INGREDIENTS_FILE}
 
           RECIPE_SAMPLE_RATIO {RECIPE_SAMPLE_RATIO}
           REVIEW_SAMPLE_RATIO {REVIEW_SAMPLE_RATIO}
 
           """.format(
-              URL = constants.DB_PARAMS.url,
-              DB_USER = constants.DB_PARAMS.username,
-              NS = constants.DB_PARAMS.namespace,
-              DB = constants.DB_PARAMS.database,
-              DB_USER_ENV_VAR = constants.DB_USER_ENV_VAR,
-              DB_PASS_ENV_VAR = constants.DB_PASS_ENV_VAR,
-              MODEL_PATH = constants.MODEL_PATH,
-              INGREDIENTS_PATH = constants.PREV_EXTRACTED_INGREDIENTS_FILE,
-              RECIPE_FILE = constants.RECIPE_FILE,
-              REVIEW_FILE = constants.REVIEW_FILE,
-              RECIPE_SAMPLE_RATIO = constants.RECIPE_SAMPLE_RATIO,
-              REVIEW_SAMPLE_RATIO = constants.REVIEW_SAMPLE_RATIO
+              URL = db_constants.DB_PARAMS.url,
+              DB_USER = db_constants.DB_PARAMS.username,
+              NS = db_constants.DB_PARAMS.namespace,
+              DB = db_constants.DB_PARAMS.database,
+              DB_USER_ENV_VAR = db_constants.DB_USER_ENV_VAR,
+              DB_PASS_ENV_VAR = db_constants.DB_PASS_ENV_VAR,
+              MODEL_PATH = embed_constants.MODEL_PATH,
+              RECIPE_FILE = recipe_constants.RECIPE_FILE,
+              REVIEW_FILE = recipe_constants.REVIEW_FILE,
+              PREV_EXTRACTED_INGREDIENTS_FILE = recipe_constants.PREV_EXTRACTED_INGREDIENTS_FILE,
+              RECIPE_SAMPLE_RATIO = recipe_constants.RECIPE_SAMPLE_RATIO,
+              REVIEW_SAMPLE_RATIO = recipe_constants.REVIEW_SAMPLE_RATIO
+
           )
           )
 
-    review_df = pd.read_csv(constants.REVIEW_FILE)
+    review_df = pd.read_csv(recipe_constants.REVIEW_FILE)
 
 
-    async with AsyncSurrealDB(constants.DB_PARAMS.url) as db:
-        auth_token = await db.sign_in(constants.DB_PARAMS.username,constants.DB_PARAMS.password)
-        await db.use(constants.DB_PARAMS.namespace, constants.DB_PARAMS.database)
+    async with AsyncSurrealDB(db_constants.DB_PARAMS.url) as db:
+        auth_token = await db.sign_in(db_constants.DB_PARAMS.username,db_constants.DB_PARAMS.password)
+        await db.use(db_constants.DB_PARAMS.namespace, db_constants.DB_PARAMS.database)
 
-        out = await db.query(SurqlDDL.DDL_REVIEWER)
-        out = await db.query(SurqlDDL.DDL_REVIEW)
+        out = await db.query(RecipeDataSurqlDDL.DDL_REVIEWER)
+        out = await db.query(RecipeDataSurqlDDL.DDL_REVIEW)
         
         recipeDataProcessor = SurqlRecipesAndSteps(db)
         reviewDataProcessor = SurqlReviewsAndReviewers(db)
@@ -199,7 +210,7 @@ async def main():
         await process_reviewers(reviewDataProcessor,reviewer_ids)
     
     #sample 
-    review_df = review_df.sample(frac=constants.REVIEW_SAMPLE_RATIO, random_state=1)
+    review_df = review_df.sample(frac=recipe_constants.REVIEW_SAMPLE_RATIO, random_state=1)
     print(review_df.describe())
     print(review_df.head())
 

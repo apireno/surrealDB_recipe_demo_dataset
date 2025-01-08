@@ -1,5 +1,5 @@
 
-class SurqlDDL:
+class RecipeDataSurqlDDL:
 
     
     DDL_CREATE_NS = """
