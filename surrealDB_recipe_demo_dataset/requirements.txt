@@ -1,1 +1,0 @@
-git+https://github.com/apireno/surrealDB_Embedding_Model.git
