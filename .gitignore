@@ -8,3 +8,4 @@ data/glove.6B.50d.txt
 .DS_Store
 src/
 surrealdb_recipe_demo_dataset.egg-info/
+.github/
