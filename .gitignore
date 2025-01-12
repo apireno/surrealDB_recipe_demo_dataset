@@ -7,3 +7,7 @@ data/glove.6B.50d.txt
 **/__pycache__/
 .DS_Store
 src/
+surrealdb_recipe_demo_dataset.egg-info/top_level.txt
+surrealdb_recipe_demo_dataset.egg-info/SOURCES.txt
+surrealdb_recipe_demo_dataset.egg-info/PKG-INFO
+surrealdb_recipe_demo_dataset.egg-info/dependency_links.txt

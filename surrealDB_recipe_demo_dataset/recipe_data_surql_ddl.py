@@ -43,7 +43,7 @@ class RecipeDataSurqlDDL:
         FIELDS review_text SEARCH ANALYZER snowball_analyzer BM25;
 
         REMOVE INDEX IF EXISTS idx_review_text ON TABLE review;
-        DEFINE INDEX idx_review_text ON TABLE review FIELDS review_text_embedding HNSW DIMENSION 50 M 32 EFC 300;
+        DEFINE INDEX idx_review_text ON TABLE review FIELDS review_text_embedding HNSW DIMENSION {embed_dimensions} M 32 EFC 300;
 
     """
 
@@ -61,7 +61,7 @@ class RecipeDataSurqlDDL:
     DDL_SEARCH_FUNCTIONS = """
 
     DEFINE FUNCTION OVERWRITE fn::steps_that_use_ingredient_from_recipe_text_search($recipe: record<recipe>, 
-    $ingredient: record<ingredient>) {
+    $ingredient: record<ingredient>) {{
         LET $full_text_results = (
             SELECT id, step_description, search::score(1) AS relevance
             FROM step            
@@ -70,10 +70,10 @@ class RecipeDataSurqlDDL:
             ORDER BY relevance DESC
         ); 
         RETURN $full_text_results;
-    };
+    }};
 
     DEFINE FUNCTION OVERWRITE fn::steps_that_use_ingredient_from_recipe_vector_search($recipe: record<recipe>, 
-    $ingredient: record<ingredient>) {
+    $ingredient: record<ingredient>) {{
         LET $semantic_results = (
             SELECT id, vector::distance::knn() as distance
             FROM step
@@ -82,11 +82,11 @@ class RecipeDataSurqlDDL:
             ORDER BY distance
         );
         RETURN $semantic_results;
-    };
+    }};
 
 
     DEFINE FUNCTION OVERWRITE fn::steps_that_use_ingredient_from_recipe($recipe: record<recipe>, 
-    $ingredient: record<ingredient>,$full_text_weight: float, $rrf_k: int) {
+    $ingredient: record<ingredient>,$full_text_weight: float, $rrf_k: int) {{
         LET $match_count = 100;
         LET $semantic_weight = 1 - $full_text_weight;
         LET $full_text_results = fn::steps_that_use_ingredient_from_recipe_text_search(
@@ -113,12 +113,12 @@ class RecipeDataSurqlDDL:
             LIMIT $match_count
         );
         
-    };
+    }};
 
     
 
     DEFINE FUNCTION OVERWRITE fn::steps_that_use_action_text_search(
-    $action: record<cooking_action>) {
+    $action: record<cooking_action>) {{
         LET $full_text_results = (
             SELECT id, search::score(1) AS relevance
             FROM step            
@@ -126,11 +126,11 @@ class RecipeDataSurqlDDL:
             ORDER BY relevance DESC
         ); 
         RETURN $full_text_results;
-    };
+    }};
 
     DEFINE FUNCTION OVERWRITE fn::steps_that_use_action_from_recipe_text_search( 
     $recipe: record<recipe>,
-    $action: record<cooking_action>) {
+    $action: record<cooking_action>) {{
         LET $full_text_results = (
             SELECT id, step_description, search::score(1) AS relevance
             FROM step            
@@ -139,12 +139,12 @@ class RecipeDataSurqlDDL:
             ORDER BY relevance DESC
         ); 
         RETURN $full_text_results;
-    };
+    }};
 
 
     DEFINE FUNCTION OVERWRITE fn::steps_that_use_action_from_recipe_vector_search( 
     $recipe: record<recipe>,
-    $action: record<cooking_action>) {
+    $action: record<cooking_action>) {{
         LET $semantic_results = (
             SELECT id, vector::distance::knn() as distance
             FROM step
@@ -153,12 +153,12 @@ class RecipeDataSurqlDDL:
             ORDER BY distance
         );
         RETURN $semantic_results;
-    };
+    }};
 
 
     DEFINE FUNCTION OVERWRITE fn::steps_that_use_action_from_recipe( 
     $recipe: record<recipe>,
-    $action: record<cooking_action>,$full_text_weight: float, $rrf_k: int) {
+    $action: record<cooking_action>,$full_text_weight: float, $rrf_k: int) {{
         LET $match_count = 100;
         LET $semantic_weight = 1 - $full_text_weight;
         LET $full_text_results = fn::steps_that_use_action_from_recipe_text_search(
@@ -183,56 +183,56 @@ class RecipeDataSurqlDDL:
             LIMIT $match_count
         );
         
-    };
+    }};
 
     """
 
     # DDL_STEP_EMBEDDING_EVENT = """
     #     DEFINE EVENT OVERWRITE update_step_description_embedding ON TABLE step WHEN 
-    #         $before.step_description != $after.step_description THEN {
+    #         $before.step_description != $after.step_description THEN {{
     #         UPDATE 
     #             $this    
     #         SET step_description_embedding = fn::sentence_to_vector($after.step_description);
-    #     };
+    #     }};
     #     """
     # DDL_RECIPE_EMBEDDING_EVENT = """
 
     #     DEFINE EVENT OVERWRITE update_recipe_description_embedding ON TABLE recipe WHEN 
-    #         $before.description != $after.description THEN {
+    #         $before.description != $after.description THEN {{
     #         UPDATE 
     #             $this    
     #         SET description_embedding = fn::sentence_to_vector($after.description);
-    #     };
+    #     }};
     #     """
 
     # DDL_REVIEW_EMBEDDING_EVENT = """
     #     DEFINE EVENT OVERWRITE update_review_text_embedding ON TABLE review WHEN 
-    #         $before.review_text != $after.review_text THEN {
+    #         $before.review_text != $after.review_text THEN {{
     #         UPDATE 
     #             $this    
     #         SET review_text_embedding = fn::sentence_to_vector($after.review_text);
-    #     };
+    #     }};
     #     """
     
 
     # DDL_ACTION_EMBEDDING_EVENT = """
       
     #     DEFINE EVENT OVERWRITE update_action_embedding ON TABLE cooking_action WHEN 
-    #         $before.name != $after.name THEN {
+    #         $before.name != $after.name THEN {{
     #         UPDATE 
     #             $this    
     #         SET action_embedding = fn::sentence_to_vector($after.name);
-    #     };
+    #     }};
     #     """
     
     # DDL_INGREDIENT_EMBEDDING_EVENT = """
       
     #     DEFINE EVENT OVERWRITE update_ingredient_embedding ON TABLE ingredient WHEN 
-    #         $before.name != $after.name THEN {
+    #         $before.name != $after.name THEN {{
     #         UPDATE 
     #             $this    
     #         SET ingredient_embedding = fn::sentence_to_vector($after.name);
-    #     };
+    #     }};
     #     """
 
     # DDL_EMBEDDING_EVENTS = DDL_STEP_EMBEDDING_EVENT + DDL_RECIPE_EMBEDDING_EVENT + DDL_REVIEW_EMBEDDING_EVENT + DDL_ACTION_EMBEDDING_EVENT + DDL_INGREDIENT_EMBEDDING_EVENT
@@ -245,17 +245,17 @@ class RecipeDataSurqlDDL:
         DEFINE FIELD word ON embedding_model TYPE string;
         DEFINE FIELD embedding ON embedding_model TYPE array<float>;
 
-        DEFINE FUNCTION OVERWRITE fn::sentence_to_vector($sentence: string) {
+        DEFINE FUNCTION OVERWRITE fn::sentence_to_vector($sentence: string) {{
             LET $vector_size = (SELECT VALUE array::len(embedding) FROM embedding_model LIMIT 1)[0];
             
             LET $words = string::lowercase($sentence).split(" ");
             LET $words = array::filter($words, |$word| $word != "");
-            LET $vectors = array::map($words, |$word| {
+            LET $vectors = array::map($words, |$word| {{
                 RETURN (SELECT VALUE embedding FROM type::thing("embedding_model",$word))[0];
-            });
+            }});
 
             
-            LET $vectors = array::filter($vectors, |$v| { RETURN $v != NONE; });
+            LET $vectors = array::filter($vectors, |$v| {{ RETURN $v != NONE; }});
             LET $transposed = array::transpose($vectors);
             LET $sum_vector = $transposed.map(|$sub_array| math::sum($sub_array));
             
@@ -263,10 +263,10 @@ class RecipeDataSurqlDDL:
             LET $mean_vector = vector::scale($sum_vector, 1.0f / array::len($vectors));
 
             RETURN 
-                IF array::len($mean_vector) == $vector_size {$mean_vector}
-                ELSE {array::repeat(0,$vector_size)}
+                IF array::len($mean_vector) == $vector_size {{$mean_vector}}
+                ELSE {{array::repeat(0,$vector_size)}}
                 ;
-        };
+        }};
 
     """
 
@@ -323,7 +323,7 @@ class RecipeDataSurqlDDL:
     
     
     REMOVE INDEX IF EXISTS idx_step_description ON TABLE step;
-    DEFINE INDEX idx_step_description ON TABLE step FIELDS step_description_embedding HNSW DIMENSION 50 M 32 EFC 300;
+    DEFINE INDEX idx_step_description ON TABLE step FIELDS step_description_embedding HNSW DIMENSION {embed_dimensions} M 32 EFC 300;
     """
     DDL_STEP = DDL_STEP_WO_EMBEDDING_EVENTS #+ DDL_STEP_EMBEDDING_EVENT
 
@@ -364,7 +364,7 @@ class RecipeDataSurqlDDL:
 
 
     REMOVE INDEX IF EXISTS idx_step_description ON TABLE recipe;
-    DEFINE INDEX idx_recipe_description ON TABLE recipe FIELDS description_embedding HNSW DIMENSION 50 M 32 EFC 300;
+    DEFINE INDEX idx_recipe_description ON TABLE recipe FIELDS description_embedding HNSW DIMENSION {embed_dimensions} M 32 EFC 300;
 
 
 

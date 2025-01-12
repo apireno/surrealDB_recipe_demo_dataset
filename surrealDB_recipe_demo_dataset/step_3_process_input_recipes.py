@@ -12,6 +12,7 @@ from surrealDB_embedding_model.embedding_model_constants import EmbeddingModelCo
 from recipe_data_constants import RecipeDataConstants, RecipeArgsLoader
 from surql_recipes_steps import SurqlRecipesAndSteps
 from recipe_data_surql_ddl import RecipeDataSurqlDDL
+from surrealDB_embedding_model.surql_embedding_model import SurqlEmbeddingModel
 
 out_folder = THIS_FOLDER + "/process_recipes_{0}".format(time.strftime("%Y%m%d-%H%M%S"))
 db_constants = DatabaseConstants()
@@ -112,8 +113,14 @@ async def process_recipes(recipe_df,batch_size=1,total_records=0,offset=0):
         auth_token = await db.sign_in(db_constants.DB_PARAMS.username,db_constants.DB_PARAMS.password)
         await db.use(db_constants.DB_PARAMS.namespace, db_constants.DB_PARAMS.database)
 
-        out = await db.query(RecipeDataSurqlDDL.DDL_STEP)
-        out = await db.query(RecipeDataSurqlDDL.DDL_RECIPE)
+
+
+        embedDataProcessor = SurqlEmbeddingModel(db)
+        embed_dimensions = await embedDataProcessor.get_model_dimensions()
+        
+
+        out = await db.query(RecipeDataSurqlDDL.DDL_STEP.format(embed_dimensions=embed_dimensions))
+        out = await db.query(RecipeDataSurqlDDL.DDL_RECIPE.format(embed_dimensions=embed_dimensions))
 
         #dataProcessor = SurqlRecipesAndSteps(db,embeddingModel)
         dataProcessor = SurqlRecipesAndSteps(db)

@@ -50,15 +50,20 @@ class RecipeArgsLoader(ArgsLoader):
         super().__init__(description,db_constants,embed_constants)
         self.recipe_data_constants = recipe_data_constants
         self.recipe_data_constants.AddArgs(self.parser)
-        #for developing edit the settings here to avoid using CLI
-        #self.db_constants.DB_PARAMS.url = "ws://0.0.0.0:8080"
-        #self.db_constants.DB_PARAMS.database = "test2"
+
 
     def LoadArgs(self):
         
         super().LoadArgs()
 
         self.recipe_data_constants.SetArgs(self.args)
+
+        
+        #for developing edit the settings here to avoid using CLI
+        # self.db_constants.DB_PARAMS.url = "ws://0.0.0.0:8080"
+        # self.db_constants.DB_PARAMS.namespace = "embedding_example"
+        # self.db_constants.DB_PARAMS.database = "custom_recipe_embedding"
+        # self.recipe_data_constants.RECIPE_SAMPLE_RATIO = 0.01
 
 
     

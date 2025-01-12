@@ -9,7 +9,7 @@ class SurqlReviewsAndReviewers:
     LET $this_object = type::thing("reviewer",$reviewer_id);
     UPSERT $this_object CONTENT {{
         name : $name
-        }};
+        }} RETRUN NONE;
     """
 
     INSERT_REVIEW = """
@@ -26,7 +26,7 @@ class SurqlReviewsAndReviewers:
         rating : $rating,
         review_text : $review_text,
         review_text_embedding : $review_text_embedding
-        }};
+        }} RETURN NONE;
     """
 
 
@@ -46,8 +46,10 @@ class SurqlReviewsAndReviewers:
         rating : $rating,
         review_text : $review_text,
         review_text_embedding : $review_text_embedding
-        }};
+        }} RETURN NONE;
     """
+
+
 
     def __init__(self,db: AsyncSurrealDB,embeddingModel: EmbeddingModel = None):
         self.db = db

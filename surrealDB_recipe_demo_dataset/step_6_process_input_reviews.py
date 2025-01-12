@@ -12,6 +12,7 @@ from recipe_data_constants import RecipeDataConstants, RecipeArgsLoader
 from surql_recipes_steps import SurqlRecipesAndSteps
 from surql_reviews import SurqlReviewsAndReviewers
 from recipe_data_surql_ddl import RecipeDataSurqlDDL
+from surrealDB_embedding_model.surql_embedding_model import SurqlEmbeddingModel
 
 
 
@@ -120,9 +121,9 @@ async def process_review(dataProcessor:SurqlReviewsAndReviewers,row,counter,tota
 
 
 
-async def process_reviews(review_df,batch_size=1,total_records=0,offset=0):
-    if total_records==0 :
-        total_records = len(review_df)
+async def process_reviews(review_df):
+
+    total_records = len(review_df)
 
     
     start_time = time.time()
@@ -136,12 +137,12 @@ async def process_reviews(review_df,batch_size=1,total_records=0,offset=0):
 
 
         dataProcessor = SurqlReviewsAndReviewers(db)
+        i = 0
+        for row in review_df.itertuples():
+            i += 1
+            await process_review(dataProcessor,row,i,total_records,start_time) 
 
-        for i in range(offset, total_records, batch_size):
             
-            batch = review_df[i : i + batch_size].itertuples()
-            tasks = [process_review(dataProcessor,row,i,total_records,start_time) for row in batch]
-            await asyncio.gather(*tasks)
 
 
         
@@ -196,8 +197,16 @@ async def main():
         auth_token = await db.sign_in(db_constants.DB_PARAMS.username,db_constants.DB_PARAMS.password)
         await db.use(db_constants.DB_PARAMS.namespace, db_constants.DB_PARAMS.database)
 
+
+
+
+        embedDataProcessor = SurqlEmbeddingModel(db)
+        embed_dimensions = await embedDataProcessor.get_model_dimensions()
+        
+
         out = await db.query(RecipeDataSurqlDDL.DDL_REVIEWER)
-        out = await db.query(RecipeDataSurqlDDL.DDL_REVIEW)
+        out = await db.query(RecipeDataSurqlDDL.DDL_REVIEW.format(embed_dimensions=embed_dimensions))
+
         
         recipeDataProcessor = SurqlRecipesAndSteps(db)
         reviewDataProcessor = SurqlReviewsAndReviewers(db)

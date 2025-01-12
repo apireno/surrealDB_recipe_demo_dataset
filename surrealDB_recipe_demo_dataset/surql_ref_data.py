@@ -59,8 +59,8 @@ class SurqlReferenceData:
   UPSERT $this_object  CONTENT {{
       name : $action,
       action_embedding:  $action_embedding
-      }};
-  RELATE $this_object ->action_is_type_of-> $parent_object;
+      }} RETURN NONE;
+  RELATE $this_object ->action_is_type_of-> $parent_object RETURN NONE;
 
   """
   
@@ -73,8 +73,8 @@ class SurqlReferenceData:
   UPSERT $this_object  CONTENT {{
       name : $action,
       action_embedding:  $action_embedding
-      }};
-  RELATE $this_object ->action_is_type_of-> $parent_object;
+      }} RETURN NONE;
+  RELATE $this_object ->action_is_type_of-> $parent_object RETURN NONE;
 
   """
 
@@ -83,7 +83,7 @@ class SurqlReferenceData:
   UPSERT $this_object CONTENT {{
       name : $ingredient,
       ingredient_embedding:  $ingredient_embedding
-      }};
+      }} RETURN NONE;
   """
 
   INSERT_INGREDIENT_CALC_EMBEDDING = """
@@ -93,7 +93,7 @@ class SurqlReferenceData:
   UPSERT $this_object CONTENT {{
       name : $ingredient,
       ingredient_embedding:  $ingredient_embedding
-      }};
+      }} RETURN NONE;
   """
 
   SELECT_ALL_INGREDIENTS = """
