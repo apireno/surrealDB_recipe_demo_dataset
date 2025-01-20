@@ -31,24 +31,6 @@ class SurqlReviewsAndReviewers:
 
 
 
-    INSERT_REVIEW_CALC_EMBEDDING = """
-    LET $reviewer_object = type::thing("reviewer",$reviewer_id);
-    LET $recipe_object = type::thing("recipe",$recipe_id);
-    LET $review_text_embedding = fn::sentence_to_vector($review_text);
-
-
-    RELATE $reviewer_object -> review -> $recipe_object
-    CONTENT {{
-        time :{{
-            submitted : <datetime>$time_submitted,
-            updated : <datetime>$time_updated
-        }},
-        rating : $rating,
-        review_text : $review_text,
-        review_text_embedding : $review_text_embedding
-        }} RETURN NONE;
-    """
-
 
 
     def __init__(self,db: AsyncSurrealDB,embeddingModel: EmbeddingModel = None):

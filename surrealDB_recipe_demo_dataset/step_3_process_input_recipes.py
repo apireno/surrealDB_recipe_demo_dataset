@@ -14,11 +14,11 @@ from surql_recipes_steps import SurqlRecipesAndSteps
 from recipe_data_surql_ddl import RecipeDataSurqlDDL
 from surrealDB_embedding_model.surql_embedding_model import SurqlEmbeddingModel
 
-out_folder = THIS_FOLDER + "/process_recipes_{0}".format(time.strftime("%Y%m%d-%H%M%S"))
+out_folder = THIS_FOLDER + "/logging/process_recipes_{0}".format(time.strftime("%Y%m%d-%H%M%S"))
 db_constants = DatabaseConstants()
 embed_constants = EmbeddingModelConstants()
 recipe_constants = RecipeDataConstants()
-args_loader = RecipeArgsLoader("Input recipes and steps",db_constants,embed_constants,recipe_constants)
+args_loader = RecipeArgsLoader("STEP 3 Input recipes and steps into DB",db_constants,embed_constants,recipe_constants)
 args_loader.LoadArgs()
 
 
@@ -192,39 +192,8 @@ async def main():
 
 
     
-    print("""
-          STEP 3 recipes
-          DB_PARAMS {URL} N: {NS} DB: {DB} USER: {DB_USER}
-
-          DB_USER_ENV_VAR {DB_USER_ENV_VAR}
-          DB_PASS_ENV_VAR {DB_PASS_ENV_VAR}
-
-          MODEL_PATH {MODEL_PATH}
-
-          RECIPE_FILE {RECIPE_FILE}
-          REVIEW_FILE {REVIEW_FILE}
-
-          PREV_EXTRACTED_INGREDIENTS_FILE {PREV_EXTRACTED_INGREDIENTS_FILE}
-
-          RECIPE_SAMPLE_RATIO {RECIPE_SAMPLE_RATIO}
-          REVIEW_SAMPLE_RATIO {REVIEW_SAMPLE_RATIO}
-
-          """.format(
-              URL = db_constants.DB_PARAMS.url,
-              DB_USER = db_constants.DB_PARAMS.username,
-              NS = db_constants.DB_PARAMS.namespace,
-              DB = db_constants.DB_PARAMS.database,
-              DB_USER_ENV_VAR = db_constants.DB_USER_ENV_VAR,
-              DB_PASS_ENV_VAR = db_constants.DB_PASS_ENV_VAR,
-              MODEL_PATH = embed_constants.MODEL_PATH,
-              RECIPE_FILE = recipe_constants.RECIPE_FILE,
-              REVIEW_FILE = recipe_constants.REVIEW_FILE,
-              PREV_EXTRACTED_INGREDIENTS_FILE = recipe_constants.PREV_EXTRACTED_INGREDIENTS_FILE,
-              RECIPE_SAMPLE_RATIO = recipe_constants.RECIPE_SAMPLE_RATIO,
-              REVIEW_SAMPLE_RATIO = recipe_constants.REVIEW_SAMPLE_RATIO
-
-          )
-          )
+    
+    args_loader.print()
     
     recipe_df = pd.read_csv(recipe_constants.RECIPE_FILE)
 

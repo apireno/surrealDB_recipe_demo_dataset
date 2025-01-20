@@ -27,7 +27,7 @@ async def main():
           RECIPE_FILE {RECIPE_FILE}
           REVIEW_FILE {REVIEW_FILE}
 
-          PREV_EXTRACTED_INGREDIENTS_FILE {PREV_EXTRACTED_INGREDIENTS_FILE}
+          EXTRACTED_INGREDIENTS_FILE {EXTRACTED_INGREDIENTS_FILE}
 
           RECIPE_SAMPLE_RATIO {RECIPE_SAMPLE_RATIO}
           REVIEW_SAMPLE_RATIO {REVIEW_SAMPLE_RATIO}
@@ -42,7 +42,7 @@ async def main():
               MODEL_PATH = embed_constants.MODEL_PATH,
               RECIPE_FILE = recipe_constants.RECIPE_FILE,
               REVIEW_FILE = recipe_constants.REVIEW_FILE,
-              PREV_EXTRACTED_INGREDIENTS_FILE = recipe_constants.PREV_EXTRACTED_INGREDIENTS_FILE,
+              EXTRACTED_INGREDIENTS_FILE = recipe_constants.EXTRACTED_INGREDIENTS_FILE,
               RECIPE_SAMPLE_RATIO = recipe_constants.RECIPE_SAMPLE_RATIO,
               REVIEW_SAMPLE_RATIO = recipe_constants.REVIEW_SAMPLE_RATIO
 

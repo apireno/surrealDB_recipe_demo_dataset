@@ -1,1266 +1,994 @@
-7up
-absinthe
-aburage
-achiote
-ackee
-acorn
-advocaat
-agar
-agave
-aioli
-ajinomoto
-ajwain
-alcohol
-ale
-alfalfa
-almond
-aloe
-alum
-amaranth
-amaretto
-amino
-ammonia
-anchovy
-angelica
-anglaise
-anise
-apple
-applejack
-apricot
-aquavit
-aril
-armagnac
-arrowroot
-artichoke
-arugula
-asparagus
-aubergine
-avocado
-bacon
-bag
-bagel
-baguette
-baharat
-baking soda
-ball
-balm
-baloney
-balsamico
-banana
-bar
-barbecue
-barberry
-bark
-barley
-basil
-bass
-batter
-bay
-bean
-bear
-beef
-beef broth
-beer
-beet
-bellflower
-berry
-besan
-beverage
-biscotti
-biscuit
-bisque
-bisto
-bit
-bite
-blackberry
-blade
-blanc
-bleach
-blend
-blintz
-blood
-blossom
-blueberry
-bluefish
-boar
-board
-bocconcini
-bockwurst
-bok choy
-bologna
-bone
-boniato
-borage
-borax
-bottle
-bottlegourd
-bouillon
-boule
-bouquet
-bourbon
-bowl
-boysenberry
-brain
-bran
-branch
-brandewijn
-brandy
-bratwurst
-bread
-bread cube
-bread stick
-breadcrumb
-breadfruit
-breading
-bream
-breast
-bresaola
-brew
-brickle
-brie
-brine
-brinjal
-brisket
-brittle
-broccoflower
-broccoli
-broccosprout
-broil
-broiler
-broth
-brownie
-bruschetta
-bubble
-bucket
-bud
-buffalo
-bug
-bulb
-bulgur
-bullion
-bun
-burger
-burghul
-burgundy
-burnet
-burrito
-butter
-butterfish
-buttermilk
-butterscotch
-cabbage
-cacao
-cachaca
-cachous
-caciocavallo
-cactus
-cafe
-cake
-cake mix
-calamari
-callaloo
-candy
-candy bar
-cane
-cantaloupe
-capellini
-caper
-caperberry
-capicola
-capon
-caponata
-capsicum
-carambola
-caramel
-caraway
-caraway seed
-carcass
-cardamom
-caribou
-carne
-carp
-carrot
-case
-cashew
-casing
-cassava
-cassia
-catfish
-catnip
-catsup
-cauliflower
-cavatappi
-cavatelli
-caviar
-cavolo
-cayenne
-celery
-cep
-cereal
-certo
-chablis
-chamomile
-champagne
-chana
-chapati
-char
-charcoal
-chard
-chayote
-cheddar
-cheddarwurst
-cheek
-cheerio
-cheese
-cheese blend
-cheese dip
-cheese spread
-cheesecake
-cheesecloth
-cherimoya
-chermoula
-cherry
-cherry juice
-chervil
-chestnut
-chex
-chicken
-chicken base
-chicken breast
-chicken broth
-chickpea
-chicory
-chiffonade
-chile
-chili
-chili paste
-chili powder
-chili sauce
-chip
-chitterling
-chive
-chocolate
-chocolate bar
-chocolate chip
-chocolate powder
-choi
-chokos
-chop
-chorizo
-chourico
-chow
-chow mein
-chowder
-choy
-chuck
-chunk
-chutney
-ciabatta
-cider
-cider mix
-cilantro
-cinnamon
-citron
-clam
-claw
-cleaner
-clementine
-cloth
-cloudberry
-clove
-coating
-cob
-coca-cola
-cochineal
-cockle
-cocktail
-cocoa
-cocoa mix
-cocoa powder
-coconut
-coconut milk
-cod
-coffee
-cognac
-coin
-coke
-cola
-colby
-coleslaw
-coloring
-comb
-compote
-concentrate
-conch
-condiment
-conditioner
-cone
-confit
-conserve
-consomme
-container
-cookie
-cookie dough
-cool whip
-cooler
-copha
-coppa
-coral
-cordial
-coriander
-corn
-corn cob
-corn syrup
-cornbread
-cornflour
-cornichon
-cornmeal
-cornstarch
-cottage cheese
-courgette
-couscous
-crab
-crab stick
-crabapple
-crabmeat
-cracker
-crackling
-craisin
-cranberry
-crawfish
-crayfish
-cream
-cream cheese
-creamer
-crema
-creme
-cremora
-crepe
-cress
-crevette
-crickets
-crisco
-crispbread
-crispins
-croissant
-crostini
-croutettes
-crouton
-crudites
-crumb
-crumpet
-crush
-crust
-crystal
-cube
-cucumber
-cucuzza
-cuitlacoche
-culantro
-cumin
-cumin seed
-cup
-cupcake
-curacao
-curd
-curl
-currant
-curry
-cushaw
-custard
-cutlet
-cutter
-cuttlefish
-dab
-dahl
-daikon
-daiquiri
-dal
-damson
-dashi
-dashida
-date
-decoration
-deer
-delight
-demi-glace
-dessert
-detergent
-dew
-dewberry
-dhal
-dill
-dinner
-dip
-ditalini
-dog
-dorito
-dough
-doughnut
-dove
-dragees
-drambuie
-draught
-dressing
-dressing mix
-drink
-drink mix
-dripping
-drumstick
-dubonnet
-duck
-duckling
-dud
-dumpling
-durian
-dust
-ear
-earth
-edamame
-eel
-egg
-egg substitute
-eggnog
-eggplant
-eggshell
-elbow
-elderberry
-elephant
-elk
-emulsion
-endive
-epice
-erythritol
-escalope
-escarole
-espresso
-essence
-extract
-eye
-farfel
-farina
-farm
-farro
-fat
-fennel
-fennel seed
-fenugreek
-feta
-fettuccine
-fiddlehead
-fideo
-fig
-filbert
-file
-filet
-filling
-filter
-finger
-fish
-fish flake
-flake
-flavor
-flax seed
-flounder
-flour
-flower
-foie
-foil
-fondant
-food
-foot
-formula
-fowl
-frank
-frankfurter
-freekeh
-frichik
-fries
-frog
-fromage
-frosting
-frosting mix
-fructevia
-fructose
-fruit
-fruitcake
-fry
-fryer
-frypowder
-fudge
-fudgsicle
-fumet
-fungi
-fusilli
-gai
-galangal
-galliano
-gallo
-game
-ganache
-garlic
-gatorade
-gel
-gelatin
-germ
-ghee
-gherkin
-giardiniera
-giblet
-gin
-ginger
-gizzard
-glass
-glitter
-glucomannan
-glucose
-glue
-glutamate
-gluten
-glycerin
-gnocchi
-goat
-gochujang
-gold
-goose
-gooseberry
-gourd
-goya
-graham
-grain
-gram
-granadilla
-granola
-grape
-grapefruit
-grappa
-grass
-gravlax
-gravox
-gravy
-grease
-greens
-grenadine
-grit
-groat
-grouper
-grouse
-gruyere
-guava
-guavaberry
-gum
-gum arabic
-gumdrop
-gur
-habanero
-haddock
-haggis
-hake
-halibut
-halva
-ham
-hamburger
-hare
-harina
-harissa
-hash
-havarti
-hazelnut
-head
-heart
-hen
-herb
-herring
-hing
-hock
-hole
-hominy
-honey
-honeydew
-hop
-horseradish
-hot dog
-huckleberry
-hummus
-husk
-ice
-ice cream
-icing
-ink
-jackfruit
-jaggery
-jalapeno
-jam
-jar
-javitri
-jelly
-jellyfish
-jerky
-jicama
-joint
-jowl
-juice
-jujube
-kahlua
-kale
-kalonji
-kangkong
-karo
-kasha
-kashk
-kebbeh
-kefalotyri
-kefir
-kelp
-kernel
-ketchup
-khoya
-khs
-kidney
-kielbasa
-kimchi
-kimion
-kingfish
-kishke
-kiwi
-knackwurst
-knuckle
-kohlrabi
-kokum
-kombu
-kombucha
-konjac
-kool aid
-kremelta
-krispies
-kudzu
-kumara
-kumquat
-kvas
-labneh
-ladyfinger
-lamb
-lamington
-lamunchi
-langoustine
-lard
-lardon
-lasagna
-latte
-lauki
-lavender
-leaf
-leche
-lecithin
-leek
-leg
-lemon
-lemon grass
-lemonade
-lemonyrass
-lentil
-lettuce
-licorice
-liempo
-lime
-limeade
-limoncello
-lingonberry
-linguine
-liqueur
-liquid
-liquor
-litchi
-liver
-liverwurst
-loaf
-lobster
-log
-loin
-lollipop
-longan
-loquat
-lotion
-lovage
-lox
-lutefisk
-lychee
-lye
-maca
-macadamia
-macaroni
-macaroon
-mace
-mackerel
-mahi
-mahlab
-maifun
-malanga
-malt
-maltesers
-maltitol
-maltose
-manchego
-mangetout
-mango
-manicotti
-mapleine
-margarine
-marigold
-marinade
-marionberry
-marjoram
-marmalade
-marmite
-marnier
-marrow
-marsala
-marshmallow
-marzipan
-masala
-masarepa
-mash
-mastic
-mate
-matzo
-mavrothaphne
-mawa
-mayonnaise
-maypo
-meal
-mealmaker
-meat
-meat substitute
-meatball
-meatloaf
-medallion
-medley
-melon
-melt
-menthe
-meringue
-merlot
-mesclun
-methi
-mettwurst
-mexicorn
-miao
-mignon
-milk
-millet
-milo
-mince
-mincemeat
-mint
-mirepoix
-mirliton
-miso
-mist
-mix
-mixer
-mixture
-molasses
-mold
-moose
-morel
-morsel
-mortadella
-moto
-mousse
-mouthwash
-mozzarella
-msg
-muesli
-muffin
-mulberry
-mullet
-mush
-mushroom
-muskellunge
-muskmelon
-mussel
-mustard
-mustard powder
-mustard seed
-mutton
-myrtle
-namak
-napkin
-nashi
-navel
-neck
-nectar
-nectarine
-needle
-nepitella
-nest
-nettle
-nib
-niblet
-nigari
-nip
-nonpareil
-noodle
-nopal
-nori
-noyaux
-nugget
-nut
-nutella
-nutmeat
-nutmeg
-oat
-octopus
-oil
-okra
-olive
-onion
-orange
-orchid
-oregano
-oreo
-orzo
-ouzo
-oxtail
-oyster
-pack
-padano
-pak choi
-palm
-pancake
-pancetta
-paneer
-panettone
-panko
-papaya
-paper
-pappadam
-paprika
-parmesan
-parsley
-parsnip
-partridge
-passata
-pasta
-paste
-pastis
-pastrami
-pastry
-pasty
-pate
-patty
-pawpaw
-pea
-peach
-peanut
-peapod
-pear
-pearl
-pecan
-pectin
-peel
-penne
-pepita
-pepper
-peppercorn
-peppermint
-pepperoni
-pepsi
-perch
-perciatelli
-perejil
-perogy
-peroxide
-persimmon
-pesto
-petal
-pheasant
-pickerel
-pickle
-pie
-piece
-pierogi
-pig
-pigeon
-pike
-pilaf
-pilchard
-pimento
-pineapple
-pineau
-pisco
-pistachio
-pita
-pitaya
-pizza
-plaice
-plantain
-plate
-plum
-pocket
-pod
-poha
-point
-pois
-polenta
-pomegranate
-popcorn
-pork
-port
-posole
-pot
-potash
-potato
-potpourri
-poultry
-powder
-praline
-prawn
-preserve
-presunto
-pretzel
-pringles
-prosciutto
-prosecco
-protein
-prune
-psyllium
-pudding
-puff pastry
-pulp
-pumpkin
-punch
-puree
-purslane
-qatayef
-quahogs
-quail
-quark
-queso
-quince
-quinoa
-quorn
-rabbit
-raccoon
-radiatore
-radicchio
-radish
-raisin
-raita
-rajma
-ram
-rambutan
-ramen
-ramp
-ranch
-rapini
-raspberry
-ratafia
-rava
-raviole
-recaito
-recipe
-redfish
-relish
-rennet
-rhizome
-rhubarb
-rib
-rice
-ricotta
-rigatoni
-rind
-ring
-risoni
-roast
-rocket
-rockfish
-roe
-roll
-romanesco
-root
-rose
-rosemary
-rotel
-rotini
-roughy
-roux
-rucola
-rue
-rum
-rusk
-rutabaga
-rye
-saba
-saffron
-sage
-sago
-sake
-salad
-salami
-salmon
-salsa
-salsify
-salt
-saltine
-saltpeter
-sambal
-sambuca
-samp
-sandwich
-sangria
-sansho
-sapodilla
-sardine
-sauce
-sauerkraut
-sausage
-sauterne
-savoiardi
-sazon
-scallion
-scallop
-scampi
-schnapps
-schnitzel
-scone
-scotch
-scuppernong
-seafood
-seaweed
-seed
-segment
-seitan
-seltzer
-semolina
-serrano
-sesame
-shallot
-shank
-shark
-shell
-sherbet
-sherry
-shin
-shochu
-shortbread
-shortcake
-shortening
-shoulder
-shoyu
-shrimp
-sirloin
-skate
-skewer
-skillet
-skin
-slaw
-slice
-sloes
-smelt
-smoke
-snack
-snail
-snapper
-snow
-soap
-soda
-softener
-sole
-soppressata
-sorbet
-sorghum
-sorrel
-souffle
-soup
-soy
-soybean
-soymilk
-spaghetti
-spam
-sparerib
-spearmint
-speck
-speculaas
-spelt
-spice
-spinach
-spirulina
-splenda
-spoon
-spray
-spread
-sprig
-sprinkle
-sprite
-sprout
-spumanti
-squab
-square
-squash
-squid
-squirrel
-starch
-starter
-steak
-stem
-stevia
-stew
-stick
-stingray
-stock
-stollen
-stout
-straw
-strawberry
-string
-strip
-strudel
-stuffing
-substitute
-sucanat
-succotash
-suet
-sugar
-sultana
-sumac
-sunflower
-supplement
-surimi
-swede
-sweetbread
-sweetcorn
-sweetener
-swordfish
-syrup
-tabbouleh
-tabil
-tablet
-taco
-tagliatelle
-tagliolini
-tahini
-tail
-tallow
-tamale
-tamari
-tamarillo
-tamarind
-tangelo
-tangerine
-tapioca
-taquito
-tarhana
-taro
-tarragon
-tart
-tartar
-tater
-tatsai
-tea
-teabag
-teff
-tempeh
-tenderloin
-tendril
-tequila
-terrapin
-thigh
-thread
-thyme
-tidbits
-tilapia
-tip
-toast
-tobiko
-toffee
-tofu
-togarashi
-tomatillo
-tomato
-tongue
-toothpick
-top
-tortellini
-tortiglioni
-tortilla
-tostada
-tot
-tournedos
-towel
-tragacanth
-treacle
-treat
-tripe
-triscuit
-trout
-truffle
-truvia
-tube
-tubetti
-tuna
-turkey
-turmeric
-turnip
-turtle
-twig
-twine
-twinkie
-twist
-tzatziki
-umbrella
-umeboshi
-v8
-vanilla
-veal
-vegemite
-vegeta
-vegetable
-veloute
-venison
-verbena
-verjuice
-vermicelli
-vermouth
-vinaigrette
-vinegar
-violet
-vodka
-wafer
-waffle
-walleye
-walnut
-wasabi
-water
-watermelon
-wattleseed
-wax
-wedge
-weed
-weetbix
-wheat
-wheatberry
-wheel
-whey
-whip
-whiskey
-whitebait
-whitefish
-wiener
-wine
-wing
-wonton
-woodruff
-worm
-wrap
-yabbies
-yam
-yeast
-yoghurt
-yolk
-yuzu
-zeera
-zest
-zinfandel
-ziti
-zucchini
+[
+{'ingredient':'7up','flavor':'sweet'},
+{'ingredient':'acid','flavor':'sour'},
+{'ingredient':'ade','flavor':'sweet'},
+{'ingredient':'agar','flavor':'N/A'},
+{'ingredient':'agave','flavor':'sweet'},
+{'ingredient':'alcohol','flavor':'N/A'},
+{'ingredient':'ale','flavor':'bitter'},
+{'ingredient':'alfredo sauce','flavor':'savory'},
+{'ingredient':'allspice','flavor':'spicy'},
+{'ingredient':'almond','flavor':'nutty'},
+{'ingredient':'aloe','flavor':'bitter'},
+{'ingredient':'amino acid','flavor':'N/A'},
+{'ingredient':'anchovy','flavor':'savory'},
+{'ingredient':'anise','flavor':'licorice'},
+{'ingredient':'annatto','flavor':'earthy'},
+{'ingredient':'apple','flavor':'sweet tart'},
+{'ingredient':'applesauce','flavor':'sweet'},
+{'ingredient':'apricot','flavor':'sweet'},
+{'ingredient':'artichoke','flavor':'savory'},
+{'ingredient':'asparagus','flavor':'bitter'},
+{'ingredient':'avocado','flavor':'creamy'},
+{'ingredient':'bacon','flavor':'salty smoky'},
+{'ingredient':'bagel','flavor':'savory'},
+{'ingredient':'baguette','flavor':'savory'},
+{'ingredient':'ball','flavor':'N/A'},
+{'ingredient':'banana','flavor':'sweet'},
+{'ingredient':'barbecue','flavor':'smoky sweet'},
+{'ingredient':'barley','flavor':'nutty'},
+{'ingredient':'basil','flavor':'savory'},
+{'ingredient':'bass','flavor':'savory'},
+{'ingredient':'batter','flavor':'N/A'},
+{'ingredient':'bay leaf','flavor':'savory'},
+{'ingredient':'bean','flavor':'earthy'},
+{'ingredient':'bean paste','flavor':'savory'},
+{'ingredient':'beef','flavor':'savory'},
+{'ingredient':'beer','flavor':'bitter'},
+{'ingredient':'beet','flavor':'earthy'},
+{'ingredient':'bell pepper','flavor':'sweet'},
+{'ingredient':'berry','flavor':'sweet tart'},
+{'ingredient':'beverage','flavor':'N/A'},
+{'ingredient':'biscuit','flavor':'savory'},
+{'ingredient':'biscuit dough','flavor':'savory'},
+{'ingredient':'bisque','flavor':'savory'},
+{'ingredient':'black bean','flavor':'earthy'},
+{'ingredient':'blackberry','flavor':'tart'},
+{'ingredient':'blackcurrant','flavor':'tart'},
+{'ingredient':'blend','flavor':'N/A'},
+{'ingredient':'blood orange','flavor':'sweet tart'},
+{'ingredient':'blueberry','flavor':'sweet tart'},
+{'ingredient':'boar','flavor':'savory'},
+{'ingredient':'bocconcini','flavor':'savory'},
+{'ingredient':'bockwurst','flavor':'savory'},
+{'ingredient':'bok choy','flavor':'savory'},
+{'ingredient':'bologna','flavor':'savory'},
+{'ingredient':'bone','flavor':'savory'},
+{'ingredient':'borage','flavor':'cucumber'},
+{'ingredient':'bottle','flavor':'N/A'},
+{'ingredient':'bouillon','flavor':'savory'},
+{'ingredient':'bourbon','flavor':'sweet'},
+{'ingredient':'boysenberry','flavor':'tart'},
+{'ingredient':'bran','flavor':'nutty'},
+{'ingredient':'brandy','flavor':'sweet'},
+{'ingredient':'bratwurst','flavor':'savory'},
+{'ingredient':'bread','flavor':'savory'},
+{'ingredient':'breadcrumb','flavor':'savory'},
+{'ingredient':'breading','flavor':'N/A'},
+{'ingredient':'breadstick','flavor':'savory'},
+{'ingredient':'bream','flavor':'savory'},
+{'ingredient':'breast','flavor':'savory'},
+{'ingredient':'bresaola','flavor':'savory'},
+{'ingredient':'brie','flavor':'nutty'},
+{'ingredient':'brine','flavor':'salty'},
+{'ingredient':'brisket','flavor':'savory'},
+{'ingredient':'broccoli','flavor':'savory'},
+{'ingredient':'broth','flavor':'savory'},
+{'ingredient':'brown rice','flavor':'nutty'},
+{'ingredient':'brownie','flavor':'sweet'},
+{'ingredient':'bruschetta','flavor':'savory'},
+{'ingredient':'buffalo','flavor':'savory'},
+{'ingredient':'bullion','flavor':'savory'},
+{'ingredient':'bun','flavor':'savory'},
+{'ingredient':'burger','flavor':'savory'},
+{'ingredient':'burrito','flavor':'savory'},
+{'ingredient':'butter','flavor':'creamy'},
+{'ingredient':'buttercream','flavor':'sweet'},
+{'ingredient':'butterfish','flavor':'savory'},
+{'ingredient':'buttermilk','flavor':'tangy'},
+{'ingredient':'cabbage','flavor':'savory'},
+{'ingredient':'cacao','flavor':'bitter'},
+{'ingredient':'cachaca','flavor':'sweet'},
+{'ingredient':'cake','flavor':'sweet'},
+{'ingredient':'cake mix','flavor':'sweet'},
+{'ingredient':'calamari','flavor':'savory'},
+{'ingredient':'callaloo','flavor':'savory'},
+{'ingredient':'calvados','flavor':'sweet'},
+{'ingredient':'candy','flavor':'sweet'},
+{'ingredient':'cane','flavor':'sweet'},
+{'ingredient':'cantaloupe','flavor':'sweet'},
+{'ingredient':'capellini','flavor':'N/A'},
+{'ingredient':'caper','flavor':'savory'},
+{'ingredient':'capsicum','flavor':'spicy'},
+{'ingredient':'caramel','flavor':'sweet'},
+{'ingredient':'caraway','flavor':'spicy'},
+{'ingredient':'cardamom','flavor':'spicy'},
+{'ingredient':'carrot','flavor':'sweet'},
+{'ingredient':'cashew','flavor':'nutty'},
+{'ingredient':'cassis','flavor':'tart'},
+{'ingredient':'catfish','flavor':'savory'},
+{'ingredient':'cauliflower','flavor':'savory'},
+{'ingredient':'cavatelli','flavor':'N/A'},
+{'ingredient':'caviar','flavor':'savory'},
+{'ingredient':'cayenne pepper','flavor':'spicy'},
+{'ingredient':'celeriac','flavor':'savory'},
+{'ingredient':'celery','flavor':'savory'},
+{'ingredient':'cep','flavor':'earthy'},
+{'ingredient':'cereal','flavor':'sweet'},
+{'ingredient':'chablis','flavor':'N/A'},
+{'ingredient':'challah','flavor':'savory'},
+{'ingredient':'chamomile','flavor':'floral'},
+{'ingredient':'champagne','flavor':'N/A'},
+{'ingredient':'chapati','flavor':'savory'},
+{'ingredient':'chard','flavor':'bitter earthy'},
+{'ingredient':'chayote','flavor':'mild'},
+{'ingredient':'cheese','flavor':'savory'},
+{'ingredient':'cherry','flavor':'sweet tart'},
+{'ingredient':'chervil','flavor':'anise'},
+{'ingredient':'chestnut','flavor':'sweet nutty'},
+{'ingredient':'chicken','flavor':'savory'},
+{'ingredient':'chickpea','flavor':'earthy'},
+{'ingredient':'chicory','flavor':'bitter'},
+{'ingredient':'chile','flavor':'spicy'},
+{'ingredient':'chili','flavor':'spicy'},
+{'ingredient':'chip','flavor':'savory'},
+{'ingredient':'chipotle','flavor':'smoky spicy'},
+{'ingredient':'chive','flavor':'onion'},
+{'ingredient':'chocolate','flavor':'sweet bitter'},
+{'ingredient':'chop','flavor':'N/A'},
+{'ingredient':'chorizo','flavor':'spicy savory'},
+{'ingredient':'chowder','flavor':'savory'},
+{'ingredient':'chuck roast','flavor':'savory'},
+{'ingredient':'chutney','flavor':'sweet sour spicy'},
+{'ingredient':'ciabatta','flavor':'savory'},
+{'ingredient':'cider','flavor':'sweet tart'},
+{'ingredient':'cilantro','flavor':'citrusy'},
+{'ingredient':'cinnamon','flavor':'sweet warm spicy'},
+{'ingredient':'clam','flavor':'savory'},
+{'ingredient':'clove','flavor':'spicy warm'},
+{'ingredient':'cocoa','flavor':'bitter'},
+{'ingredient':'coconut','flavor':'sweet'},
+{'ingredient':'cod','flavor':'savory'},
+{'ingredient':'coffee','flavor':'bitter'},
+{'ingredient':'cognac','flavor':'fruity spicy'},
+{'ingredient':'cola','flavor':'sweet'},
+{'ingredient':'coleslaw','flavor':'savory'},
+{'ingredient':'comb','flavor':'N/A'},
+{'ingredient':'compote','flavor':'sweet'},
+{'ingredient':'conch','flavor':'savory'},
+{'ingredient':'confit','flavor':'savory'},
+{'ingredient':'cookie','flavor':'sweet'},
+{'ingredient':'cookie dough','flavor':'sweet'},
+{'ingredient':'coppa','flavor':'savory'},
+{'ingredient':'coral','flavor':'N/A'},
+{'ingredient':'cordial','flavor':'sweet'},
+{'ingredient':'coriander','flavor':'citrusy'},
+{'ingredient':'corn','flavor':'sweet'},
+{'ingredient':'cornichon','flavor':'sour'},
+{'ingredient':'cornmeal','flavor':'nutty'},
+{'ingredient':'couscous','flavor':'savory'},
+{'ingredient':'crab','flavor':'savory'},
+{'ingredient':'crabmeat','flavor':'savory'},
+{'ingredient':'cracker','flavor':'savory'},
+{'ingredient':'crackers','flavor':'savory'},
+{'ingredient':'cranberry','flavor':'tart'},
+{'ingredient':'crawfish','flavor':'savory'},
+{'ingredient':'crayfish','flavor':'savory'},
+{'ingredient':'cream','flavor':'rich'},
+{'ingredient':'cream cheese','flavor':'tangy'},
+{'ingredient':'creamer','flavor':'rich'},
+{'ingredient':'creme de cacao','flavor':'sweet chocolatey'},
+{'ingredient':'crepe','flavor':'savory'},
+{'ingredient':'cress','flavor':'peppery'},
+{'ingredient':'crock','flavor':'N/A'},
+{'ingredient':'croissant','flavor':'buttery'},
+{'ingredient':'crouton','flavor':'savory'},
+{'ingredient':'crumb','flavor':'N/A'},
+{'ingredient':'crust','flavor':'N/A'},
+{'ingredient':'cucumber','flavor':'mild'},
+{'ingredient':'cucuzza','flavor':'mild'},
+{'ingredient':'culantro','flavor':'citrusy'},
+{'ingredient':'cumin','flavor':'earthy spicy'},
+{'ingredient':'cupcake','flavor':'sweet'},
+{'ingredient':'curacao','flavor':'sweet'},
+{'ingredient':'curd','flavor':'tangy'},
+{'ingredient':'currant','flavor':'tart'},
+{'ingredient':'curry','flavor':'spicy'},
+{'ingredient':'custard','flavor':'sweet'},
+{'ingredient':'cutlet','flavor':'savory'},
+{'ingredient':'cuttlefish','flavor':'savory'},
+{'ingredient':'dahl','flavor':'savory'},
+{'ingredient':'daikon','flavor':'peppery'},
+{'ingredient':'daiquiri','flavor':'sweet tart'},
+{'ingredient':'dal','flavor':'savory'},
+{'ingredient':'damsons','flavor':'tart'},
+{'ingredient':'danish','flavor':'sweet'},
+{'ingredient':'date','flavor':'sweet'},
+{'ingredient':'deer','flavor':'gamey'},
+{'ingredient':'demi-glace','flavor':'savory'},
+{'ingredient':'dewberry','flavor':'tart'},
+{'ingredient':'dhal','flavor':'savory'},
+{'ingredient':'dill','flavor':'anise'},
+{'ingredient':'dip','flavor':'savory'},
+{'ingredient':'dough','flavor':'N/A'},
+{'ingredient':'doughnut','flavor':'sweet'},
+{'ingredient':'dressing','flavor':'savory'},
+{'ingredient':'drink','flavor':'N/A'},
+{'ingredient':'dripping','flavor':'savory'},
+{'ingredient':'drumstick','flavor':'savory'},
+{'ingredient':'duck','flavor':'savory'},
+{'ingredient':'dukkah','flavor':'savory'},
+{'ingredient':'dulce de leche','flavor':'sweet'},
+{'ingredient':'dumpling','flavor':'savory'},
+{'ingredient':'durian','flavor':'sweet pungent'},
+{'ingredient':'ear','flavor':'N/A'},
+{'ingredient':'eau de vie','flavor':'fruity'},
+{'ingredient':'edamame','flavor':'savory'},
+{'ingredient':'eel','flavor':'savory'},
+{'ingredient':'egg','flavor':'savory'},
+{'ingredient':'eggnog','flavor':'sweet'},
+{'ingredient':'eggplant','flavor':'savory'},
+{'ingredient':'elderberry','flavor':'tart'},
+{'ingredient':'elixir','flavor':'N/A'},
+{'ingredient':'elk','flavor':'gamey'},
+{'ingredient':'endive','flavor':'slightly bitter'},
+{'ingredient':'english muffin','flavor':'savory'},
+{'ingredient':'epazote','flavor':'peppery'},
+{'ingredient':'escalope','flavor':'savory'},
+{'ingredient':'escargot','flavor':'savory'},
+{'ingredient':'escarole','flavor':'bitter'},
+{'ingredient':'espresso','flavor':'bitter'},
+{'ingredient':'extract','flavor':'N/A'},
+{'ingredient':'farfel','flavor':'N/A'},
+{'ingredient':'farina','flavor':'N/A'},
+{'ingredient':'farro','flavor':'nutty'},
+{'ingredient':'fat','flavor':'rich'},
+{'ingredient':'fennel','flavor':'licorice'},
+{'ingredient':'fenugreek','flavor':'bitter'},
+{'ingredient':'fettuccine','flavor':'N/A'},
+{'ingredient':'fiddlehead','flavor':'bitter'},
+{'ingredient':'fideo','flavor':'N/A'},
+{'ingredient':'fig','flavor':'sweet'},
+{'ingredient':'filbert','flavor':'nutty'},
+{'ingredient':'file','flavor':'N/A'},
+{'ingredient':'filet','flavor':'N/A'},
+{'ingredient':'fish','flavor':'savory'},
+{'ingredient':'flake','flavor':'N/A'},
+{'ingredient':'flatbread','flavor':'N/A'},
+{'ingredient':'flavor','flavor':'N/A'},
+{'ingredient':'floret','flavor':'N/A'},
+{'ingredient':'flounder','flavor':'mild'},
+{'ingredient':'flour','flavor':'N/A'},
+{'ingredient':'flower','flavor':'N/A'},
+{'ingredient':'foil','flavor':'N/A'},
+{'ingredient':'fondant','flavor':'sweet'},
+{'ingredient':'food','flavor':'N/A'},
+{'ingredient':'foot','flavor':'N/A'},
+{'ingredient':'fowl','flavor':'savory'},
+{'ingredient':'fraiche','flavor':'tart'},
+{'ingredient':'frangelico','flavor':'nutty'},
+{'ingredient':'frankfurter','flavor':'savory'},
+{'ingredient':'freekeh','flavor':'nutty'},
+{'ingredient':'fresca','flavor':'N/A'},
+{'ingredient':'fresco','flavor':'N/A'},
+{'ingredient':'fries','flavor':'savory'},
+{'ingredient':'frog','flavor':'mild'},
+{'ingredient':'frosting','flavor':'sweet'},
+{'ingredient':'fructose','flavor':'sweet'},
+{'ingredient':'fruit','flavor':'sweet'},
+{'ingredient':'fruitcake','flavor':'sweet'},
+{'ingredient':'fry','flavor':'N/A'},
+{'ingredient':'fudge','flavor':'sweet'},
+{'ingredient':'fumet','flavor':'savory'},
+{'ingredient':'fusilli','flavor':'N/A'},
+{'ingredient':'gai choy','flavor':'bitter'},
+{'ingredient':'gai lan','flavor':'bitter'},
+{'ingredient':'galangal','flavor':'spicy'},
+{'ingredient':'galliano','flavor':'anise'},
+{'ingredient':'game','flavor':'savory'},
+{'ingredient':'ganache','flavor':'sweet'},
+{'ingredient':'garlic','flavor':'pungent'},
+{'ingredient':'gatorade','flavor':'sweet'},
+{'ingredient':'gel','flavor':'N/A'},
+{'ingredient':'gelatin','flavor':'N/A'},
+{'ingredient':'gelato','flavor':'sweet'},
+{'ingredient':'germ','flavor':'N/A'},
+{'ingredient':'ghee','flavor':'nutty'},
+{'ingredient':'gianduja','flavor':'nutty'},
+{'ingredient':'giblet','flavor':'savory'},
+{'ingredient':'gin','flavor':'piney'},
+{'ingredient':'ginger','flavor':'spicy'},
+{'ingredient':'gingersnap','flavor':'spicy'},
+{'ingredient':'gizzard','flavor':'savory'},
+{'ingredient':'glass','flavor':'N/A'},
+{'ingredient':'glaze','flavor':'sweet'},
+{'ingredient':'glucose','flavor':'sweet'},
+{'ingredient':'glue','flavor':'N/A'},
+{'ingredient':'gluten','flavor':'N/A'},
+{'ingredient':'glycerin','flavor':'sweet'},
+{'ingredient':'gnocchi','flavor':'N/A'},
+{'ingredient':'gochujang','flavor':'spicy'},
+{'ingredient':'goldfish','flavor':'savory'},
+{'ingredient':'goose','flavor':'savory'},
+{'ingredient':'gooseberry','flavor':'tart'},
+{'ingredient':'gorgonzola','flavor':'pungent'},
+{'ingredient':'gouda','flavor':'nutty'},
+{'ingredient':'grain','flavor':'N/A'},
+{'ingredient':'granadilla','flavor':'tart'},
+{'ingredient':'granola','flavor':'sweet'},
+{'ingredient':'grape','flavor':'sweet'},
+{'ingredient':'grappa','flavor':'fruity'},
+{'ingredient':'grass','flavor':'N/A'},
+{'ingredient':'graviera','flavor':'nutty'},
+{'ingredient':'gravy','flavor':'savory'},
+{'ingredient':'green','flavor':'N/A'},
+{'ingredient':'gremolata','flavor':'citrusy'},
+{'ingredient':'grenadine','flavor':'sweet'},
+{'ingredient':'grit','flavor':'N/A'},
+{'ingredient':'grits','flavor':'N/A'},
+{'ingredient':'grouper','flavor':'mild'},
+{'ingredient':'grouse','flavor':'gamey'},
+{'ingredient':'gruyere','flavor':'nutty'},
+{'ingredient':'guacamole','flavor':'savory'},
+{'ingredient':'guajillo','flavor':'spicy'},
+{'ingredient':'guava','flavor':'sweet'},
+{'ingredient':'guinness','flavor':'bitter'},
+{'ingredient':'gum','flavor':'N/A'},
+{'ingredient':'gumbo','flavor':'savory'},
+{'ingredient':'gumdrop','flavor':'sweet'},
+{'ingredient':'gur','flavor':'sweet'},
+{'ingredient':'habanero','flavor':'spicy'},
+{'ingredient':'haddock','flavor':'mild'},
+{'ingredient':'haggis','flavor':'savory'},
+{'ingredient':'hake','flavor':'mild'},
+{'ingredient':'halibut','flavor':'mild'},
+{'ingredient':'halloumi','flavor':'salty'},
+{'ingredient':'halva','flavor':'sweet'},
+{'ingredient':'ham','flavor':'savory'},
+{'ingredient':'hamburger','flavor':'savory'},
+{'ingredient':'hare','flavor':'gamey'},
+{'ingredient':'harissa','flavor':'spicy'},
+{'ingredient':'hash','flavor':'savory'},
+{'ingredient':'hawaij','flavor':'spicy'},
+{'ingredient':'hazelnut','flavor':'nutty'},
+{'ingredient':'head','flavor':'N/A'},
+{'ingredient':'hen','flavor':'savory'},
+{'ingredient':'herb','flavor':'N/A'},
+{'ingredient':'herring','flavor':'salty'},
+{'ingredient':'hing','flavor':'pungent'},
+{'ingredient':'hominy','flavor':'sweet'},
+{'ingredient':'honey','flavor':'sweet'},
+{'ingredient':'honeydew','flavor':'sweet'},
+{'ingredient':'horseradish','flavor':'pungent spicy'},
+{'ingredient':'hot sauce','flavor':'spicy'},
+{'ingredient':'huacatay','flavor':'nutty peppery'},
+{'ingredient':'huckleberry','flavor':'sweet tart'},
+{'ingredient':'hummus','flavor':'savory'},
+{'ingredient':'ice cream','flavor':'sweet'},
+{'ingredient':'icing','flavor':'sweet'},
+{'ingredient':'jackfruit','flavor':'sweet'},
+{'ingredient':'jagermeister','flavor':'bitter herbal'},
+{'ingredient':'jaggery','flavor':'sweet'},
+{'ingredient':'jalapeno','flavor':'spicy'},
+{'ingredient':'jam','flavor':'sweet'},
+{'ingredient':'jamon','flavor':'savory'},
+{'ingredient':'javitri','flavor':'nutmeg-like'},
+{'ingredient':'jeera','flavor':'warm earthy'},
+{'ingredient':'jelly','flavor':'sweet'},
+{'ingredient':'jicama','flavor':'sweet crisp'},
+{'ingredient':'juice','flavor':'N/A'},
+{'ingredient':'jujube','flavor':'sweet'},
+{'ingredient':'kadaifi','flavor':'N/A'},
+{'ingredient':'kahlua','flavor':'sweet coffee'},
+{'ingredient':'kale','flavor':'bitter earthy'},
+{'ingredient':'kalonji','flavor':'nutty peppery'},
+{'ingredient':'kamaboko','flavor':'savory'},
+{'ingredient':'kamut','flavor':'nutty'},
+{'ingredient':'kangaroo','flavor':'gamey'},
+{'ingredient':'karela','flavor':'bitter'},
+{'ingredient':'kasha','flavor':'nutty'},
+{'ingredient':'kashk','flavor':'sour tangy'},
+{'ingredient':'katakuriko','flavor':'N/A'},
+{'ingredient':'kefalotiri','flavor':'tangy salty'},
+{'ingredient':'kefir','flavor':'tart'},
+{'ingredient':'kelp','flavor':'salty umami'},
+{'ingredient':'ketchup','flavor':'sweet tangy'},
+{'ingredient':'ketjap','flavor':'savory'},
+{'ingredient':'khoya','flavor':'sweet'},
+{'ingredient':'khubz','flavor':'N/A'},
+{'ingredient':'khus','flavor':'grassy'},
+{'ingredient':'kielbasa','flavor':'savory'},
+{'ingredient':'kimchi','flavor':'spicy sour'},
+{'ingredient':'kimion','flavor':'earthy'},
+{'ingredient':'kingfish','flavor':'savory'},
+{'ingredient':'kirsch','flavor':'fruity'},
+{'ingredient':'kishke','flavor':'savory'},
+{'ingredient':'kiwi','flavor':'tart sweet'},
+{'ingredient':'knackwurst','flavor':'savory'},
+{'ingredient':'kohlrabi','flavor':'mild'},
+{'ingredient':'kokum','flavor':'tart'},
+{'ingredient':'kombu','flavor':'umami'},
+{'ingredient':'kombucha','flavor':'tangy'},
+{'ingredient':'konafah','flavor':'sweet'},
+{'ingredient':'konjac','flavor':'N/A'},
+{'ingredient':'kool-aid','flavor':'sweet'},
+{'ingredient':'kudzu','flavor':'N/A'},
+{'ingredient':'kumara','flavor':'sweet earthy'},
+{'ingredient':'kumquat','flavor':'tart sweet'},
+{'ingredient':'kwas','flavor':'sour'},
+{'ingredient':'labneh','flavor':'tangy'},
+{'ingredient':'ladyfinger','flavor':'sweet'},
+{'ingredient':'lamb','flavor':'savory'},
+{'ingredient':'lamington','flavor':'sweet'},
+{'ingredient':'langoustine','flavor':'savory'},
+{'ingredient':'lard','flavor':'N/A'},
+{'ingredient':'lauki','flavor':'mild'},
+{'ingredient':'lavender','flavor':'floral'},
+{'ingredient':'leaf','flavor':'N/A'},
+{'ingredient':'lecithin','flavor':'N/A'},
+{'ingredient':'leek','flavor':'onion-like'},
+{'ingredient':'leg','flavor':'N/A'},
+{'ingredient':'lemon','flavor':'sour'},
+{'ingredient':'lemonade','flavor':'sour sweet'},
+{'ingredient':'lentil','flavor':'earthy'},
+{'ingredient':'lettuce','flavor':'mild'},
+{'ingredient':'licorice','flavor':'bitter sweet'},
+{'ingredient':'liempo','flavor':'savory'},
+{'ingredient':'lime','flavor':'sour'},
+{'ingredient':'limoncello','flavor':'sour sweet'},
+{'ingredient':'linguine','flavor':'N/A'},
+{'ingredient':'linseed','flavor':'nutty'},
+{'ingredient':'liqueur','flavor':'N/A'},
+{'ingredient':'litchi','flavor':'sweet'},
+{'ingredient':'liver','flavor':'savory'},
+{'ingredient':'loaf','flavor':'N/A'},
+{'ingredient':'lobster','flavor':'savory'},
+{'ingredient':'loin','flavor':'N/A'},
+{'ingredient':'longan','flavor':'sweet'},
+{'ingredient':'loquat','flavor':'sweet tart'},
+{'ingredient':'lox','flavor':'salty'},
+{'ingredient':'lutefisk','flavor':'pungent'},
+{'ingredient':'lychee','flavor':'sweet'},
+{'ingredient':'lye','flavor':'N/A'},
+{'ingredient':'maca','flavor':'nutty'},
+{'ingredient':'macaroni','flavor':'N/A'},
+{'ingredient':'macaroons','flavor':'sweet'},
+{'ingredient':'mace','flavor':'spicy'},
+{'ingredient':'mache','flavor':'nutty'},
+{'ingredient':'mackerel','flavor':'savory'},
+{'ingredient':'mahi mahi','flavor':'savory'},
+{'ingredient':'mahlab','flavor':'almond-like'},
+{'ingredient':'maifun','flavor':'N/A'},
+{'ingredient':'malanga','flavor':'earthy'},
+{'ingredient':'maltitol','flavor':'sweet'},
+{'ingredient':'maltose','flavor':'sweet'},
+{'ingredient':'mango','flavor':'sweet'},
+{'ingredient':'manzanilla','flavor':'savory'},
+{'ingredient':'margarine','flavor':'N/A'},
+{'ingredient':'margarita','flavor':'sour sweet'},
+{'ingredient':'marinade','flavor':'N/A'},
+{'ingredient':'marionberry','flavor':'sweet tart'},
+{'ingredient':'marjoram','flavor':'herbal'},
+{'ingredient':'marlin','flavor':'savory'},
+{'ingredient':'marmalade','flavor':'sweet'},
+{'ingredient':'marmite','flavor':'savory'},
+{'ingredient':'marnier','flavor':'orange'},
+{'ingredient':'marrow','flavor':'mild'},
+{'ingredient':'marsala','flavor':'sweet'},
+{'ingredient':'marshmallow','flavor':'sweet'},
+{'ingredient':'marzipan','flavor':'sweet almond'},
+{'ingredient':'masala','flavor':'spicy'},
+{'ingredient':'mascarpone','flavor':'creamy'},
+{'ingredient':'mastic','flavor':'resinous'},
+{'ingredient':'matcha','flavor':'bitter vegetal'},
+{'ingredient':'mate','flavor':'bitter vegetal'},
+{'ingredient':'matzo','flavor':'savory'},
+{'ingredient':'matzo meal','flavor':'savory'},
+{'ingredient':'mawa','flavor':'sweet'},
+{'ingredient':'mayo','flavor':'savory'},
+{'ingredient':'mayonnaise','flavor':'savory'},
+{'ingredient':'mead','flavor':'sweet'},
+{'ingredient':'meal','flavor':'N/A'},
+{'ingredient':'meat','flavor':'savory'},
+{'ingredient':'meat sauce','flavor':'savory'},
+{'ingredient':'meatball','flavor':'savory'},
+{'ingredient':'meatloaf','flavor':'savory'},
+{'ingredient':'melon','flavor':'sweet'},
+{'ingredient':'menthe','flavor':'sweet'},
+{'ingredient':'meringue','flavor':'sweet'},
+{'ingredient':'merlot','flavor':'tart'},
+{'ingredient':'mesclun','flavor':'slightly sweet'},
+{'ingredient':'mesquite','flavor':'smoky'},
+{'ingredient':'methi','flavor':'bitter'},
+{'ingredient':'mettwurst','flavor':'savory'},
+{'ingredient':'mexicorn','flavor':'sweet'},
+{'ingredient':'milk','flavor':'sweet'},
+{'ingredient':'millet','flavor':'nutty'},
+{'ingredient':'mince','flavor':'savory'},
+{'ingredient':'mint','flavor':'cool'},
+{'ingredient':'mirepoix','flavor':'savory'},
+{'ingredient':'mirin','flavor':'sweet'},
+{'ingredient':'miso','flavor':'savory umami'},
+{'ingredient':'mix','flavor':'N/A'},
+{'ingredient':'molasses','flavor':'sweet'},
+{'ingredient':'monkfish','flavor':'savory'},
+{'ingredient':'montrachet','flavor':'N/A'},
+{'ingredient':'moose','flavor':'gamey'},
+{'ingredient':'morel','flavor':'earthy'},
+{'ingredient':'morsel','flavor':'N/A'},
+{'ingredient':'mortadella','flavor':'savory'},
+{'ingredient':'mousse','flavor':'N/A'},
+{'ingredient':'mozzarella','flavor':'mild'},
+{'ingredient':'muesli','flavor':'nutty'},
+{'ingredient':'muffin','flavor':'N/A'},
+{'ingredient':'mulberry','flavor':'sweet tart'},
+{'ingredient':'mullet','flavor':'savory'},
+{'ingredient':'muscatel','flavor':'sweet'},
+{'ingredient':'mushroom','flavor':'earthy'},
+{'ingredient':'mussel','flavor':'savory'},
+{'ingredient':'mustard','flavor':'pungent'},
+{'ingredient':'mustard green','flavor':'bitter peppery'},
+{'ingredient':'mustard seed','flavor':'pungent'},
+{'ingredient':'myrtle','flavor':'slightly sweet'},
+{'ingredient':'nachos','flavor':'savory'},
+{'ingredient':'namak','flavor':'salty'},
+{'ingredient':'nectar','flavor':'sweet'},
+{'ingredient':'nectarine','flavor':'sweet'},
+{'ingredient':'nib','flavor':'N/A'},
+{'ingredient':'niblet','flavor':'N/A'},
+{'ingredient':'noodle','flavor':'N/A'},
+{'ingredient':'nori','flavor':'umami'},
+{'ingredient':'nugget','flavor':'N/A'},
+{'ingredient':'nut','flavor':'nutty'},
+{'ingredient':'nutella','flavor':'sweet'},
+{'ingredient':'nutmeg','flavor':'warm spicy'},
+{'ingredient':'oat','flavor':'nutty'},
+{'ingredient':'oatmeal','flavor':'nutty'},
+{'ingredient':'octopus','flavor':'savory'},
+{'ingredient':'oelek','flavor':'spicy'},
+{'ingredient':'oil','flavor':'N/A'},
+{'ingredient':'okra','flavor':'slightly sweet'},
+{'ingredient':'olive','flavor':'bitter'},
+{'ingredient':'olive oil','flavor':'fruity'},
+{'ingredient':'onion','flavor':'pungent'},
+{'ingredient':'opah','flavor':'savory'},
+{'ingredient':'opossum','flavor':'gamey'},
+{'ingredient':'orange','flavor':'acid sweet'},
+{'ingredient':'orange juice','flavor':'acid sweet'},
+{'ingredient':'orangecello','flavor':'sweet'},
+{'ingredient':'orchid','flavor':'floral'},
+{'ingredient':'orecchiette','flavor':'N/A'},
+{'ingredient':'oregano','flavor':'herbal'},
+{'ingredient':'oreo','flavor':'sweet'},
+{'ingredient':'orzo','flavor':'N/A'},
+{'ingredient':'oyster','flavor':'savory'},
+{'ingredient':'oyster sauce','flavor':'savory'},
+{'ingredient':'padano','flavor':'savory'},
+{'ingredient':'pancake','flavor':'N/A'},
+{'ingredient':'panko','flavor':'N/A'},
+{'ingredient':'paprika','flavor':'spicy'},
+{'ingredient':'parmesan','flavor':'savory'},
+{'ingredient':'parsley','flavor':'herbal'},
+{'ingredient':'pasta','flavor':'N/A'},
+{'ingredient':'pasta sauce','flavor':'savory'},
+{'ingredient':'paste','flavor':'N/A'},
+{'ingredient':'pastrami','flavor':'savory'},
+{'ingredient':'pastry','flavor':'N/A'},
+{'ingredient':'pate','flavor':'savory'},
+{'ingredient':'patty','flavor':'N/A'},
+{'ingredient':'pea','flavor':'sweet'},
+{'ingredient':'pea soup','flavor':'savory'},
+{'ingredient':'peach','flavor':'sweet'},
+{'ingredient':'peanut','flavor':'nutty'},
+{'ingredient':'peanut butter','flavor':'nutty'},
+{'ingredient':'pear','flavor':'sweet'},
+{'ingredient':'peas','flavor':'sweet'},
+{'ingredient':'pecan','flavor':'nutty'},
+{'ingredient':'pectin','flavor':'N/A'},
+{'ingredient':'peel','flavor':'N/A'},
+{'ingredient':'penne','flavor':'N/A'},
+{'ingredient':'pepper','flavor':'spicy'},
+{'ingredient':'pepper jelly','flavor':'sweet spicy'},
+{'ingredient':'pepperoni','flavor':'savory spicy'},
+{'ingredient':'pepsi','flavor':'sweet'},
+{'ingredient':'perch','flavor':'savory'},
+{'ingredient':'perogy','flavor':'savory'},
+{'ingredient':'persimmon','flavor':'sweet'},
+{'ingredient':'pesto','flavor':'savory'},
+{'ingredient':'petal','flavor':'floral'},
+{'ingredient':'pheasant','flavor':'gamey'},
+{'ingredient':'phyllo','flavor':'N/A'},
+{'ingredient':'pickle','flavor':'sour'},
+{'ingredient':'pie','flavor':'sweet'},
+{'ingredient':'pie crust','flavor':'savory'},
+{'ingredient':'pie filling','flavor':'sweet'},
+{'ingredient':'pierogi','flavor':'savory'},
+{'ingredient':'pike','flavor':'savory'},
+{'ingredient':'pilaf','flavor':'savory'},
+{'ingredient':'pimento','flavor':'sweet'},
+{'ingredient':'pineapple','flavor':'sweet, acid'},
+{'ingredient':'pineau','flavor':'sweet'},
+{'ingredient':'pistachio','flavor':'nutty'},
+{'ingredient':'pita','flavor':'savory'},
+{'ingredient':'pizza','flavor':'savory'},
+{'ingredient':'pizza crust','flavor':'savory'},
+{'ingredient':'plantain','flavor':'sweet'},
+{'ingredient':'plum','flavor':'sweet, tart'},
+{'ingredient':'plum paste','flavor':'sweet'},
+{'ingredient':'polenta','flavor':'savory'},
+{'ingredient':'pollock','flavor':'savory'},
+{'ingredient':'pomegranate','flavor':'sweet, tart'},
+{'ingredient':'pomegranate juice','flavor':'sweet, tart'},
+{'ingredient':'popcorn','flavor':'savory'},
+{'ingredient':'poppy seed','flavor':'nutty'},
+{'ingredient':'pork','flavor':'savory'},
+{'ingredient':'pork and bean','flavor':'savory'},
+{'ingredient':'potato','flavor':'starchy'},
+{'ingredient':'potato chip','flavor':'savory'},
+{'ingredient':'poultry','flavor':'savory'},
+{'ingredient':'pound cake','flavor':'sweet'},
+{'ingredient':'powder','flavor':'N/A'},
+{'ingredient':'prawn','flavor':'savory'},
+{'ingredient':'preserve','flavor':'sweet'},
+{'ingredient':'pretzel','flavor':'savory'},
+{'ingredient':'protein powder','flavor':'N/A'},
+{'ingredient':'provolone','flavor':'savory'},
+{'ingredient':'prune','flavor':'sweet'},
+{'ingredient':'pudding','flavor':'sweet'},
+{'ingredient':'pumpkin','flavor':'sweet'},
+{'ingredient':'pumpkin puree','flavor':'sweet'},
+{'ingredient':'punch','flavor':'sweet'},
+{'ingredient':'puree','flavor':'N/A'},
+{'ingredient':'quahog','flavor':'savory'},
+{'ingredient':'quark','flavor':'tart'},
+{'ingredient':'queso','flavor':'savory'},
+{'ingredient':'quince','flavor':'sweet, tart'},
+{'ingredient':'quinoa','flavor':'nutty'},
+{'ingredient':'quinoa flour','flavor':'nutty'},
+{'ingredient':'quorn','flavor':'savory'},
+{'ingredient':'rabbit','flavor':'savory'},
+{'ingredient':'raclette','flavor':'savory'},
+{'ingredient':'radiatore','flavor':'N/A'},
+{'ingredient':'radicchio','flavor':'bitter'},
+{'ingredient':'radish','flavor':'spicy'},
+{'ingredient':'ragu','flavor':'savory'},
+{'ingredient':'raisin','flavor':'sweet'},
+{'ingredient':'raisin bran','flavor':'sweet'},
+{'ingredient':'raita','flavor':'savory'},
+{'ingredient':'rajma','flavor':'savory'},
+{'ingredient':'rambutan','flavor':'sweet'},
+{'ingredient':'ramen','flavor':'savory'},
+{'ingredient':'ramp','flavor':'savory'},
+{'ingredient':'ranch','flavor':'savory'},
+{'ingredient':'ranch dressing','flavor':'savory'},
+{'ingredient':'rapadura','flavor':'sweet'},
+{'ingredient':'rapeseed oil','flavor':'N/A'},
+{'ingredient':'rapini','flavor':'bitter'},
+{'ingredient':'raspberry','flavor':'sweet, tart'},
+{'ingredient':'raspberry jam','flavor':'sweet'},
+{'ingredient':'rattlesnake','flavor':'savory'},
+{'ingredient':'rau ram','flavor':'savory'},
+{'ingredient':'rava','flavor':'N/A'},
+{'ingredient':'raviol','flavor':'savory'},
+{'ingredient':'reblochon','flavor':'savory'},
+{'ingredient':'recaito','flavor':'savory'},
+{'ingredient':'red pepper','flavor':'spicy'},
+{'ingredient':'redfish','flavor':'savory'},
+{'ingredient':'reese s','flavor':'sweet'},
+{'ingredient':'relish','flavor':'savory'},
+{'ingredient':'remoulade','flavor':'savory'},
+{'ingredient':'rennet','flavor':'N/A'},
+{'ingredient':'rhubarb','flavor':'tart'},
+{'ingredient':'rhubarb jam','flavor':'sweet, tart'},
+{'ingredient':'rib','flavor':'savory'},
+{'ingredient':'rib eye','flavor':'savory'},
+{'ingredient':'riccotta','flavor':'savory'},
+{'ingredient':'rice','flavor':'starchy'},
+{'ingredient':'rice cake','flavor':'starchy'},
+{'ingredient':'rice milk','flavor':'N/A'},
+{'ingredient':'rice noodle','flavor':'savory'},
+{'ingredient':'rice paper','flavor':'N/A'},
+{'ingredient':'rice vinegar','flavor':'acid'},
+{'ingredient':'rice wine','flavor':'sweet'},
+{'ingredient':'rigatoni','flavor':'N/A'},
+{'ingredient':'rind','flavor':'savory'},
+{'ingredient':'rioja','flavor':'N/A'},
+{'ingredient':'risoni','flavor':'N/A'},
+{'ingredient':'risotto','flavor':'savory'},
+{'ingredient':'ritz cracker','flavor':'savory'},
+{'ingredient':'river hot cereal','flavor':'N/A'},
+{'ingredient':'roast','flavor':'savory'},
+{'ingredient':'roast beef','flavor':'savory'},
+{'ingredient':'robiola','flavor':'savory'},
+{'ingredient':'rocket','flavor':'peppery'},
+{'ingredient':'rockfish','flavor':'savory'},
+{'ingredient':'roe','flavor':'savory'},
+{'ingredient':'roll','flavor':'savory'},
+{'ingredient':'romano','flavor':'savory'},
+{'ingredient':'root','flavor':'earthy'},
+{'ingredient':'rose','flavor':'floral'},
+{'ingredient':'rosemary','flavor':'savory'},
+{'ingredient':'rotini','flavor':'N/A'},
+{'ingredient':'roughy','flavor':'savory'},
+{'ingredient':'roux','flavor':'savory'},
+{'ingredient':'rub','flavor':'savory'},
+{'ingredient':'rucola','flavor':'peppery'},
+{'ingredient':'rum','flavor':'sweet'},
+{'ingredient':'rum extract','flavor':'sweet'},
+{'ingredient':'rump roast','flavor':'savory'},
+{'ingredient':'rusk','flavor':'savory'},
+{'ingredient':'rutabaga','flavor':'savory'},
+{'ingredient':'rutland','flavor':'N/A'},
+{'ingredient':'rye','flavor':'earthy'},
+{'ingredient':'rye bread','flavor':'savory'},
+{'ingredient':'saba','flavor':'sweet sour'},
+{'ingredient':'safflower oil','flavor':'nutty'},
+{'ingredient':'saffron','flavor':'bitter'},
+{'ingredient':'sage','flavor':'savory'},
+{'ingredient':'sago','flavor':'N/A'},
+{'ingredient':'saimin','flavor':'savory'},
+{'ingredient':'sake','flavor':'sweet'},
+{'ingredient':'salad','flavor':'N/A'},
+{'ingredient':'salad dressing','flavor':'N/A'},
+{'ingredient':'salami','flavor':'savory'},
+{'ingredient':'salba','flavor':'N/A'},
+{'ingredient':'salmon','flavor':'rich'},
+{'ingredient':'salmon roe','flavor':'salty'},
+{'ingredient':'salsa','flavor':'spicy'},
+{'ingredient':'salsify','flavor':'earthy'},
+{'ingredient':'salt','flavor':'salty'},
+{'ingredient':'salt beef','flavor':'savory'},
+{'ingredient':'saltine','flavor':'salty'},
+{'ingredient':'sambal','flavor':'spicy'},
+{'ingredient':'sambuca','flavor':'anise'},
+{'ingredient':'samp','flavor':'N/A'},
+{'ingredient':'sand dab','flavor':'mild'},
+{'ingredient':'sandwich','flavor':'N/A'},
+{'ingredient':'sangria','flavor':'fruity'},
+{'ingredient':'sansho pepper','flavor':'citrusy'},
+{'ingredient':'sapodilla','flavor':'sweet'},
+{'ingredient':'sardine','flavor':'savory'},
+{'ingredient':'sassafras','flavor':'licorice'},
+{'ingredient':'satsuma','flavor':'sweet'},
+{'ingredient':'sauce','flavor':'N/A'},
+{'ingredient':'sauerkraut','flavor':'sour'},
+{'ingredient':'saunf','flavor':'anise'},
+{'ingredient':'sausage','flavor':'savory'},
+{'ingredient':'sauterne','flavor':'fruity'},
+{'ingredient':'sauvignon blanc','flavor':'fruity'},
+{'ingredient':'savoiardi','flavor':'sweet'},
+{'ingredient':'sazon','flavor':'savory'},
+{'ingredient':'scallion','flavor':'onion'},
+{'ingredient':'scallop','flavor':'sweet'},
+{'ingredient':'scamorza','flavor':'creamy'},
+{'ingredient':'scampi','flavor':'garlicky'},
+{'ingredient':'scape','flavor':'garlicky'},
+{'ingredient':'schmaltz','flavor':'rich'},
+{'ingredient':'schnapps','flavor':'N/A'},
+{'ingredient':'schnitzel','flavor':'savory'},
+{'ingredient':'scone','flavor':'sweet'},
+{'ingredient':'scotch','flavor':'smoky'},
+{'ingredient':'scotch bonnet','flavor':'spicy'},
+{'ingredient':'scrod','flavor':'mild'},
+{'ingredient':'scungilli','flavor':'savory'},
+{'ingredient':'sea bass','flavor':'mild'},
+{'ingredient':'sea bream','flavor':'mild'},
+{'ingredient':'sea salt','flavor':'salty'},
+{'ingredient':'sea scallop','flavor':'sweet'},
+{'ingredient':'seafood','flavor':'N/A'},
+{'ingredient':'seasoning','flavor':'N/A'},
+{'ingredient':'seaweed','flavor':'salty'},
+{'ingredient':'seed','flavor':'N/A'},
+{'ingredient':'seed oil','flavor':'N/A'},
+{'ingredient':'seitan','flavor':'savory'},
+{'ingredient':'seltzer','flavor':'N/A'},
+{'ingredient':'semolina','flavor':'nutty'},
+{'ingredient':'serrano pepper','flavor':'spicy'},
+{'ingredient':'sesame','flavor':'nutty'},
+{'ingredient':'sesame oil','flavor':'nutty'},
+{'ingredient':'sev','flavor':'savory'},
+{'ingredient':'shallot','flavor':'onion'},
+{'ingredient':'shank','flavor':'savory'},
+{'ingredient':'shark','flavor':'fishy'},
+{'ingredient':'shell','flavor':'N/A'},
+{'ingredient':'sherbet','flavor':'sweet'},
+{'ingredient':'sherry','flavor':'nutty'},
+{'ingredient':'shiso','flavor':'anise'},
+{'ingredient':'shochu','flavor':'N/A'},
+{'ingredient':'short rib','flavor':'savory'},
+{'ingredient':'shortbread','flavor':'sweet'},
+{'ingredient':'shortcake','flavor':'sweet'},
+{'ingredient':'shortening','flavor':'N/A'},
+{'ingredient':'shoulder','flavor':'savory'},
+{'ingredient':'shoyu','flavor':'salty'},
+{'ingredient':'shrimp','flavor':'sweet'},
+{'ingredient':'sichuan pepper','flavor':'spicy'},
+{'ingredient':'sicilia','flavor':'N/A'},
+{'ingredient':'sirloin','flavor':'savory'},
+{'ingredient':'skate','flavor':'mild'},
+{'ingredient':'skin','flavor':'N/A'},
+{'ingredient':'skirt','flavor':'savory'},
+{'ingredient':'slice','flavor':'N/A'},
+{'ingredient':'sloppy joe','flavor':'savory'},
+{'ingredient':'smoke','flavor':'smoky'},
+{'ingredient':'snack','flavor':'N/A'},
+{'ingredient':'snack cake','flavor':'sweet'},
+{'ingredient':'snail','flavor':'savory'},
+{'ingredient':'snapper','flavor':'mild'},
+{'ingredient':'snow pea','flavor':'sweet'},
+{'ingredient':'sockeye','flavor':'rich'},
+{'ingredient':'soda','flavor':'N/A'},
+{'ingredient':'soda bread','flavor':'savory'},
+{'ingredient':'soft drink','flavor':'N/A'},
+{'ingredient':'sole','flavor':'mild'},
+{'ingredient':'soppressata','flavor':'savory'},
+{'ingredient':'sorbet','flavor':'sweet'},
+{'ingredient':'sorrel','flavor':'sour'},
+{'ingredient':'soup','flavor':'N/A'},
+{'ingredient':'soup base','flavor':'N/A'},
+{'ingredient':'sour cream','flavor':'sour'},
+{'ingredient':'soy','flavor':'N/A'},
+{'ingredient':'soy milk','flavor':'beany'},
+{'ingredient':'soy sauce','flavor':'salty'},
+{'ingredient':'soybean','flavor':'beany'},
+{'ingredient':'spaghetti','flavor':'N/A'},
+{'ingredient':'spaghetti sauce','flavor':'savory'},
+{'ingredient':'spam','flavor':'savory'},
+{'ingredient':'sparerib','flavor':'savory'},
+{'ingredient':'sparkling water','flavor':'N/A'},
+{'ingredient':'spear','flavor':'N/A'},
+{'ingredient':'spearmint','flavor':'minty'},
+{'ingredient':'spelt','flavor':'nutty'},
+{'ingredient':'spice','flavor':'savory'},
+{'ingredient':'spinach','flavor':'bitter earthy'},
+{'ingredient':'spiral pasta','flavor':'N/A'},
+{'ingredient':'spirulina','flavor':'earthy'},
+{'ingredient':'splenda','flavor':'sweet'},
+{'ingredient':'split pea','flavor':'earthy'},
+{'ingredient':'sponge cake','flavor':'sweet'},
+{'ingredient':'spray','flavor':'N/A'},
+{'ingredient':'spread','flavor':'N/A'},
+{'ingredient':'sprig','flavor':'N/A'},
+{'ingredient':'sprinkle','flavor':'N/A'},
+{'ingredient':'sprout','flavor':'N/A'},
+{'ingredient':'square','flavor':'N/A'},
+{'ingredient':'squash','flavor':'sweet'},
+{'ingredient':'squid','flavor':'savory'},
+{'ingredient':'star anise','flavor':'licorice'},
+{'ingredient':'starch','flavor':'N/A'},
+{'ingredient':'steak','flavor':'savory'},
+{'ingredient':'steak sauce','flavor':'savory'},
+{'ingredient':'stem','flavor':'N/A'},
+{'ingredient':'stevia','flavor':'sweet'},
+{'ingredient':'stew','flavor':'savory'},
+{'ingredient':'stew meat','flavor':'savory'},
+{'ingredient':'stick','flavor':'N/A'},
+{'ingredient':'stilton','flavor':'sharp pungent'},
+{'ingredient':'stock','flavor':'savory'},
+{'ingredient':'stollen','flavor':'sweet'},
+{'ingredient':'stout','flavor':'bitter'},
+{'ingredient':'strawberry','flavor':'sweet tart'},
+{'ingredient':'strip','flavor':'N/A'},
+{'ingredient':'stuffing','flavor':'savory'},
+{'ingredient':'succotash','flavor':'savory sweet'},
+{'ingredient':'suet','flavor':'rich'},
+{'ingredient':'sugar','flavor':'sweet'},
+{'ingredient':'sumac','flavor':'tart lemony'},
+{'ingredient':'sunflower seed','flavor':'nutty'},
+{'ingredient':'supplement','flavor':'N/A'},
+{'ingredient':'sweet potato','flavor':'sweet earthy'},
+{'ingredient':'sweetbread','flavor':'savory'},
+{'ingredient':'swiss cheese','flavor':'nutty'},
+{'ingredient':'swordfish','flavor':'savory'},
+{'ingredient':'syrup','flavor':'sweet'},
+{'ingredient':'tabbouleh','flavor':'herbaceous'},
+{'ingredient':'taco','flavor':'N/A'},
+{'ingredient':'tahini','flavor':'nutty'},
+{'ingredient':'taleggio','flavor':'nutty'},
+{'ingredient':'tallow','flavor':'rich'},
+{'ingredient':'tamale','flavor':'savory'},
+{'ingredient':'tamari','flavor':'savory'},
+{'ingredient':'tamarillo','flavor':'tart'},
+{'ingredient':'tamarind','flavor':'tart sweet'},
+{'ingredient':'tangelo','flavor':'sweet tart'},
+{'ingredient':'tangerine','flavor':'sweet tart'},
+{'ingredient':'tapenade','flavor':'savory'},
+{'ingredient':'tapioca','flavor':'N/A'},
+{'ingredient':'tarama','flavor':'savory'},
+{'ingredient':'tarhana','flavor':'sour'},
+{'ingredient':'taro root','flavor':'earthy'},
+{'ingredient':'tarragon','flavor':'anise'},
+{'ingredient':'tartar','flavor':'sour'},
+{'ingredient':'tater tot','flavor':'savory'},
+{'ingredient':'tatsoi','flavor':'peppery'},
+{'ingredient':'tea','flavor':'N/A'},
+{'ingredient':'teff','flavor':'nutty'},
+{'ingredient':'tempeh','flavor':'earthy'},
+{'ingredient':'tenderloin','flavor':'savory'},
+{'ingredient':'tequila','flavor':'N/A'},
+{'ingredient':'teriyaki','flavor':'sweet savory'},
+{'ingredient':'terrapin','flavor':'savory'},
+{'ingredient':'thigh','flavor':'savory'},
+{'ingredient':'thyme','flavor':'savory'},
+{'ingredient':'tilapia','flavor':'mild'},
+{'ingredient':'toast','flavor':'nutty'},
+{'ingredient':'toffee','flavor':'sweet'},
+{'ingredient':'tofu','flavor':'beany'},
+{'ingredient':'togarashi','flavor':'spicy'},
+{'ingredient':'tomatillo','flavor':'tart'},
+{'ingredient':'tomato','flavor':'acid sweet'},
+{'ingredient':'tomato paste','flavor':'acid sweet'},
+{'ingredient':'tongue','flavor':'savory'},
+{'ingredient':'tonic','flavor':'bitter'},
+{'ingredient':'tonic water','flavor':'bitter'},
+{'ingredient':'tootsie roll','flavor':'sweet'},
+{'ingredient':'topping','flavor':'N/A'},
+{'ingredient':'tortellini','flavor':'N/A'},
+{'ingredient':'tortilla','flavor':'N/A'},
+{'ingredient':'tostada','flavor':'N/A'},
+{'ingredient':'trail mix','flavor':'N/A'},
+{'ingredient':'treacle','flavor':'sweet'},
+{'ingredient':'trifle','flavor':'sweet'},
+{'ingredient':'tripe','flavor':'savory'},
+{'ingredient':'triscuit','flavor':'savory'},
+{'ingredient':'trout','flavor':'savory'},
+{'ingredient':'truffle','flavor':'earthy'},
+{'ingredient':'tuna','flavor':'savory'},
+{'ingredient':'turkey','flavor':'savory'},
+{'ingredient':'turmeric','flavor':'earthy'},
+{'ingredient':'turnip','flavor':'earthy'},
+{'ingredient':'twinkie','flavor':'sweet'},
+{'ingredient':'tzatziki','flavor':'savory'},
+{'ingredient':'udon noodle','flavor':'N/A'},
+{'ingredient':'vanilla','flavor':'sweet'},
+{'ingredient':'veal','flavor':'savory'},
+{'ingredient':'vegemite','flavor':'savory'},
+{'ingredient':'vegeta','flavor':'savory'},
+{'ingredient':'vegetable','flavor':'N/A'},
+{'ingredient':'veloute','flavor':'savory'},
+{'ingredient':'velvet cake mix','flavor':'sweet'},
+{'ingredient':'venison','flavor':'savory'},
+{'ingredient':'verbena','flavor':'citrusy'},
+{'ingredient':'verjuice','flavor':'tart'},
+{'ingredient':'vermicelli','flavor':'N/A'},
+{'ingredient':'vermouth','flavor':'bitter'},
+{'ingredient':'vinaigrette','flavor':'acid'},
+{'ingredient':'vinegar','flavor':'acid'},
+{'ingredient':'vodka','flavor':'N/A'},
+{'ingredient':'wafer','flavor':'N/A'},
+{'ingredient':'waffle','flavor':'N/A'},
+{'ingredient':'walleye','flavor':'mild'},
+{'ingredient':'walnut','flavor':'nutty'},
+{'ingredient':'wasabi','flavor':'spicy'},
+{'ingredient':'water','flavor':'N/A'},
+{'ingredient':'watercress','flavor':'bitter peppery'},
+{'ingredient':'watermelon','flavor':'sweet'},
+{'ingredient':'wattleseed','flavor':'nutty'},
+{'ingredient':'wax bean','flavor':'sweet'},
+{'ingredient':'weed','flavor':'N/A'},
+{'ingredient':'weet-bix','flavor':'sweet'},
+{'ingredient':'wheat','flavor':'nutty'},
+{'ingredient':'whey','flavor':'savory'},
+{'ingredient':'whiskey','flavor':'strong'},
+{'ingredient':'whisky','flavor':'strong'},
+{'ingredient':'whitefish','flavor':'savory'},
+{'ingredient':'whiz','flavor':'savory'},
+{'ingredient':'wine','flavor':'acid'},
+{'ingredient':'wine vinaigrette','flavor':'acid'},
+{'ingredient':'wine vinegar','flavor':'acid'},
+{'ingredient':'wing','flavor':'savory'},
+{'ingredient':'wonton','flavor':'savory'},
+{'ingredient':'worcestershire sauce','flavor':'umami savory'},
+{'ingredient':'wrap','flavor':'N/A'},
+{'ingredient':'wurst','flavor':'savory'},
+{'ingredient':'yam','flavor':'sweet'},
+{'ingredient':'yeast','flavor':'N/A'},
+{'ingredient':'yogurt','flavor':'tart'},
+{'ingredient':'yolk','flavor':'rich'},
+{'ingredient':'yuzu','flavor':'acid'},
+{'ingredient':'zeera','flavor':'spicy'},
+{'ingredient':'zest','flavor':'N/A'},
+{'ingredient':'zinfandel','flavor':'acid'},
+{'ingredient':'ziti','flavor':'N/A'},
+{'ingredient':'zucchini','flavor':'mild'},
+]

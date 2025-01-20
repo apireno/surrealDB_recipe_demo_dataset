@@ -25,7 +25,7 @@ class RecipeDataSurqlDDL:
 
 
 
-    DDL_REVIEW_WO_EMBEDDING_EVENTS = """
+    DDL_REVIEW = """
 
         REMOVE TABLE IF EXISTS review;
         DEFINE TABLE review TYPE RELATION IN reviewer OUT recipe SCHEMAFULL;
@@ -34,7 +34,7 @@ class RecipeDataSurqlDDL:
         DEFINE FIELD time.updated ON review TYPE datetime VALUE time::now();
         DEFINE FIELD rating ON review TYPE number;
         DEFINE FIELD review_text ON review TYPE string;
-        DEFINE FIELD review_text_embedding ON review TYPE option<array<float>>;
+        DEFINE FIELD review_text_embedding ON review TYPE option<array<float>> DEFAULT fn::sentence_to_vector(review_text);
 
 
 
@@ -47,7 +47,6 @@ class RecipeDataSurqlDDL:
 
     """
 
-    DDL_REVIEW = DDL_REVIEW_WO_EMBEDDING_EVENTS #+ DDL_REVIEW_EMBEDDING_EVENT
 
     DDL_REVIEWER = """
        
@@ -187,56 +186,6 @@ class RecipeDataSurqlDDL:
 
     """
 
-    # DDL_STEP_EMBEDDING_EVENT = """
-    #     DEFINE EVENT OVERWRITE update_step_description_embedding ON TABLE step WHEN 
-    #         $before.step_description != $after.step_description THEN {{
-    #         UPDATE 
-    #             $this    
-    #         SET step_description_embedding = fn::sentence_to_vector($after.step_description);
-    #     }};
-    #     """
-    # DDL_RECIPE_EMBEDDING_EVENT = """
-
-    #     DEFINE EVENT OVERWRITE update_recipe_description_embedding ON TABLE recipe WHEN 
-    #         $before.description != $after.description THEN {{
-    #         UPDATE 
-    #             $this    
-    #         SET description_embedding = fn::sentence_to_vector($after.description);
-    #     }};
-    #     """
-
-    # DDL_REVIEW_EMBEDDING_EVENT = """
-    #     DEFINE EVENT OVERWRITE update_review_text_embedding ON TABLE review WHEN 
-    #         $before.review_text != $after.review_text THEN {{
-    #         UPDATE 
-    #             $this    
-    #         SET review_text_embedding = fn::sentence_to_vector($after.review_text);
-    #     }};
-    #     """
-    
-
-    # DDL_ACTION_EMBEDDING_EVENT = """
-      
-    #     DEFINE EVENT OVERWRITE update_action_embedding ON TABLE cooking_action WHEN 
-    #         $before.name != $after.name THEN {{
-    #         UPDATE 
-    #             $this    
-    #         SET action_embedding = fn::sentence_to_vector($after.name);
-    #     }};
-    #     """
-    
-    # DDL_INGREDIENT_EMBEDDING_EVENT = """
-      
-    #     DEFINE EVENT OVERWRITE update_ingredient_embedding ON TABLE ingredient WHEN 
-    #         $before.name != $after.name THEN {{
-    #         UPDATE 
-    #             $this    
-    #         SET ingredient_embedding = fn::sentence_to_vector($after.name);
-    #     }};
-    #     """
-
-    # DDL_EMBEDDING_EVENTS = DDL_STEP_EMBEDDING_EVENT + DDL_RECIPE_EMBEDDING_EVENT + DDL_REVIEW_EMBEDDING_EVENT + DDL_ACTION_EMBEDDING_EVENT + DDL_INGREDIENT_EMBEDDING_EVENT
-
     DDL_EMBEDDING_MODEL = """
 
 
@@ -270,40 +219,55 @@ class RecipeDataSurqlDDL:
 
     """
 
-    DDL_INGREDIENT_WO_EMBEDDING_EVENTS = """
+    DDL_INGREDIENT = """
 
     REMOVE TABLE IF EXISTS ingredient;
     DEFINE TABLE ingredient TYPE NORMAL SCHEMAFULL;
     DEFINE FIELD name ON ingredient TYPE string;
-    DEFINE FIELD ingredient_embedding ON ingredient TYPE option<array<float>>;
-
-
+    DEFINE FIELD flavor_desecription ON ingredient TYPE string;
+    DEFINE FIELD ingredient_embedding ON ingredient TYPE option<array<float>>  
+        DEFAULT fn::sentence_to_vector(name);
+    DEFINE FIELD flavor_embedding ON ingredient TYPE option<array<float>>  
+        DEFAULT fn::sentence_to_vector(flavor_desecription);
+    REMOVE INDEX IF EXISTS idx_flavor_description ON TABLE step;
+    DEFINE INDEX idx_flavor_description ON TABLE ingredient FIELDS flavor_embedding HNSW DIMENSION {embed_dimensions} M 32 EFC 300;
+    
     """
 
-    DDL_INGREDIENT = DDL_INGREDIENT_WO_EMBEDDING_EVENTS #+ DDL_INGREDIENT_EMBEDDING_EVENT
+    DDL_INGREDIENT_SIMILARITY = """
 
+    REMOVE TABLE IF EXISTS is_similar_to;
+    DEFINE TABLE is_similar_to SCHEMAFULL TYPE RELATION FROM ingredient TO ingredient;
+    DEFINE FIELD description ON TABLE is_similar_to TYPE string;
+    DEFINE FIELD strength ON TABLE is_similar_to TYPE int;
+    DEFINE FIELD description_embedding ON TABLE is_similar_to TYPE option<array<float>> 
+        DEFAULT fn::sentence_to_vector(description);
 
+    REMOVE INDEX IF EXISTS idx_is_similar_to_description ON TABLE is_similar_to;
+    DEFINE INDEX idx_is_similar_to_description ON TABLE is_similar_to FIELDS description_embedding MTREE DIMENSION 100 DIST COSINE;
+    """
 
-    DDL_ACTION_WO_EMBEDDING_EVENTS = """
+    DDL_ACTION = """
 
     REMOVE TABLE IF EXISTS cooking_action;
     DEFINE TABLE cooking_action TYPE NORMAL SCHEMAFULL;
     DEFINE FIELD name ON cooking_action TYPE string;
-    DEFINE FIELD action_embedding ON cooking_action TYPE option<array<float>>;
+    DEFINE FIELD action_embedding ON cooking_action TYPE option<array<float>>
+     DEFAULT fn::sentence_to_vector(name);
 
     REMOVE TABLE IF EXISTS action_is_type_of;
     DEFINE TABLE action_is_type_of TYPE RELATION IN cooking_action OUT cooking_action SCHEMAFULL;
 
     """
-    DDL_ACTION = DDL_ACTION_WO_EMBEDDING_EVENTS #+ DDL_ACTION_EMBEDDING_EVENT
-
-    DDL_STEP_WO_EMBEDDING_EVENTS = """
+   
+    DDL_STEP = """
     REMOVE TABLE IF EXISTS step;
     DEFINE TABLE step TYPE NORMAL SCHEMAFULL;
     DEFINE FIELD id ON step TYPE array<number>;
     DEFINE FIELD step_order ON step TYPE number;
     DEFINE FIELD step_description ON step TYPE option<string>;
-    DEFINE FIELD step_description_embedding ON step TYPE option<array<float>>;
+    DEFINE FIELD step_description_embedding ON step TYPE option<array<float>> 
+     DEFAULT fn::sentence_to_vector(step_description);
     DEFINE FIELD normalized_ingredients ON step TYPE option<array<record<ingredient>>>;
     DEFINE FIELD actions ON step TYPE option<array<record<cooking_action>>>;
 
@@ -325,10 +289,9 @@ class RecipeDataSurqlDDL:
     REMOVE INDEX IF EXISTS idx_step_description ON TABLE step;
     DEFINE INDEX idx_step_description ON TABLE step FIELDS step_description_embedding HNSW DIMENSION {embed_dimensions} M 32 EFC 300;
     """
-    DDL_STEP = DDL_STEP_WO_EMBEDDING_EVENTS #+ DDL_STEP_EMBEDDING_EVENT
+    
 
-
-    DDL_RECIPE_WO_EMBEDDING_EVENTS = """
+    DDL_RECIPE = """
     REMOVE TABLE IF EXISTS recipe;
     DEFINE TABLE recipe TYPE NORMAL SCHEMAFULL;
     DEFINE FIELD name ON recipe TYPE string;
@@ -340,7 +303,8 @@ class RecipeDataSurqlDDL:
     DEFINE FIELD normalized_ingredients ON recipe TYPE option<array<record<ingredient>>>;
     DEFINE FIELD ingredients ON recipe TYPE option<array<string>>;
     DEFINE FIELD description ON recipe TYPE option<string>;
-    DEFINE FIELD description_embedding ON TABLE recipe TYPE option<array<float>>;
+    DEFINE FIELD description_embedding ON TABLE recipe TYPE option<array<float>> 
+    DEFAULT fn::sentence_to_vector(description);
     DEFINE FIELD nutrition ON recipe TYPE option<array<number>>;
     DEFINE FIELD time ON recipe TYPE object;
     DEFINE FIELD time.submitted ON recipe TYPE datetime DEFAULT time::now();
@@ -369,17 +333,16 @@ class RecipeDataSurqlDDL:
 
 
     """
-    DDL_RECIPE = DDL_RECIPE_WO_EMBEDDING_EVENTS #+ DDL_RECIPE_EMBEDDING_EVENT
+   
 
 
-
-    DDL_WO_EMBEDDING_EVENTS = (DDL_ANALYZER + DDL_ACTION_WO_EMBEDDING_EVENTS + 
-                        DDL_INGREDIENT_WO_EMBEDDING_EVENTS + 
-                        DDL_STEP_WO_EMBEDDING_EVENTS + 
-                        DDL_RECIPE_WO_EMBEDDING_EVENTS + 
+    DDL = (DDL_ANALYZER + DDL_ACTION + 
+                        DDL_INGREDIENT + 
+                        DDL_STEP + 
+                        DDL_RECIPE + 
                         DDL_REVIEWER +
-                        DDL_REVIEW_WO_EMBEDDING_EVENTS +
+                        DDL_REVIEW +
+                        DDL_INGREDIENT_SIMILARITY +
                         DDL_SEARCH_FUNCTIONS)
     
-    DDL = DDL_WO_EMBEDDING_EVENTS #+ DDL_EMBEDDING_EVENTS
 

@@ -18,19 +18,6 @@ class SurqlRecipesAndSteps:
     """
 
 
-    INSERT_STEP_CALC_EMBEDDING = """
-    LET $this_object = type::thing("step",[$recipe_id,$step_order]);
-    LET $step_description_embedding = fn::sentence_to_vector($step_description);
-
-    CREATE $this_object CONTENT {{
-        step_order : $step_order,
-        step_description : $step_description,
-        step_description_embedding : $step_description_embedding,
-        normalized_ingredients : $ingredients,
-        actions : $actions
-        }}  RETURN NONE;
-    """
-
 
     INSERT_RECIPE = """
 
@@ -59,34 +46,6 @@ class SurqlRecipesAndSteps:
         } RETURN NONE;
     """
 
-
-    INSERT_RECIPE_CALC_EMBEDDING = """
-
-    LET $stepPointers = array::map($steps, |$obj| {
-        RETURN type::thing("step", [$obj.recipe_id, $obj.sort_order]);
-    });
-
-
-    LET $this_object = type::thing("recipe",$recipe_id);
-    LET $description_embedding = fn::sentence_to_vector($description);
-
-    CREATE $this_object CONTENT {
-        name : $name,
-        contributor_id : $contributor_id,
-        minutes : $minutes,
-        tags : $tags,
-        steps : $stepPointers,
-        ingredients : $ingredients,
-        normalized_ingredients : $normalized_ingredients,
-        description : $description,
-        description_embedding : $description_embedding,
-        nutrition : $nutrition,
-        time :{
-            submitted : <datetime>$time_submitted,
-            updated : <datetime>$time_updated
-        }
-        } RETURN NONE;
-    """
 
     SELECT_RECIPES_THAT_USE_INGREDIENT = """
     SELECT id FROM recipe WHERE ingredients[*] @@ $ingredient_name;

@@ -64,20 +64,6 @@ class SurqlReferenceData:
 
   """
   
-  INSERT_COOKING_ACTION_CALC_EMBEDDING = """
-
-  LET $parent_object = type::thing("cooking_action",$parent);
-  LET $this_object = type::thing("cooking_action",$action);
-  LET $action_embedding = fn::sentence_to_vector($action);
-
-  UPSERT $this_object  CONTENT {{
-      name : $action,
-      action_embedding:  $action_embedding
-      }} RETURN NONE;
-  RELATE $this_object ->action_is_type_of-> $parent_object RETURN NONE;
-
-  """
-
   INSERT_INGREDIENT = """
   LET $this_object = type::thing("ingredient",$ingredient);
   UPSERT $this_object CONTENT {{
@@ -86,15 +72,6 @@ class SurqlReferenceData:
       }} RETURN NONE;
   """
 
-  INSERT_INGREDIENT_CALC_EMBEDDING = """
-  LET $this_object = type::thing("ingredient",$ingredient);
-  LET $ingredient_embedding = fn::sentence_to_vector($ingredient);
-  
-  UPSERT $this_object CONTENT {{
-      name : $ingredient,
-      ingredient_embedding:  $ingredient_embedding
-      }} RETURN NONE;
-  """
 
   SELECT_ALL_INGREDIENTS = """
   SELECT id,name FROM ingredient;
