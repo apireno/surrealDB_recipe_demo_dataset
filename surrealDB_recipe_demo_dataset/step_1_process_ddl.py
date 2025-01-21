@@ -11,8 +11,6 @@ recipe_constants = RecipeDataConstants()
 args_loader = RecipeArgsLoader("Step 1 - Process initial DDL",db_constants,embed_constants,recipe_constants)
 args_loader.LoadArgs()
 
-
-
 async def process_DDL():
     async with AsyncSurrealDB(db_constants.DB_PARAMS.url) as db:
         auth_token = await db.sign_in(db_constants.DB_PARAMS.username,db_constants.DB_PARAMS.password)

@@ -88,24 +88,26 @@ class SurqlReferenceData:
       self.embeddingModel = embeddingModel
 
 
-  @staticmethod
-  def extract_cooking_actions_with_parent(actions = None,parent = None):
-      retVal = [] 
-      if actions == None:
-        actions = SurqlReferenceData.COOKING_ACTIONS
-      for key, value in actions.items():
-          if parent == None:
-              retVal.append({"action":key,"parent":key}) 
-          else:    
-              retVal.append({"action":key, "parent":parent}) 
-          if isinstance(value, list):
-            for item in value:
-                retVal.append({"action":item, "parent":key})
-          else: 
-              moreVals = SurqlReferenceData.extract_cooking_actions_with_parent(value,key)
-              retVal.extend(moreVals)
-      return retVal    
-      
+  # @staticmethod
+  # def extract_cooking_actions_with_parent(actions = None,parent = None):
+  #     retVal = [] 
+  #     if actions == None:
+  #       actions = SurqlReferenceData.COOKING_ACTIONS
+  #     for key, value in actions.items():
+  #         if parent == None:
+  #             retVal.append({"action":key,"parent":key}) 
+  #         else:    
+  #             retVal.append({"action":key, "parent":parent}) 
+  #         if isinstance(value, list):
+  #           for item in value:
+  #               retVal.append({"action":item, "parent":key})
+  #         else: 
+  #             moreVals = SurqlReferenceData.extract_cooking_actions_with_parent(value,key)
+  #             retVal.extend(moreVals)
+  #     return retVal    
+    
+
+
 
       
   async def insert_cooking_action(self,action,parent,useDBEmbedding = True):

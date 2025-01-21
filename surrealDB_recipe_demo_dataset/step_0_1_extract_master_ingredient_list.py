@@ -5,11 +5,12 @@ import ast
 import os
 import pandas as pd
 from surrealDB_embedding_model.embedding_model_constants import EmbeddingModelConstants,DatabaseConstants,THIS_FOLDER
-from recipe_data_constants import RecipeDataConstants, RecipeArgsLoader,GeminiConstants
+from recipe_data_constants import RecipeDataConstants, RecipeArgsLoader,GeminiConstants,DATA_FOLDER
 from gemini import GeminiHelper
+from extraction_ref_data_helpers import RefDataHelper
+from helpers import Helpers
 
 out_folder = THIS_FOLDER + "/logging/ing_extract_{0}".format(time.strftime("%Y%m%d-%H%M%S"))
-data_folder = THIS_FOLDER + "/data"
 db_constants = DatabaseConstants()
 embed_constants = EmbeddingModelConstants()
 recipe_constants = RecipeDataConstants()
@@ -17,13 +18,16 @@ gemini_constants = GeminiConstants()
 args_loader = RecipeArgsLoader("STEP 0.1 - LLM Extract ingredients from data",db_constants,embed_constants,recipe_constants,gemini_constants)
 args_loader.LoadArgs()
 
+Helpers.ensure_folders([out_folder,DATA_FOLDER])
 
 GEMINI_INGREDIENT_STEMMING_PROMPT = """
-You are a data cleanser.
+You are a linguist and professor of culinary arts.
 Please simplify the following list of ingredients in the attached file.
-The goal is to have a much shorter list of ingredients that are easier to search.
-To acheive this please target reducing the number of ingredients by a ratio of {target_ingredient_reduction_ratio}
-The name of the ingredient should be reduced to its stem for use in full-text search. 
+The goal is to have a much shorter list of ingredients that are easier to search that encomapasses all the ingredients needed in a comprehensive cookbook.
+The list was obtained from your students who compiled the list without curation.
+From a chef's perspective make sure the list is comprehensive.
+From a linguist's perpective ensure that the list is only the root lemmas for use in full-text search and NLP operations.
+The name of the ingredient should be reduced to its stem lemma for use in full-text search. 
 This will help ensure that searches for any variations of a word will still return relevant results.
 If there are suprflous adjectives in the item then remove the adjective and only return the noun.
 Do not return words that are not ingredients after reduction. 
@@ -56,16 +60,17 @@ Do not add explanatory text or object names.
 When finished, output the completion delimiter: {completion_delimiter}
 <example>
     <input_from_attachment> 
-        Lemon
-        lemons
-        lime
-        lime juice
-        sugar
-        granulated sugar
-        olive oil
-        extra virgin olive oil
-        baking soda
-        baking powder
+        [
+        "Lemon",
+        "lemons",
+        "lime",
+        "lime juice",
+        "sugar",
+        "granulated sugar",
+        "olive oil",
+        "extra virgin olive oil",
+        "baking soda",
+        "baking powder",
     </input_from_attachment>
     <output>
         ["lemon","lime","sugar""olive oil","baking soda","baking powder"]
@@ -87,11 +92,11 @@ If an ingredient doesn't have a flavor per se return "N/A" as the flavor.
 
 The input file has the list of ingredients in the format of:
 [
-    {{"ingredient":`<ingredient_name1>`,"flavor":`<flavor_name1>`}},
-    {{"ingredient":`<ingredient_name2>`,"flavor":`<flavor_name2>`}},
-    {{"ingredient":`<ingredient_name3>`,"flavor":`<flavor_name3>`}},
+    {{"ingredient":"<ingredient_name1>","flavor":"<flavor_name1>"}},
+    {{"ingredient":"<ingredient_name2>","flavor":"<flavor_name2>"}},
+    {{"ingredient":"<ingredient_name3>","flavor":"<flavor_name3>"}},
     ...
-    {{"ingredient":`<ingredient_nameN>`,"flavor":`<flavor_nameN>`}}
+    {{"ingredient":"<ingredient_nameN>","flavor":"<flavor_nameN>"}}
 ]
 
 Only return the flavor of the ingredients that are explictly listed.
@@ -115,7 +120,7 @@ When finished, output the completion delimiter: {completion_delimiter}
 </example>
 """
 
-TARGET_INGREDIENTS_LIST_SIZE = 1200
+TARGET_INGREDIENTS_LIST_SIZE = 1400
 MAX_LOOP_COUNT = 5
 
 def count_items_with_value(array_of_dicts, key, values):
@@ -126,24 +131,11 @@ def count_items_with_value(array_of_dicts, key, values):
                 count += 1
     return count
 
-
-def write_enriched_ingredients_to_file(ingredient_list,ingredient_file):
-    with open(ingredient_file, "w") as f:
-        f.write("[\n")
-        for item in ingredient_list:
-            f.write(f"{{'ingredient':'{item["ingredient"].replace("'"," ")}','flavor':'{item["flavor"].replace("'"," ")}'}},\n")
-        f.write("]")
         
-def process_ingredient_enrichment_for_chunk(ingredient_list_len,gemini_processor,chunk,temp_ingredient_file,chunk_i,loop_counter=0):
+def process_ingredient_enrichment_for_chunk(ingredient_list_len,gemini_processor:GeminiHelper,chunk,temp_ingredient_file,chunk_i):
     # Process the chunk here
 
-
-    if loop_counter>MAX_LOOP_COUNT:
-        print("Max loop count reached")
-        return
-    
-
-    print(f"\nProcessing enrich chunk starting at index loop try {loop_counter} chunk {chunk_i}/{ingredient_list_len}: {chunk[0]["ingredient"]}-{chunk[-1]["ingredient"]}") 
+    print(f"\nProcessing enrich chunk {chunk_i}/{ingredient_list_len}: {chunk[0]["ingredient"]}-{chunk[-1]["ingredient"]}") 
     
 
     #this is the message prompt
@@ -155,33 +147,15 @@ def process_ingredient_enrichment_for_chunk(ingredient_list_len,gemini_processor
 
     #generate chuncked list of ingredients
 
-    write_enriched_ingredients_to_file(chunk,temp_ingredient_file)
+    RefDataHelper.write_enriched_ingredients_to_file(chunk,temp_ingredient_file)
 
     attached_file = gemini_processor.attach_file(temp_ingredient_file)
     
     #generate a response from the LLM
-    ai_response_text = gemini_processor.generate_content_until_complete(messages,attached_file)
-    try:    
-        item_list =  ast.literal_eval(ai_response_text)
-        for item in item_list:
-            item['ingredient'] = item['ingredient'].strip()
-            item['flavor'] = item['flavor'].strip()
-        return item_list
-    except Exception as e:
-        loop_counter += 1
-        print("bad json")
-        print(e)
-        print(ai_response_text)
-        return process_ingredient_enrichment_for_chunk(ingredient_list_len,gemini_processor,chunk,temp_ingredient_file,chunk_i,loop_counter=loop_counter)
-
+    return gemini_processor.generate_content_until_complete_with_post_process_function(RefDataHelper.convert_enriched_ingredient_file_text_to_list ,messages,attached_file)
 
 
 def process_ingredient_enrichment(ingredient_list,loop_counter=0,debug_file=None):
-
-    if not os.path.exists(out_folder):
-        os.makedirs(out_folder)
-    if not os.path.exists(data_folder):
-        os.makedirs(data_folder)
 
     num_not_processed = count_items_with_value(
         ingredient_list, "flavor", ["N/A", "", None])
@@ -204,10 +178,10 @@ def process_ingredient_enrichment(ingredient_list,loop_counter=0,debug_file=None
     initial_ingredient_file = out_folder + "/initial_ingredients_enrich.txt"
 
     if(loop_counter == 0):
-        write_enriched_ingredients_to_file(ingredient_list,initial_ingredient_file)
+        RefDataHelper.write_enriched_ingredients_to_file(ingredient_list,initial_ingredient_file)
 
     working_ingredient_file = out_folder + f"/working_ingredients_enrich_{loop_counter}.txt"
-    write_enriched_ingredients_to_file(ingredient_list,working_ingredient_file)
+    RefDataHelper.write_enriched_ingredients_to_file(ingredient_list,working_ingredient_file)
     
 
     #to limit the tokens per call we will process 500 ingredients at a time
@@ -217,25 +191,38 @@ def process_ingredient_enrichment(ingredient_list,loop_counter=0,debug_file=None
     enriched_ingredients = []
     for i in range(0, len(ingredient_list), chunk_size): 
         chunk = ingredient_list[i: i + chunk_size]
-        item_list = process_ingredient_enrichment_for_chunk(len(ingredient_list),gemini_processor,chunk,temp_ingredient_file,i)
-        if len (item_list) > 0:
-            enriched_ingredients.extend(item_list)
-        else:
-            print("too many loops on retries")
-            return []
 
-    if(len(ingredient_list)>len(enriched_ingredients)):
+        RefDataHelper.write_enriched_ingredients_to_file(chunk,temp_ingredient_file)
+
+        item_list = process_ingredient_enrichment_for_chunk(len(ingredient_list),gemini_processor,chunk,temp_ingredient_file,i)
+        
+        item_list = sorted(item_list, key=lambda x: x['ingredient'])
+        if RefDataHelper.validate_sorted_lists_match_on_key(
+                chunk,item_list,"ingredient") == False:
+            #failed to keep chunk the same len... try again with same input
+           
+            print("#failed to keep chunk the same len... try again with same input")
+            break
+        enriched_ingredients.extend(item_list)
+            
+
+    enriched_ingredients = sorted(enriched_ingredients, key=lambda x: x['ingredient'])
+    if RefDataHelper.validate_sorted_lists_match_on_key(
+                ingredient_list,enriched_ingredients,"ingredient") == False:
+        #failed to keep list the same... try again with same input
+        print("#failed to keep list the same... try again with same input")
         enriched_ingredients = ingredient_list
     else:
-        enriched_ingredients = sorted(enriched_ingredients, key=lambda x: x['ingredient'])
+        #success sort and refine
+        print("#success sort and refine")
 
-    write_enriched_ingredients_to_file(enriched_ingredients,working_ingredient_file)
+    RefDataHelper.write_enriched_ingredients_to_file(enriched_ingredients,working_ingredient_file)
 
 
     
 
     loop_counter += 1
-    return process_ingredient_enrichment(enriched_ingredients,loop_counter=loop_counter,initial_ingredient_file=initial_ingredient_file,debug_file=debug_file)  
+    return process_ingredient_enrichment(enriched_ingredients,loop_counter=loop_counter,debug_file=debug_file)  
 
 
 
@@ -243,31 +230,26 @@ def process_ingredient_enrichment(ingredient_list,loop_counter=0,debug_file=None
 def process_ingredient_reduction(ingredient_list,loop_counter=0,debug_file=None):
 
 
-    if not os.path.exists(out_folder):
-        os.makedirs(out_folder)
-    if not os.path.exists(data_folder):
-        os.makedirs(data_folder)
 
     temp_ingredient_file = out_folder + "/temp_ingredients.txt"
     initial_ingredient_file = out_folder + "/initial_ingredients.txt"
     working_ingredient_file = out_folder + f"/working_ingredients{loop_counter}.txt"
 
     if(loop_counter == 0):
-        with open(initial_ingredient_file, "w") as f:
-            f.write("\n".join(ingredient_list))
+        RefDataHelper.write_list_to_file(ingredient_list,initial_ingredient_file)
 
-    with open(working_ingredient_file, "w") as f:
-        f.write("\n".join(ingredient_list))
+    RefDataHelper.write_list_to_file(ingredient_list,working_ingredient_file)
 
 
     #to limit the tokens per call we will process in batches of chucnk_size
     chunk_size = TARGET_INGREDIENTS_LIST_SIZE
     gemini_processor = GeminiHelper(gemini_constants,debug_file=debug_file)
 
-    target_ingredient_reduction_ratio = TARGET_INGREDIENTS_LIST_SIZE/len(ingredient_list) 
+    #target_ingredient_reduction_ratio = TARGET_INGREDIENTS_LIST_SIZE/len(ingredient_list) 
 
     if loop_counter<MAX_LOOP_COUNT and len(ingredient_list) > TARGET_INGREDIENTS_LIST_SIZE:
-        ai_response_texts = []
+        #start a new list of ingredients
+        truncated_ingredients = []
         for i in range(0, len(ingredient_list), chunk_size): 
             chunk = ingredient_list[i: i + chunk_size]
             # Process the chunk here
@@ -276,35 +258,29 @@ def process_ingredient_reduction(ingredient_list,loop_counter=0,debug_file=None)
 
             #this is the message prompt
             messages = []
-            prompt_text = GEMINI_INGREDIENT_STEMMING_PROMPT.format(completion_delimiter=gemini_constants.COMPLETION_DELEMITER,target_ingredient_reduction_ratio=target_ingredient_reduction_ratio)
+            prompt_text = GEMINI_INGREDIENT_STEMMING_PROMPT.format(completion_delimiter=gemini_constants.COMPLETION_DELEMITER)#,target_ingredient_reduction_ratio=target_ingredient_reduction_ratio)
             messages.append( 
                         {"role": "user", "parts": [{"text": prompt_text}]}
             )
 
             #generate chuncked list of ingredients
-            with open(temp_ingredient_file, "w") as f:
-                f.write("\n".join(chunk))
+            RefDataHelper.write_list_to_file(chunk,temp_ingredient_file)
 
             attached_file = gemini_processor.attach_file(temp_ingredient_file)
             
             #generate a response from the LLM
-            ai_response_text = gemini_processor.generate_content_until_complete(messages,attached_file)
-
-            #append the ingredient list to the list of responses
-            ai_response_texts.append(ai_response_text)
-
-
-
-        #iterate through the ai responses and append the ingredients to the working ingredient list
-        truncated_ingredients = []
-        for item in ai_response_texts:
-            item_list =  ast.literal_eval(item)
-            item_list = [s.strip().lower() for s in item_list]
+            item_list = gemini_processor.generate_content_until_complete_with_post_process_function(
+                RefDataHelper.convert_simple_array_text_to_unique_sorted_list,
+                            messages,attached_file)
+            
+            #append the results to new new list
             truncated_ingredients.extend(item_list)
-        truncated_ingredients = list(set(truncated_ingredients))
-        truncated_ingredients.sort()
-        with open(working_ingredient_file, "w") as f:
-            f.write("\n".join(truncated_ingredients))
+        
+        #make unique and sort
+        truncated_ingredients = sorted(list(set(truncated_ingredients)))
+
+        RefDataHelper.write_list_to_file(truncated_ingredients,working_ingredient_file)
+        
 
         
         print(f"Loop {loop_counter} -- {len(truncated_ingredients)} ingredients")
@@ -335,24 +311,21 @@ async def main():
     
     use_original_file = True
     if use_original_file:
-        recipe_df = pd.read_csv(recipe_constants.RECIPE_FILE)
+        recipe_df = pd.read_csv(recipe_constants.RECIPE_FILE).sample(frac=recipe_constants.RECIPE_SAMPLE_RATIO, random_state=1)
         indredient_df = recipe_df["ingredients"].apply(lambda x: ast.literal_eval(x)).explode().unique()
         indredient_df.sort()
         ingredient_list = indredient_df.tolist()
     else:
-        #working_file = data_folder + "/working_ingredients.txt"
-        with open(recipe_constants.EXTRACTED_INGREDIENTS_FILE, 'r') as f:
-            #ingredient_list = f.read().splitlines()
-            enriched_ingredient_list =  ast.literal_eval(f.read())
-            ingredient_list = [item["ingredient"] for item in enriched_ingredient_list]
+        enriched_ingredient_list = RefDataHelper.convert_enriched_ingredient_file_to_list(
+            recipe_constants.EXTRACTED_INGREDIENTS_FILE
+        )
+        ingredient_list = [item["ingredient"] for item in enriched_ingredient_list]
        
        
-        
-    
-
 
     debug_file = out_folder + "/gemini_debug.txt"
     truncated_ingredient_list = process_ingredient_reduction(ingredient_list,debug_file=debug_file)
+    
     
     enriched_ingredent_list = []
     for item in truncated_ingredient_list:
@@ -360,9 +333,10 @@ async def main():
 
     enriched_ingredent_list = process_ingredient_enrichment(enriched_ingredent_list,debug_file=debug_file)
 
-
-    write_enriched_ingredients_to_file(enriched_ingredent_list,recipe_constants.EXTRACTED_INGREDIENTS_FILE)
-
+    if len(enriched_ingredent_list)>0:
+        RefDataHelper.write_enriched_ingredients_to_file(enriched_ingredent_list,recipe_constants.EXTRACTED_INGREDIENTS_FILE)
+    else:
+        print("empty array fail")
     
         
 

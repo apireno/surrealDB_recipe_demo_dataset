@@ -2,9 +2,10 @@ import asyncio
 import time
 from surrealdb import AsyncSurrealDB
 from surrealDB_embedding_model.embedding_model_constants import EmbeddingModelConstants,DatabaseConstants,THIS_FOLDER
-from recipe_data_constants import RecipeDataConstants, RecipeArgsLoader
+from recipe_data_constants import RecipeDataConstants, RecipeArgsLoader,DATA_FOLDER
 from surql_ref_data import SurqlReferenceData
 from recipe_data_surql_ddl import RecipeDataSurqlDDL
+from helpers import Helpers
 
 out_folder = THIS_FOLDER + "/logging/ing_{0}".format(time.strftime("%Y%m%d-%H%M%S"))
 db_constants = DatabaseConstants()
@@ -12,6 +13,9 @@ embed_constants = EmbeddingModelConstants()
 recipe_constants = RecipeDataConstants()
 args_loader = RecipeArgsLoader("STEP 2 - Insert reference data to DB ingredients and actions",db_constants,embed_constants,recipe_constants)
 args_loader.LoadArgs()
+
+
+Helpers.ensure_folders([out_folder])
 
 
 async def process_ingredients_actions(truncated_ingredients):
@@ -52,12 +56,9 @@ async def main():
     
     args_loader.print()
 
-    truncated_ingredients = []
-    try:
-        with open(recipe_constants.EXTRACTED_INGREDIENTS_FILE, 'r') as file:
-            truncated_ingredients = file.read().splitlines()
-    except:
-        truncated_ingredients = []
+    debug_file = out_folder + "/gemini_debug.txt"
+    ingredient_list = SurqlReferenceData.convert_ingredient_file_to_list(recipe_constants.EXTRACTED_INGREDIENTS_FILE)
+    
 
 
     await process_ingredients_actions(truncated_ingredients)

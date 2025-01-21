@@ -9,10 +9,11 @@ from helpers import Helpers
 from datetime import datetime,timedelta
 from surrealdb import AsyncSurrealDB
 from surrealDB_embedding_model.embedding_model_constants import EmbeddingModelConstants,DatabaseConstants,THIS_FOLDER
-from recipe_data_constants import RecipeDataConstants, RecipeArgsLoader
+from recipe_data_constants import RecipeDataConstants, RecipeArgsLoader,DATA_FOLDER
 from surql_recipes_steps import SurqlRecipesAndSteps
 from recipe_data_surql_ddl import RecipeDataSurqlDDL
 from surrealDB_embedding_model.surql_embedding_model import SurqlEmbeddingModel
+from helpers import Helpers
 
 out_folder = THIS_FOLDER + "/logging/process_recipes_{0}".format(time.strftime("%Y%m%d-%H%M%S"))
 db_constants = DatabaseConstants()
@@ -20,6 +21,8 @@ embed_constants = EmbeddingModelConstants()
 recipe_constants = RecipeDataConstants()
 args_loader = RecipeArgsLoader("STEP 3 Input recipes and steps into DB",db_constants,embed_constants,recipe_constants)
 args_loader.LoadArgs()
+
+Helpers.ensure_folders([out_folder])
 
 
 step_insert_durations = []

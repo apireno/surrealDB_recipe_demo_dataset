@@ -1,8 +1,8 @@
 
 import argparse
-import os
-from surrealDB_embedding_model.database import Database
 from surrealDB_embedding_model.embedding_model_constants import EmbeddingModelConstants,DatabaseConstants,THIS_FOLDER,ArgsLoader
+
+DATA_FOLDER = THIS_FOLDER + "data/"
 
 class GeminiConstants():
     def __init__(self):
@@ -31,15 +31,15 @@ class RecipeDataConstants():
 
     def __init__(self):
        
-        self.EXTRACTED_INGREDIENTS_FILE = THIS_FOLDER + "data/extracted_ingredients_list.txt"
-        self.MATCHED_INGREDIENTS_FILE = THIS_FOLDER + "data/extracted_ingredients_match_list.txt"
-        self.EXTRACTED_COOKING_ACTIONS_FILE = THIS_FOLDER + "data/extracted_cooking_actions_list.txt"
-        self.MATCHED_COOKING_ACTIONS_FILE = THIS_FOLDER + "data/extracted_cooking_actions_match_list.txt"
+        self.EXTRACTED_INGREDIENTS_FILE = DATA_FOLDER + "extracted_ingredients_list.txt"
+        self.MATCHED_INGREDIENTS_FILE = DATA_FOLDER + "extracted_ingredients_match_list.txt"
+        self.EXTRACTED_COOKING_ACTIONS_FILE = DATA_FOLDER + "extracted_cooking_actions_list.txt"
+        self.MATCHED_COOKING_ACTIONS_FILE = DATA_FOLDER + "extracted_cooking_actions_match_list.txt"
 
 
         #https://www.kaggle.com/datasets/shuyangli94/food-com-recipes-and-user-interactions
-        self.RECIPE_FILE = THIS_FOLDER + "data/RAW_recipes.csv"
-        self.REVIEW_FILE = THIS_FOLDER + "data/RAW_interactions.csv"
+        self.RECIPE_FILE = DATA_FOLDER + "RAW_recipes.csv"
+        self.REVIEW_FILE = DATA_FOLDER + "RAW_interactions.csv"
         
         self.RECIPE_SAMPLE_RATIO = 0.0001
         self.REVIEW_SAMPLE_RATIO = 1.0
@@ -103,7 +103,7 @@ class RecipeArgsLoader(ArgsLoader):
         self.db_constants.DB_PARAMS.url = "ws://0.0.0.0:8080"
         self.db_constants.DB_PARAMS.namespace = "embedding_example"
         self.db_constants.DB_PARAMS.database = "embedding_example"
-        self.recipe_data_constants.RECIPE_SAMPLE_RATIO = 0.01
+        self.recipe_data_constants.RECIPE_SAMPLE_RATIO = 1 #0.1
 
 
 

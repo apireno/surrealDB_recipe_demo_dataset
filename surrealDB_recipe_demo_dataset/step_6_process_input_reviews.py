@@ -8,7 +8,7 @@ import names
 from datetime import datetime,timedelta
 from surrealdb import AsyncSurrealDB
 from surrealDB_embedding_model.embedding_model_constants import EmbeddingModelConstants,DatabaseConstants,THIS_FOLDER
-from recipe_data_constants import RecipeDataConstants, RecipeArgsLoader
+from recipe_data_constants import RecipeDataConstants, RecipeArgsLoader,DATA_FOLDER
 from surql_recipes_steps import SurqlRecipesAndSteps
 from surql_reviews import SurqlReviewsAndReviewers
 from recipe_data_surql_ddl import RecipeDataSurqlDDL

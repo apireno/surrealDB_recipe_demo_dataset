@@ -3,15 +3,13 @@ import time
 import math
 import ast
 import os
-import pandas as pd
 from surrealDB_embedding_model.embedding_model_constants import EmbeddingModelConstants,DatabaseConstants,THIS_FOLDER
-from recipe_data_constants import RecipeDataConstants, RecipeArgsLoader,GeminiConstants
-from surql_ref_data import SurqlReferenceData
-from recipe_data_surql_ddl import RecipeDataSurqlDDL
+from recipe_data_constants import RecipeDataConstants, RecipeArgsLoader,GeminiConstants,DATA_FOLDER
 from gemini import GeminiHelper
+from extraction_ref_data_helpers import RefDataHelper
+from helpers import Helpers
 
 out_folder = THIS_FOLDER + "/logging/act_heir_{0}".format(time.strftime("%Y%m%d-%H%M%S"))
-data_folder = THIS_FOLDER + "/data"
 db_constants = DatabaseConstants()
 embed_constants = EmbeddingModelConstants()
 recipe_constants = RecipeDataConstants()
@@ -19,6 +17,8 @@ gemini_constants = GeminiConstants()
 args_loader = RecipeArgsLoader("STEP 0.4 - LLM Extract action heirarchy",db_constants,embed_constants,recipe_constants,gemini_constants)
 args_loader.LoadArgs()
 
+
+Helpers.ensure_folders([out_folder,DATA_FOLDER])
 
 
 
@@ -28,8 +28,9 @@ GEMINI_ACTION_HEIRARCHY_PROMPT = """
 
 You are a data processor and researcher who excels at finding connections in data.
 Given the list of entities contained in the attached file, reason out how they can be organized into a heiarchy.
-The entities in the file are all of the type {entity_type} which should only be considered via the vocabulary of the culinary arts.
-The file will have the list of entities that haven't been processed listed with a confidence of 0.
+The permissible list of parent entities is first listed followed by the delimiter {exisiting_relations_delimiter}.
+After the delimiter {exisiting_relations_delimiter} the list of all the entities with thier matches will be enumerated.
+Any entity that haven't been processed will be listed with a confidence of 0 after the {exisiting_relations_delimiter}.
 DO NOT add any explanatory text outside of the instructions below in the specific format described.
 Organize the entities in a heirarchy such that they are easily grouped and undestood relative to eachother.
 
@@ -40,7 +41,7 @@ So in this instance we would have a 2-level heirachy of "prep"->"wash","thaw" an
 -Steps-
 
 - For each of entities listed, identify a parent entity also in the list if none exits.
-- Parents must be selected from within the overall list of entities. IE do NOT add any parents that are not in the entity list.
+- Parents must be selected from the list of entities in attached file before the delimiter {exisiting_relations_delimiter}. IE do NOT add any parents that are not in the entity list.
 - If no parent can be found as it is logically the most broad definition in your heirarchy indicate itself as the parent.
 - There field entity should be unique in your output, IE every entity should only have one parent.
 - For each of the entity to parent entity pairs extracted extract the following information:
@@ -49,7 +50,7 @@ So in this instance we would have a 2-level heirachy of "prep"->"wash","thaw" an
     -relationship_rationale: your rationale for the parent <> entity relationship 
     -relationship_confidence: a numeric score of 1-10 indicating your confidence in the relationship
     -Format each relationship as a an array of json objects with the following format:
-    {{"entity":"{entity_type}:`<entity>`", "parent":"{entity_type}:`<parent_entity>`",  "rationale":"<relationship_rationale>", "confidence":<relationship_confidence>}}
+    {{"entity":"<entity>", "parent":"<parent_entity>",  "rationale":"<relationship_rationale>", "confidence":<relationship_confidence>}}
 - Due to size constraints only return the top {max_count} matches based on your confidence.
 - There shouldn't be any orphaned entities. IE no entity should have itself as a parent and no child relationships.
 - Output only the top {max_count} new matches in which the data is different than the input.
@@ -63,25 +64,36 @@ Example 1:
 entity type: cooking_action
 <input>
 [
-    {{"entity":"cooking_action:`chop`", "parent":"",  "rationale":"", "confidence":0}},
-    {{"entity":"cooking_action:`slice`", "parent":"",  "rationale":"", "confidence":0}},
-    {{"entity":"cooking_action:`mince`", "parent":"",  "rationale":"", "confidence":0}},
-    {{"entity":"cooking_action:`dice`", "parent":"",  "rationale":"", "confidence":0}},
-    {{"entity":"cooking_action:`cut`", "parent":"",  "rationale":"", "confidence":0}},
-    {{"entity":"cooking_action:`thaw`", "parent":"",  "rationale":"", "confidence":0}},
-    {{"entity":"cooking_action:`wash`", "parent":"cooking_action:`prep`",  "rationale":"Washing is a form of prep before yuu cook. You may wash after but in a culinary vocabulary it is likely meant as prep.", "confidence":7}},
-    {{"entity":"cooking_action:`prep`", "parent":"cooking_action:`prep`",  "rationale":"Prepping is a top of a heirarchy for all prep work", "confidence":10}},
+"chop",
+"slice",
+"mince",
+"dice",
+"cut",
+"thaw",
+"wash",
+"prep",
+]
+{exisiting_relations_delimiter}
+[
+    {{"entity":"chop", "parent":"",  "rationale":"", "confidence":0}},
+    {{"entity":"slice", "parent":"",  "rationale":"", "confidence":0}},
+    {{"entity":"mince", "parent":"",  "rationale":"", "confidence":0}},
+    {{"entity":"dice", "parent":"",  "rationale":"", "confidence":0}},
+    {{"entity":"cut", "parent":"",  "rationale":"", "confidence":0}},
+    {{"entity":"thaw", "parent":"",  "rationale":"", "confidence":0}},
+    {{"entity":"wash", "parent":"prep",  "rationale":"Washing is a form of prep before yuu cook. You may wash after but in a culinary vocabulary it is likely meant as prep.", "confidence":7}},
+    {{"entity":"prep", "parent":"prep",  "rationale":"Prepping is a top of a heirarchy for all prep work", "confidence":10}},
 ]
 </input>
 ######################
 <output>
 [
-    {{"entity":"cooking_action:`chop`", "parent":"cooking_action:`cut`",  "rationale":"chopping is a form of cutting in a culinary vocabulary", "confidence":9}},
-    {{"entity":"cooking_action:`slice`", "parent":"cooking_action:`cut`",  "rationale":"slicing is a form of cutting in a culinary vocabulary", "confidence":9}},
-    {{"entity":"cooking_action:`mince`", "parent":"cooking_action:`cut`",  "rationale":"mincing is a form of cutting" in a culinary vocabulary, "confidence":9}},
-    {{"entity":"cooking_action:`dice`", "parent":"cooking_action:`cut`",  "rationale":"dicing is a form of cutting in a culinary vocabulary", "confidence":9}},
-    {{"entity":"cooking_action:`cut`", "parent":"cooking_action:`cut`",  "rationale":"Cutting a braod definition for using a knife. I am resonably confident it should be a first order member of the heirarchy", "confidence":7}},
-    {{"entity":"cooking_action:`thaw`", "parent":"cooking_action:`prep`",  "rationale":"Thawing is something you must do before you cook and hence prep work", "confidence":9}},
+    {{"entity":"chop", "parent":"cut",  "rationale":"chopping is a form of cutting in a culinary vocabulary", "confidence":9}},
+    {{"entity":"slice", "parent":"cut",  "rationale":"slicing is a form of cutting in a culinary vocabulary", "confidence":9}},
+    {{"entity":"mince", "parent":"cut",  "rationale":"mincing is a form of cutting" in a culinary vocabulary, "confidence":9}},
+    {{"entity":"dice", "parent":"cut",  "rationale":"dicing is a form of cutting in a culinary vocabulary", "confidence":9}},
+    {{"entity":"cut", "parent":"cut",  "rationale":"Cutting a braod definition for using a knife. I am resonably confident it should be a first order member of the heirarchy", "confidence":7}},
+    {{"entity":"thaw", "parent":"prep",  "rationale":"Thawing is something you must do before you cook and hence prep work", "confidence":9}},
 ]
 </output>
 """
@@ -101,39 +113,7 @@ CHECK_LOOP_PROMPT = "It appears some entities have missing parents or more suita
 
 PROMPT_BATCH_SIZE = 100
 ENTITY_TYPE = "cooking_action"
-
-def rsq(s):
-    return s.replace("'", "")
-
-def extend_action_to_action_match_list(action_list):
-    action_match_list = []
-    for item in action_list:
-        action_match_list.append(
-            {
-                "entity":f"{ENTITY_TYPE}:`{item}`","parent":"", "rationale":"", "confidence":0
-            }
-        )
-    return action_match_list
-
-
-def write_actions_as_matched_actions_to_file(action_list,action_file,file_mode="w"):
-    action_match_list = extend_action_to_action_match_list(action_list)
-    write_matched_actions_to_file(action_match_list,action_file,file_mode = file_mode)
-
-
-def write_actions_to_file(action_list,action_file,file_mode="w"):
-     with open(action_file, file_mode) as f:
-        f.write("[\n")
-        for item in action_list:           
-            f.write(f"'{item},\n")
-        f.write("]")
-
-def write_matched_actions_to_file(action_match_list,action_file,file_mode="w"):
-    with open(action_file, file_mode) as f:
-        f.write("[\n")
-        for item in action_match_list:           
-            f.write(f"{{'entity':'{rsq(item["entity"])}','parent':'{rsq(item["parent"])}','rationale':'{rsq(item["rationale"])}','confidence':{item["confidence"]}}},\n")
-        f.write("]")
+EXISITING_RELATIONS_DELIMITER = "# RELATIONS ALREADY CREATED:"
 
 
 
@@ -163,21 +143,17 @@ def process_action_matching(action_list,action_match_list=[],loop_counter=0,debu
 
     print(f"Loop {loop_counter} of {max_loop_count} enrichments  {len(action_match_list)} matches of {len(action_list)} actions")
     
-    if not os.path.exists(out_folder):
-        os.makedirs(out_folder)
-    if not os.path.exists(data_folder):
-        os.makedirs(data_folder)
-
     working_actions_matches_file = out_folder + f"/working_actions_matches_{loop_counter}.txt"
     if(loop_counter == 0):
-        action_match_list = extend_action_to_action_match_list(action_list)
+        action_match_list = RefDataHelper.extend_action_to_action_match_list(action_list)
         initial_action_file = out_folder + "/initial_action_match.txt"
-        write_matched_actions_to_file(action_match_list,working_actions_matches_file)
-        write_actions_as_matched_actions_to_file(action_list,initial_action_file)
+        RefDataHelper.write_actions_and_matched_actions_to_file(action_list,action_match_list,EXISITING_RELATIONS_DELIMITER,working_actions_matches_file)
+        RefDataHelper.write_actions_as_matched_actions_to_file(action_list,initial_action_file)
 
     init_messages = []
     init_prompt_text = GEMINI_ACTION_HEIRARCHY_PROMPT.format(
         completion_delimiter=gemini_constants.COMPLETION_DELEMITER,
+        exisiting_relations_delimiter = EXISITING_RELATIONS_DELIMITER,
         max_count = PROMPT_BATCH_SIZE,
         entity_type = ENTITY_TYPE
         )
@@ -236,7 +212,7 @@ def process_action_matching(action_list,action_match_list=[],loop_counter=0,debu
 
     loop_counter += 1
     working_actions_matches_file = out_folder + f"/working_actions_matches_{loop_counter}.txt"
-    write_matched_actions_to_file(action_match_list,working_actions_matches_file)
+    RefDataHelper.write_actions_and_matched_actions_to_file(action_list,action_match_list,EXISITING_RELATIONS_DELIMITER,working_actions_matches_file)
     continue_loop = check_are_matches_complete(gemini_processor,check_are_matches_complete_messages,working_actions_matches_file)
 
 
@@ -273,7 +249,7 @@ async def main():
     debug_file = out_folder + "/gemini_debug.txt"
     matched_list = process_action_matching(action_list,debug_file=debug_file)
     
-    write_matched_actions_to_file(matched_list,recipe_constants.MATCHED_COOKING_ACTIONS_FILE)
+    RefDataHelper.write_matched_actions_to_file(matched_list,recipe_constants.MATCHED_COOKING_ACTIONS_FILE)
 
 
         

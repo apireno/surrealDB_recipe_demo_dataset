@@ -261,7 +261,7 @@
 "precook",
 "precut",
 "preheat",
-"prep",
+"prepare",
 "press",
 "prevent",
 "prick",

@@ -8,7 +8,7 @@ from helpers import Helpers
 from collections import defaultdict
 from surrealdb import AsyncSurrealDB
 from surrealDB_embedding_model.embedding_model_constants import EmbeddingModelConstants,DatabaseConstants,THIS_FOLDER
-from recipe_data_constants import RecipeDataConstants, RecipeArgsLoader
+from recipe_data_constants import RecipeDataConstants, RecipeArgsLoader,DATA_FOLDER
 from surql_recipes_steps import SurqlRecipesAndSteps
 from surql_ref_data import SurqlReferenceData
 

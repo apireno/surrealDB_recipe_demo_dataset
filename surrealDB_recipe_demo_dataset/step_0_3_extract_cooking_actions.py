@@ -4,17 +4,20 @@ import ast
 import os
 import pandas as pd
 from surrealDB_embedding_model.embedding_model_constants import EmbeddingModelConstants,DatabaseConstants,THIS_FOLDER
-from recipe_data_constants import RecipeDataConstants, RecipeArgsLoader,GeminiConstants
+from recipe_data_constants import RecipeDataConstants, RecipeArgsLoader,GeminiConstants,DATA_FOLDER
 from gemini import GeminiHelper
+from extraction_ref_data_helpers import RefDataHelper
+from helpers import Helpers
 
 out_folder = THIS_FOLDER + "/logging/act_{0}".format(time.strftime("%Y%m%d-%H%M%S"))
-data_folder = THIS_FOLDER + "/data"
 db_constants = DatabaseConstants()
 embed_constants = EmbeddingModelConstants()
 recipe_constants = RecipeDataConstants()
 gemini_constants = GeminiConstants()
 args_loader = RecipeArgsLoader("STEP 0.3 - LLM Extract cooking actions from data",db_constants,embed_constants,recipe_constants,gemini_constants)
 args_loader.LoadArgs()
+
+Helpers.ensure_folders([out_folder,DATA_FOLDER])
 
 
 
@@ -134,14 +137,6 @@ GEMINI_ACTION_REFINE = """
 """
 
 
-# CONTINUE_PROMPT = """MANY entities and relationships were missed in the last extraction. Try to identify relationships that may be weaker or were not apparent at your first attempt. Make sure to have at least one relationship for each entity even if it is to itself. AND make sure to add any entities mentioned in relationships. Remember to ONLY emit entities that match any of the previously extracted types and do NOT extract the entities from the examples sections. Add them below using the same format. Do not add any explanatory text outside of the instructions you were given as the OUTPUT.
-# Due to max tokens in output we need to call this in a loop. So limit the results to the top {max_results} remaining results.
-# Again only return maximum of {max_results} relationships! Do not exceed  {max_results} rows returned!
-# And remember to ALWAYS end your response with the completion delimiter: {completion_delimiter}\n"""
-
-# CHECK_LOOP_PROMPT = "It appears some entities and relationships may have still been missed. For instance we need at least one result per entity.  Answer YES | NO if there are still entities or relationships that need to be added. ONLY answer with 'YES' or 'NO' and nothing else!\n"
-
-
 
 MAX_LOOP_COUNT = 10
 PROMPT_BATCH_SIZE = 100
@@ -151,47 +146,11 @@ TARGET_ACTION_LIST_SIZE = 1000
 
 
 
-def rsq(s):
-    return s.replace("'", "")
-
-def write_action_steps_for_attach_to_file(
-        action_list,step_list, existing_actions_delimiter,new_text_delimiter,output_file
-):
-    
-    with open(output_file, "w") as f:
-        f.write(existing_actions_delimiter)
-
-    write_actions_to_file(action_list,output_file,"a")
-
-    with open(output_file, "a") as f:
-        f.write(new_text_delimiter)
-
-    write_steps_to_file(step_list,output_file,"a")
-    
-       
-
-def write_steps_to_file(step_list,step_file, file_mode="w"):
-    with open(step_file, file_mode) as f:
-        for item in step_list:
-            f.write(f"{item}\n")
-
-
-def write_actions_to_file(action_list,action_file, file_mode="w"):
-    with open(action_file, file_mode) as f:
-        f.write("[\n")
-        for item in action_list:
-            f.write(f""""{item}",\n""")
-        f.write("]\n")
 
 
 
 def process_action_reduction(action_list,loop_counter=0,debug_file=None):
 
-
-    if not os.path.exists(out_folder):
-        os.makedirs(out_folder)
-    if not os.path.exists(data_folder):
-        os.makedirs(data_folder)
 
 
     print(f"\nProcessing action reduction loop {loop_counter}/{MAX_LOOP_COUNT} acts {len(action_list)}") 
@@ -219,15 +178,9 @@ def process_action_reduction(action_list,loop_counter=0,debug_file=None):
         )
         attached_file = gemini_processor.attach_file(working_action_file)
 
-        ai_response_text = gemini_processor.generate_content_until_complete(messages,attached_file)
+        action_list = gemini_processor.generate_content_until_complete_with_post_process_function(
+            RefDataHelper.convert_simple_array_text_to_unique_sorted_list,messages,attached_file)
 
-        action_list = []
-        item_list =  ast.literal_eval(ai_response_text)
-        for item in item_list:
-            item_lower = item.lower()
-            if item_lower not in action_list:
-                action_list.append(item_lower)
-        action_list.sort()
         loop_counter += 1
         return process_action_reduction(action_list,loop_counter,debug_file=debug_file)
     else:
@@ -244,16 +197,12 @@ def process_action_reduction(action_list,loop_counter=0,debug_file=None):
 def process_actions_extraction(step_list,action_list = [],debug_file=None):
 
 
-    if not os.path.exists(out_folder):
-        os.makedirs(out_folder)
-    if not os.path.exists(data_folder):
-        os.makedirs(data_folder)
 
     temp_action_file = out_folder + "/temp_steps.txt"
     initial_steps_file = out_folder + "/initial_steps_data.txt"
     working_action_file = out_folder + f"/init_action_extracts.txt"
 
-    write_steps_to_file(step_list,initial_steps_file)
+    RefDataHelper.write_list_as_blurb_to_file(step_list,initial_steps_file)
 
     
     #to limit the tokens per call we will process in batches of chucnk_size
@@ -276,8 +225,7 @@ def process_actions_extraction(step_list,action_list = [],debug_file=None):
         messages.append( 
                     {"role": "user", "parts": [{"text": prompt_text}]}
         )
-
-        write_action_steps_for_attach_to_file(
+        RefDataHelper.write_action_steps_for_attach_to_file(
             action_list,chunk,EXISTING_ACTIONS_DELIMITER,NEW_TEXT_DELIMITER,temp_action_file
         )
         
@@ -287,16 +235,9 @@ def process_actions_extraction(step_list,action_list = [],debug_file=None):
         #ai_response_text = gemini_processor.generate_content_until_complete(messages,attached_file)
 
         item_list = gemini_processor.generate_content_until_complete_with_post_process_function(
-            ast.literal_eval,messages,attached_file)
-        for item in item_list:
-            item_lower = item.lower()
-            if item_lower not in action_list:
-                action_list.append(item_lower)
-        action_list.sort()
+            RefDataHelper.convert_simple_array_text_to_unique_sorted_list,messages,attached_file)
         
-        write_actions_to_file(action_list,working_action_file)
-
-    
+        RefDataHelper.write_list_to_file(action_list,working_action_file)
     
     print(
         """ 
@@ -313,33 +254,15 @@ async def main():
     args_loader.print()
 
     debug_file = out_folder + "/gemini_debug.txt"
-    use_original_file = True
-    if use_original_file:
-        recipe_df = pd.read_csv(recipe_constants.RECIPE_FILE).sample(frac=recipe_constants.RECIPE_SAMPLE_RATIO, random_state=1)
-        steps_list = recipe_df["steps"].tolist()
-        extracted_actions = process_actions_extraction(steps_list,debug_file=debug_file)
-        extracted_actions = process_action_reduction(extracted_actions,debug_file=debug_file)
-        write_actions_to_file(extracted_actions,recipe_constants.EXTRACTED_COOKING_ACTIONS_FILE)
-    else:
-        return
-        # #working_file = data_folder + "/working_actions.txt"
-        # with open(recipe_constants.EXTRACTED_COOKING_ACTIONS_FILE, 'r') as f:
-        #     #action_list = f.read().splitlines()
-        #     step_heirachy_list =  ast.literal_eval(f.read())
-        #     steps_list = [item["action"] for item in enriched_action_list]
+   
+    recipe_df = pd.read_csv(recipe_constants.RECIPE_FILE).sample(frac=recipe_constants.RECIPE_SAMPLE_RATIO, random_state=1)
+    steps_list = recipe_df["steps"].tolist()
+    extracted_actions = process_actions_extraction(steps_list,debug_file=debug_file)
+    extracted_actions = process_action_reduction(extracted_actions,debug_file=debug_file)
+    RefDataHelper.write_list_to_file(extracted_actions,recipe_constants.EXTRACTED_COOKING_ACTIONS_FILE)
+   
        
-       
-     
-
-
-
-
-    # extracted_actions = process_extract_actions()
-    
-    # write_actions_to_file(extracted_actions,recipe_constants.EXTRACTED_COOKING_ACTIONS_FILE)
-
-
-        
+             
 
 if __name__ == "__main__":
     asyncio.run(main())

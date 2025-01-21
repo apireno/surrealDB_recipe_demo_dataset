@@ -14,7 +14,6 @@ class GeminiHelper():
         self.model = genai.GenerativeModel(gemini_constants.GEMINI_LLM_MODEL)
         self.debug_file = debug_file
 
-
     def fix_json_quotes(input_string):
 
         try:
