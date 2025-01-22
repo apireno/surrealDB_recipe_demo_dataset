@@ -103,7 +103,7 @@ class RecipeArgsLoader(ArgsLoader):
         self.db_constants.DB_PARAMS.url = "ws://0.0.0.0:8080"
         self.db_constants.DB_PARAMS.namespace = "embedding_example"
         self.db_constants.DB_PARAMS.database = "embedding_example"
-        self.recipe_data_constants.RECIPE_SAMPLE_RATIO = 1 #0.1
+        self.recipe_data_constants.RECIPE_SAMPLE_RATIO = 0.001
 
 
 

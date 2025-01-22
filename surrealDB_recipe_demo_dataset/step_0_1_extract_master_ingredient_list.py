@@ -71,6 +71,7 @@ When finished, output the completion delimiter: {completion_delimiter}
         "extra virgin olive oil",
         "baking soda",
         "baking powder",
+        ]
     </input_from_attachment>
     <output>
         ["lemon","lime","sugar""olive oil","baking soda","baking powder"]

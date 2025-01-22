@@ -186,65 +186,33 @@ class RecipeDataSurqlDDL:
 
     """
 
-    DDL_EMBEDDING_MODEL = """
-
-
-        REMOVE TABLE IF EXISTS embedding_model;
-        DEFINE TABLE embedding_model TYPE NORMAL SCHEMAFULL;
-        DEFINE FIELD word ON embedding_model TYPE string;
-        DEFINE FIELD embedding ON embedding_model TYPE array<float>;
-
-        DEFINE FUNCTION OVERWRITE fn::sentence_to_vector($sentence: string) {{
-            LET $vector_size = (SELECT VALUE array::len(embedding) FROM embedding_model LIMIT 1)[0];
-            
-            LET $words = string::lowercase($sentence).split(" ");
-            LET $words = array::filter($words, |$word| $word != "");
-            LET $vectors = array::map($words, |$word| {{
-                RETURN (SELECT VALUE embedding FROM type::thing("embedding_model",$word))[0];
-            }});
-
-            
-            LET $vectors = array::filter($vectors, |$v| {{ RETURN $v != NONE; }});
-            LET $transposed = array::transpose($vectors);
-            LET $sum_vector = $transposed.map(|$sub_array| math::sum($sub_array));
-            
-            
-            LET $mean_vector = vector::scale($sum_vector, 1.0f / array::len($vectors));
-
-            RETURN 
-                IF array::len($mean_vector) == $vector_size {{$mean_vector}}
-                ELSE {{array::repeat(0,$vector_size)}}
-                ;
-        }};
-
-    """
-
     DDL_INGREDIENT = """
 
     REMOVE TABLE IF EXISTS ingredient;
     DEFINE TABLE ingredient TYPE NORMAL SCHEMAFULL;
     DEFINE FIELD name ON ingredient TYPE string;
-    DEFINE FIELD flavor_desecription ON ingredient TYPE string;
+    DEFINE FIELD flavor ON ingredient TYPE string;
     DEFINE FIELD ingredient_embedding ON ingredient TYPE option<array<float>>  
         DEFAULT fn::sentence_to_vector(name);
     DEFINE FIELD flavor_embedding ON ingredient TYPE option<array<float>>  
-        DEFAULT fn::sentence_to_vector(flavor_desecription);
-    REMOVE INDEX IF EXISTS idx_flavor_description ON TABLE step;
-    DEFINE INDEX idx_flavor_description ON TABLE ingredient FIELDS flavor_embedding HNSW DIMENSION {embed_dimensions} M 32 EFC 300;
-    
-    """
+        DEFAULT fn::sentence_to_vector(flavor);
 
-    DDL_INGREDIENT_SIMILARITY = """
+    REMOVE INDEX IF EXISTS idx_ingredient_flavor_description_embedding ON TABLE ingredient;
+    DEFINE INDEX idx_ingredient_flavor_description_embedding ON TABLE ingredient FIELDS flavor_embedding HNSW DIMENSION {embed_dimensions} M 32 EFC 300;
+    
+    REMOVE INDEX IF EXISTS idx_ingredient_embedding ON TABLE ingredient;
+    DEFINE INDEX idx_ingredient_embedding ON TABLE ingredient FIELDS ingredient_embedding HNSW DIMENSION {embed_dimensions} M 32 EFC 300;
+    
 
     REMOVE TABLE IF EXISTS is_similar_to;
     DEFINE TABLE is_similar_to SCHEMAFULL TYPE RELATION FROM ingredient TO ingredient;
-    DEFINE FIELD description ON TABLE is_similar_to TYPE string;
-    DEFINE FIELD strength ON TABLE is_similar_to TYPE int;
-    DEFINE FIELD description_embedding ON TABLE is_similar_to TYPE option<array<float>> 
-        DEFAULT fn::sentence_to_vector(description);
+    DEFINE FIELD rationale ON TABLE is_similar_to TYPE string;
+    DEFINE FIELD confidence ON TABLE is_similar_to TYPE int;
+    DEFINE FIELD rationale_embedding ON TABLE is_similar_to TYPE option<array<float>> 
+        DEFAULT fn::sentence_to_vector(rationale);
 
-    REMOVE INDEX IF EXISTS idx_is_similar_to_description ON TABLE is_similar_to;
-    DEFINE INDEX idx_is_similar_to_description ON TABLE is_similar_to FIELDS description_embedding MTREE DIMENSION 100 DIST COSINE;
+    REMOVE INDEX IF EXISTS idx_is_similar_to_rationale_embedding ON TABLE is_similar_to;
+    DEFINE INDEX idx_is_similar_to_rationale_embedding ON TABLE is_similar_to FIELDS rationale_embedding HNSW DIMENSION {embed_dimensions} M 32 EFC 300;
     """
 
     DDL_ACTION = """
@@ -252,11 +220,19 @@ class RecipeDataSurqlDDL:
     REMOVE TABLE IF EXISTS cooking_action;
     DEFINE TABLE cooking_action TYPE NORMAL SCHEMAFULL;
     DEFINE FIELD name ON cooking_action TYPE string;
-    DEFINE FIELD action_embedding ON cooking_action TYPE option<array<float>>
+    DEFINE FIELD cooking_action_embedding ON cooking_action TYPE option<array<float>>
      DEFAULT fn::sentence_to_vector(name);
 
-    REMOVE TABLE IF EXISTS action_is_type_of;
-    DEFINE TABLE action_is_type_of TYPE RELATION IN cooking_action OUT cooking_action SCHEMAFULL;
+    REMOVE TABLE IF EXISTS is_type_of;
+    DEFINE TABLE is_type_of TYPE RELATION IN cooking_action OUT cooking_action SCHEMAFULL;
+    DEFINE FIELD rationale ON TABLE is_type_of TYPE string;
+    DEFINE FIELD confidence ON TABLE is_type_of TYPE int;
+
+    DEFINE FIELD rationale_embedding ON TABLE is_type_of TYPE option<array<float>> 
+        DEFAULT fn::sentence_to_vector(rationale);
+
+    REMOVE INDEX IF EXISTS idx_is_type_of_rationale_embedding ON TABLE is_type_of;
+    DEFINE INDEX idx_is_type_of_rationale_embedding ON TABLE is_type_of FIELDS rationale_embedding HNSW DIMENSION {embed_dimensions} M 32 EFC 300;
 
     """
    
@@ -342,7 +318,6 @@ class RecipeDataSurqlDDL:
                         DDL_RECIPE + 
                         DDL_REVIEWER +
                         DDL_REVIEW +
-                        DDL_INGREDIENT_SIMILARITY +
                         DDL_SEARCH_FUNCTIONS)
     
 

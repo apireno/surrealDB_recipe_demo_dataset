@@ -26,23 +26,56 @@ Helpers.ensure_folders([out_folder,DATA_FOLDER])
 GEMINI_ACTION_HEIRARCHY_PROMPT = """
 -Goal-
 
-You are a data processor and researcher who excels at finding connections in data.
-Given the list of entities contained in the attached file, reason out how they can be organized into a heiarchy.
-The permissible list of parent entities is first listed followed by the delimiter {exisiting_relations_delimiter}.
-After the delimiter {exisiting_relations_delimiter} the list of all the entities with thier matches will be enumerated.
-Any entity that haven't been processed will be listed with a confidence of 0 after the {exisiting_relations_delimiter}.
-DO NOT add any explanatory text outside of the instructions below in the specific format described.
-Organize the entities in a heirarchy such that they are easily grouped and undestood relative to eachother.
+You are a culinary arts professor and linguist who excels at finding connections in data.
+Given the list of entities contained in the attached file, use your knowledge as a chef out how they can be they can be organized into a heiarchy.
 
 For instance "chopping", "slicing", "mincing" and "dicing" are all knife skills that we could broadly call "cutting".
 While "washing" and "thawing" are all entities that could be considered "prepping"
 So in this instance we would have a 2-level heirachy of "prep"->"wash","thaw" and "cut"->"mince","slice","chop"
 
--Steps-
+The file will have the following sections:
+    - Entities that have no matches as of yet between the delimiters: <{no_match_list_delimiter}> and </{no_match_list_delimiter}>
+         -The format for these entities is:
+            <{no_match_list_delimiter}> 
+            [
+                "entity1",
+                "entity2",
+                "entity3",
+                ...
+                "entityN",
+            ]
+            </{no_match_list_delimiter}>
+    - Exhaustive list of the the permissible entities for substitutes <{full_list_delimiter}> and </{full_list_delimiter}>
+        -The format for these entities is:
+            <{full_list_delimiter}>
+            [
+                "entity1",
+                "entity2",
+                "entity3",
+                ...
+                "entityN",
+            ]
+            </{full_list_delimiter}>
+    - Substitute matches that have already been identified but could be refined and/or additional substitutes could be found listed between the delimiters <{already_matched_delimeter}> and </{already_matched_delimeter}>.
+        -The format for these entities is:
+            <{already_matched_delimeter}>
+            [
+                {{"entity":"<source_entity1>", "parent":"<parent_entityX>", "rationale":"<relationship_rationale>", "confidence":<relationship_confidence>}},
+                {{"entity":"<source_entity2>", "parent":"<parent_entityY>", "rationale":"<relationship_rationale>", "confidence":<relationship_confidence>}},
+                {{"entity":"<source_entity3>", "parent":"<parent_entity1Z>", "rationale":"<relationship_rationale>", "confidence":<relationship_confidence>}},
+                ...
+                {{"entity":"<source_entityN>", "parent":"<parent_entityX>", "rationale":"<relationship_rationale>", "confidence":<relationship_confidence>}},
+            ]
+            </{already_matched_delimeter}>
 
-- For each of entities listed, identify a parent entity also in the list if none exits.
-- Parents must be selected from the list of entities in attached file before the delimiter {exisiting_relations_delimiter}. IE do NOT add any parents that are not in the entity list.
-- If no parent can be found as it is logically the most broad definition in your heirarchy indicate itself as the parent.
+    
+DO NOT add any explanatory text outside of the instructions below in the specific format described.
+
+
+
+-Steps-
+- As a chef, for each of entities listed in the first section of the input file, identify all the parent from the second section.
+- If a parent action cannot be identified then indicate the parent as the enitity itself. I.E. the top of the heirachy should have both parent and entity fields equal eachother
 - There field entity should be unique in your output, IE every entity should only have one parent.
 - For each of the entity to parent entity pairs extracted extract the following information:
     -entity: the name of the entity
@@ -51,18 +84,44 @@ So in this instance we would have a 2-level heirachy of "prep"->"wash","thaw" an
     -relationship_confidence: a numeric score of 1-10 indicating your confidence in the relationship
     -Format each relationship as a an array of json objects with the following format:
     {{"entity":"<entity>", "parent":"<parent_entity>",  "rationale":"<relationship_rationale>", "confidence":<relationship_confidence>}}
-- Due to size constraints only return the top {max_count} matches based on your confidence.
-- There shouldn't be any orphaned entities. IE no entity should have itself as a parent and no child relationships.
-- Output only the top {max_count} new matches in which the data is different than the input.
-- When finished generating output the completion delimiter: {completion_delimiter}
+- The top section of the file will be the entities that have yet to be matched between the delimiters: <{no_match_list_delimiter}> and </{no_match_list_delimiter}>; you MUST address these first!
+- Only choose parents from the second section that begins are between the delimiters <{full_list_delimiter}> and </{full_list_delimiter}>.
+- Do not dupilcate *explicit* combinations of entities and subs.
+    -E.G.  This is invalid:
+        [
+            {{"entity":"chop", "parent":"cut", "rationale":"chopping is a form of cutting which are knife skills"}},
+            {{"entity":"chop", "parent":"prepare", "rationale":"chopping is a form of prepping"}},
+        ]
+    -E.G. This is valid however since the lemon and lime are reversed and hence not explicitly the same combination:
+        [
+            {{"entity":"chop", "parent":"cut", "rationale":"chopping is a form of cutting which are knife skills"}},
+            {{"entity":"cut", "parent":"prepare", "rationale":"cutting is a form of prepping"}},
+            {{"entity":"prepare", "parent":"prepare", "rationale":"prepping is the top of the heirarchy"}},
+        ]
+
+- Due to max tokens in output we need to call this in a loop. So limit the results to the be the top {max_results} results.
+- Again only return maximum of {max_results} relationships! Do not exceed  {max_results} rows returned!
+- If no entries are left in the un-matched section then proceed to refine the matches and double check your work.
+- When finished generating the whole list or reach the token count, output the completion delimiter: {completion_delimiter}
+
 
  
 ###################
 -Examples-
 ######################
 Example 1:
-entity type: cooking_action
-<input>
+
+<{no_match_list_delimiter}> 
+[
+"chop",
+"slice",
+"mince",
+"dice",
+"cut",
+"thaw",
+]
+</{no_match_list_delimiter}>
+<{full_list_delimiter}> 
 [
 "chop",
 "slice",
@@ -73,7 +132,8 @@ entity type: cooking_action
 "wash",
 "prep",
 ]
-{exisiting_relations_delimiter}
+</{full_list_delimiter}>
+<{already_matched_delimeter}>
 [
     {{"entity":"chop", "parent":"",  "rationale":"", "confidence":0}},
     {{"entity":"slice", "parent":"",  "rationale":"", "confidence":0}},
@@ -84,7 +144,7 @@ entity type: cooking_action
     {{"entity":"wash", "parent":"prep",  "rationale":"Washing is a form of prep before yuu cook. You may wash after but in a culinary vocabulary it is likely meant as prep.", "confidence":7}},
     {{"entity":"prep", "parent":"prep",  "rationale":"Prepping is a top of a heirarchy for all prep work", "confidence":10}},
 ]
-</input>
+</{already_matched_delimeter}>
 ######################
 <output>
 [
@@ -98,14 +158,19 @@ entity type: cooking_action
 </output>
 """
 
+
 CONTINUE_PROMPT = """MANY entities have missing parents or more suitable parents to choose from the list. 
-First tackle any entities that are missing parents or have a 0 confidence score.
-If all of those are accounted for, try to identify better matches with low confidence scores. 
-Make sure to have one and only one parent for every entity even if it is to itself. 
-Make sure to not have any entities that only have themselves as a parent and no children. 
-There field entity should be unique in your output, IE every entity should only have one parent.
-Due to size constraints only return the top {max_count} matches based on your confidence.
+Tackle the entities first section that is between the <{no_match_list_delimiter}> delimiters.
+Only choose parents from the section between the <{full_list_delimiter}> delimiters.
+If there entity list in the <{no_match_list_delimiter}> section is empty then move on to identify better parents that have a higher confidence.
+Again address items between the <{no_match_list_delimiter}> delimiters first! Do not refine your answers until that list is empty.
+Entities and parents are only valid if they exist in the  <{full_list_delimiter}> section.
+Do NOT extract the entities from the examples sections. 
+Do not add any explanatory text outside of the instructions you were given as the OUTPUT.
+Due to max tokens in output we need to call this in a loop. So limit the results to the top {max_results} remaining results; you will find more matches in another loop.
+Again only return maximum of {max_results} relationships! Do not exceed  {max_results} rows returned!
 And remember to ALWAYS end your response with the completion delimiter: {completion_delimiter}\n"""
+
 
 CHECK_LOOP_PROMPT = "It appears some entities have missing parents or more suitable parents may have been missed. We need one and only one least one line per entity.  Answer YES | NO if there are still better parent<>child relationships that need to be added. ONLY answer with 'YES' or 'NO' and nothing else!\n"
 
@@ -113,7 +178,13 @@ CHECK_LOOP_PROMPT = "It appears some entities have missing parents or more suita
 
 PROMPT_BATCH_SIZE = 100
 ENTITY_TYPE = "cooking_action"
-EXISITING_RELATIONS_DELIMITER = "# RELATIONS ALREADY CREATED:"
+
+
+
+NO_MATCH_LIST_DELIMITER = "NO_MATCHES"
+FULL_LIST_DELIMITER = "ONLY_PERMISSIBLE_ENTITIES"
+ALREADY_MATCHED_DELIMETER = "IDENTIFIED_MATCHES"
+
 
 
 
@@ -141,20 +212,23 @@ def process_action_matching(action_list,action_match_list=[],loop_counter=0,debu
     
     max_loop_count = math.floor(2*len(action_list)/PROMPT_BATCH_SIZE)
 
-    print(f"Loop {loop_counter} of {max_loop_count} enrichments  {len(action_match_list)} matches of {len(action_list)} actions")
+
+    action_unmatched_list = RefDataHelper.find_unmatched_items( 
+                action_list,action_match_list,None,"entity"
+            )
     
-    working_actions_matches_file = out_folder + f"/working_actions_matches_{loop_counter}.txt"
-    if(loop_counter == 0):
-        action_match_list = RefDataHelper.extend_action_to_action_match_list(action_list)
-        initial_action_file = out_folder + "/initial_action_match.txt"
-        RefDataHelper.write_actions_and_matched_actions_to_file(action_list,action_match_list,EXISITING_RELATIONS_DELIMITER,working_actions_matches_file)
-        RefDataHelper.write_actions_as_matched_actions_to_file(action_list,initial_action_file)
+
+
+    print(f"Loop {loop_counter} of {max_loop_count} loops | substitutes matched: {len(action_match_list)} | unmatched: {len(action_unmatched_list)} of {len(action_list)} actions")
+    
 
     init_messages = []
     init_prompt_text = GEMINI_ACTION_HEIRARCHY_PROMPT.format(
         completion_delimiter=gemini_constants.COMPLETION_DELEMITER,
-        exisiting_relations_delimiter = EXISITING_RELATIONS_DELIMITER,
-        max_count = PROMPT_BATCH_SIZE,
+        no_match_list_delimiter = NO_MATCH_LIST_DELIMITER,
+        full_list_delimiter = FULL_LIST_DELIMITER,
+        already_matched_delimeter = ALREADY_MATCHED_DELIMETER,
+        max_results = PROMPT_BATCH_SIZE,
         entity_type = ENTITY_TYPE
         )
     init_messages.append( 
@@ -166,8 +240,6 @@ def process_action_matching(action_list,action_match_list=[],loop_counter=0,debu
 
 
 
-
-
     check_are_matches_complete_prompt_text = CHECK_LOOP_PROMPT
     
     check_are_matches_complete_messages.append( 
@@ -176,44 +248,61 @@ def process_action_matching(action_list,action_match_list=[],loop_counter=0,debu
     
 
     continue_prompt_prompt_text = CONTINUE_PROMPT.format(  
-        max_count = PROMPT_BATCH_SIZE,
-        completion_delimiter=gemini_constants.COMPLETION_DELEMITER
+        max_results = PROMPT_BATCH_SIZE,
+        completion_delimiter=gemini_constants.COMPLETION_DELEMITER,
+        no_match_list_delimiter = NO_MATCH_LIST_DELIMITER,
+        full_list_delimiter = FULL_LIST_DELIMITER,
+        already_matched_delimeter = ALREADY_MATCHED_DELIMETER
         )
 
     continue_prompt_messages.append( 
                     {"role": "user", "parts": [{"text": continue_prompt_prompt_text}]}
         )
 
-    
+
    
     gemini_processor = GeminiHelper(gemini_constants,debug_file=debug_file)
 
     
+    working_action_matches_file = out_folder + f"/working_action_matches_{loop_counter}.txt"
     messages_to_use = []
     if(loop_counter == 0):
+        initial_action_file = out_folder + "/initial_action_match.txt"
+        RefDataHelper.write_list_to_file(action_list,initial_action_file)
+        RefDataHelper.write_actions_and_matched_actions_to_file(
+            action_list,
+            action_match_list,
+            action_unmatched_list, NO_MATCH_LIST_DELIMITER,FULL_LIST_DELIMITER,ALREADY_MATCHED_DELIMETER,
+            working_action_matches_file)
         messages_to_use = init_messages
     else:
         messages_to_use = continue_prompt_messages
-    
 
 
 
-    new_matches = get_matches(
-        gemini_processor,messages_to_use,working_actions_matches_file
+    new_matches_list = get_matches(
+        gemini_processor,messages_to_use,working_action_matches_file
     )
 
-    for new_match in new_matches:
-        for i, old_match in enumerate(action_match_list):  # Use enumerate to get index
-            if new_match["entity"].lower() == old_match["entity"].lower():
-                action_match_list[i] = new_match  # Update the list directly using index
-                break
-            
+
+    action_match_list = RefDataHelper.merge_dicts_over_single_key(
+        action_match_list,new_matches_list,"entity"
+    )
+
+    action_unmatched_list = RefDataHelper.find_unmatched_items( 
+                action_list,action_match_list,None,"entity"
+            )
     
 
     loop_counter += 1
-    working_actions_matches_file = out_folder + f"/working_actions_matches_{loop_counter}.txt"
-    RefDataHelper.write_actions_and_matched_actions_to_file(action_list,action_match_list,EXISITING_RELATIONS_DELIMITER,working_actions_matches_file)
-    continue_loop = check_are_matches_complete(gemini_processor,check_are_matches_complete_messages,working_actions_matches_file)
+    working_action_matches_file = out_folder + f"/working_action_matches_{loop_counter}.txt"
+
+    RefDataHelper.write_actions_and_matched_actions_to_file(
+        action_list,
+        action_match_list,
+        action_unmatched_list, NO_MATCH_LIST_DELIMITER,FULL_LIST_DELIMITER,ALREADY_MATCHED_DELIMETER,
+        working_action_matches_file)
+    continue_loop = check_are_matches_complete(gemini_processor,check_are_matches_complete_messages,working_action_matches_file)
 
 
 

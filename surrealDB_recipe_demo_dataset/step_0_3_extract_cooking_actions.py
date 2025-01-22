@@ -22,9 +22,9 @@ Helpers.ensure_folders([out_folder,DATA_FOLDER])
 
 
 GEMINI_ACTION_STEMMING_PROMPT = """
-You are a data cleanser.
+You are a linguist and professor of culinary arts.
 Please extract and simplify all the culinary actions (IE verbs) from the attached corpus.
-You will be going in a loop and examining portions of the coupus with the already extracted actions listed above the new text.
+You will be going in a loop and examining portions of the corpus with the already extracted actions listed above the new text.
 The list of already parsed actions will be preceded with the delimiter {new_text_delimiter}.
 The new text to be parsed will be preceded with the delimiter {existing_actions_delimiter}.
 The goal is to have a much shorter list of actions that are easier to search.
@@ -87,7 +87,7 @@ When finished, output the completion delimiter: {completion_delimiter}
 
 
 GEMINI_ACTION_REFINE = """
-    You are a professor at a culinary institute and you are also a linguist.
+    You are a linguist and professor of culinary arts.
 
     Your first task is to take this comprehensive list of culinary actions that your students provided and add the techniques and terminology they needed.
     This list is in the attached file.
@@ -160,11 +160,9 @@ def process_action_reduction(action_list,loop_counter=0,debug_file=None):
     working_action_file = out_folder + f"/working_actions{loop_counter}.txt"
 
     if(loop_counter == 0):
-        with open(initial_action_file, "w") as f:
-            f.write("\n".join(action_list))
+        RefDataHelper.write_list_to_file(action_list,initial_action_file)
 
-    with open(working_action_file, "w") as f:
-        f.write("\n".join(action_list))
+    RefDataHelper.write_list_to_file(action_list,working_action_file)
 
     gemini_processor = GeminiHelper(gemini_constants,debug_file=debug_file)
 
@@ -180,7 +178,7 @@ def process_action_reduction(action_list,loop_counter=0,debug_file=None):
 
         action_list = gemini_processor.generate_content_until_complete_with_post_process_function(
             RefDataHelper.convert_simple_array_text_to_unique_sorted_list,messages,attached_file)
-
+        
         loop_counter += 1
         return process_action_reduction(action_list,loop_counter,debug_file=debug_file)
     else:
@@ -237,6 +235,10 @@ def process_actions_extraction(step_list,action_list = [],debug_file=None):
         item_list = gemini_processor.generate_content_until_complete_with_post_process_function(
             RefDataHelper.convert_simple_array_text_to_unique_sorted_list,messages,attached_file)
         
+        action_list.extend(item_list)
+
+        action_list = sorted(list(set(action_list)))
+
         RefDataHelper.write_list_to_file(action_list,working_action_file)
     
     print(

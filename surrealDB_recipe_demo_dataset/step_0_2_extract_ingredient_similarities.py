@@ -150,13 +150,7 @@ entity list:
 {{"entity":"pepper", "sub":"mustard",  "rationale":"both supply heat but the flavors are distinct", "confidence":5}},
 ]
 </output>
-######################
--Real Data-
-######################
-entity type: {entity_type}
-defining property: {property_name}
-######################
-Output:"""
+"""
 
 CONTINUE_PROMPT = """MANY entities and substitutes were missed in the last extraction. 
 Tackle the entities listed in the first section that is between the <{no_match_list_delimiter}> delimiters first.
@@ -225,20 +219,11 @@ def process_ingredient_matching(ingredient_list,ingredient_match_list=[],loop_co
 
     print(f"Loop {loop_counter} of {MAX_LOOP_COUNT} loops | substitutes matched: {len(ingredient_match_list)} of {target_match_count} target | unmatched: {len(ingredient_unmatched_list)} of {len(ingredient_list)} ingredients")
     
-    if(loop_counter == 0):
-        initial_ingredient_file = out_folder + "/initial_ingredient_match.txt"
-        RefDataHelper.write_enriched_ingredients_to_file(ingredient_list,initial_ingredient_file)
-
+    
     init_messages = []
-
-
-
 
     init_prompt_text = ENTITY_REPLACEMENT_PROMPT.format(
         completion_delimiter=gemini_constants.COMPLETION_DELEMITER,
-        parent_entity = "recipe",
-        property_name = "flavor",
-        entity_type = "ingredient",
         max_results = PROMPT_BATCH_SIZE,
         no_match_list_delimiter = NO_MATCH_LIST_DELIMITER,
         full_list_delimiter = FULL_LIST_DELIMITER,
@@ -255,9 +240,7 @@ def process_ingredient_matching(ingredient_list,ingredient_match_list=[],loop_co
 
 
 
-    check_are_matches_complete_prompt_text = CHECK_LOOP_PROMPT.format(
-        max_results = PROMPT_BATCH_SIZE
-        )
+    check_are_matches_complete_prompt_text = CHECK_LOOP_PROMPT
     
     check_are_matches_complete_messages.append( 
                     {"role": "user", "parts": [{"text": check_are_matches_complete_prompt_text}]}
@@ -298,6 +281,8 @@ def process_ingredient_matching(ingredient_list,ingredient_match_list=[],loop_co
     new_matches_list = get_matches(
         gemini_processor,messages_to_use,working_ingredient_matches_file
     )
+
+    #append new matches or replace them in the new list where both entity and sub match
     ingredient_match_list = RefDataHelper.merge_dicts_over_two_keys(
         ingredient_match_list,new_matches_list,"entity","sub"
     )

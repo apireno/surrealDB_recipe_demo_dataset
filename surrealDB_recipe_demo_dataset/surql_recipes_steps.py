@@ -1,4 +1,3 @@
-from surrealDB_embedding_model.embeddings import EmbeddingModel
 from surrealdb import AsyncSurrealDB
 
 
@@ -11,7 +10,6 @@ class SurqlRecipesAndSteps:
     CREATE $this_object CONTENT {{
         step_order : $step_order,
         step_description : $step_description,
-        step_description_embedding : $step_description_embedding,
         normalized_ingredients : $ingredients,
         actions : $actions
         }}  RETURN NONE;
@@ -37,7 +35,6 @@ class SurqlRecipesAndSteps:
         ingredients : $ingredients,
         normalized_ingredients : $normalized_ingredients,
         description : $description,
-        description_embedding : $description_embedding,
         nutrition : $nutrition,
         time :{
             submitted : <datetime>$time_submitted,
@@ -55,14 +52,10 @@ class SurqlRecipesAndSteps:
     SELECT id FROM step WHERE step_description @@ $ingredient_name;
     """
     
-
-
-
     UPDATE_RECIPE_NORMALIZED_INGREDIENTS = """
     UPDATE type::record($recipe)
     SET normalized_ingredients = $normalized_ingredients RETURN NONE;
     """
-
 
     UPDATE_STEP_NORMALIZED_INGREDIENTS = """
     UPDATE type::record($step)
@@ -94,58 +87,32 @@ class SurqlRecipesAndSteps:
     RETURN fn::steps_that_use_action_text_search($action)
     """
 
-    # SELECT_STEPS_THAT_USE_ACTION_FROM_RECIPE = """
-    #   RETURN fn::steps_that_use_action_from_recipe($recipe,$action,$full_text_weight,$rrf_k)
-    # """
     SELECT_STEPS_THAT_USE_ACTION_FROM_RECIPE = """
     RETURN fn::steps_that_use_action_from_recipe_text_search($recipe,$action)
     """
 
 
-    # SELECT_STEPS_THAT_USE_INGREDIENT_FROM_RECIPE = """
-    #   RETURN fn::steps_that_use_ingredient_from_recipe($recipe,$ingredient,$full_text_weight,$rrf_k)
-    # """
     SELECT_STEPS_THAT_USE_INGREDIENT_FROM_RECIPE = """
     RETURN fn::steps_that_use_ingredient_from_recipe_text_search($recipe,$ingredient)
     """
 
 
-    def __init__(self,db: AsyncSurrealDB,embeddingModel: EmbeddingModel = None):
+    def __init__(self,db: AsyncSurrealDB):
         self.db = db
-        self.embeddingModel = embeddingModel
 
 
     async def insert_step(self,recipe_id,
                         step_order,step_description,
-                        normalized_ingredients = [],actions = [],useDBEmbedding = True):
-
-        if useDBEmbedding   == False:
-            step_description_embedding = self.embeddingModel.sentence_to_vec(str(step_description))
-
-            params = {"recipe_id": recipe_id,
-                    "step_order": step_order,
-                    "step_description": str(step_description),
-                    "step_description_embedding": step_description_embedding,
-                    "normalized_ingredients": normalized_ingredients,
-                    "actions": actions
-                    }
-            outcome = await self.db.query(SurqlRecipesAndSteps.INSERT_STEP, params)
-        else:
-            params = {"recipe_id": recipe_id,
-                    "step_order": step_order,
-                    "step_description": str(step_description),
-                    "normalized_ingredients": normalized_ingredients,
-                    "actions": actions
-                    }
-            outcome = await self.db.query(SurqlRecipesAndSteps.INSERT_STEP_CALC_EMBEDDING, params)
-
+                        normalized_ingredients = [],actions = []):
 
         
-        # for i, (key, value) in enumerate(params.items()):
-        #   print(f"LET ${key} = {value}")
-        # print(INSERT_STEP)
-
-
+        params = {"recipe_id": recipe_id,
+                "step_order": step_order,
+                "step_description": str(step_description),
+                "normalized_ingredients": normalized_ingredients,
+                "actions": actions
+                }
+        outcome = await self.db.query(SurqlRecipesAndSteps.INSERT_STEP, params)
 
         for item in outcome:
             if item["status"]=="ERR":
@@ -169,40 +136,23 @@ class SurqlRecipesAndSteps:
                             nutrition,
                             time_submitted,
                             time_updated,
-                            normalized_ingredients = [],useDBEmbedding = True):
+                            normalized_ingredients = []):
 
-        if useDBEmbedding   == False:
-            description_embedding = self.embeddingModel.sentence_to_vec(str(description))
-            params = {"recipe_id": recipe_id,
-                "name": str(name),
-                "contributor_id": contributor_id,
-                "minutes": minutes,
-                "tags": tags,
-                "steps": steps,
-                "ingredients": ingredients,
-                "normalized_ingredients": normalized_ingredients,
-                "description": str(description),
-                "description_embedding": description_embedding,
-                "nutrition": nutrition,
-                "time_submitted": time_submitted,
-                "time_updated": time_updated
-                }
-            outcome = await self.db.query(SurqlRecipesAndSteps.INSERT_RECIPE, params)
-        else:
-            params = {"recipe_id": recipe_id,
-                "name": str(name),
-                "contributor_id": contributor_id,
-                "minutes": minutes,
-                "tags": tags,
-                "steps": steps,
-                "ingredients": ingredients,
-                "normalized_ingredients": normalized_ingredients,
-                "description": str(description),
-                "nutrition": nutrition,
-                "time_submitted": time_submitted,
-                "time_updated": time_updated
-                }
-            outcome = await self.db.query(SurqlRecipesAndSteps.INSERT_RECIPE_CALC_EMBEDDING, params)
+       
+        params = {"recipe_id": recipe_id,
+            "name": str(name),
+            "contributor_id": contributor_id,
+            "minutes": minutes,
+            "tags": tags,
+            "steps": steps,
+            "ingredients": ingredients,
+            "normalized_ingredients": normalized_ingredients,
+            "description": str(description),
+            "nutrition": nutrition,
+            "time_submitted": time_submitted,
+            "time_updated": time_updated
+            }
+        outcome = await self.db.query(SurqlRecipesAndSteps.INSERT_RECIPE, params)
 
         
         
@@ -212,8 +162,8 @@ class SurqlRecipesAndSteps:
 
 
                 for i, (key, value) in enumerate(params.items()):
-                  print(f"LET ${key} = {value};")
-                print(SurqlRecipesAndSteps.INSERT_RECIPE_CALC_EMBEDDING)
+                    print(f"LET ${key} = {value};")
+                print(SurqlRecipesAndSteps.INSERT_RECIPE)
                 
                 raise SystemError("Recipe insert error: {0}".format(item["result"])) 
             
