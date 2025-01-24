@@ -9,3 +9,13 @@ data/glove.6B.50d.txt
 src/
 surrealdb_recipe_demo_dataset.egg-info/
 .github/
+data/cooking_actions_list_old.txt
+data/extracted_cooking_actions_list copy.txt
+data/extracted_ingredients_list copy.txt
+data/extracted_ingriedients_list copy.txt
+data/working_ingredients.txt
+logging/
+data/extracted_cooking_actions_list copy 2.txt
+data/extracted_ingredients_match_list copy.txt
+data/extracted_ingredients_list copy 2.txt
+data/extracted_cooking_actions_match_list copy.txt

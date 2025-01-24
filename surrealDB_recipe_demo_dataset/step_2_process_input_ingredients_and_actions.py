@@ -2,98 +2,131 @@ import asyncio
 import time
 from surrealdb import AsyncSurrealDB
 from surrealDB_embedding_model.embedding_model_constants import EmbeddingModelConstants,DatabaseConstants,THIS_FOLDER
-from recipe_data_constants import RecipeDataConstants, RecipeArgsLoader
+from recipe_data_constants import RecipeDataConstants, RecipeArgsLoader,DATA_FOLDER
 from surql_ref_data import SurqlReferenceData
 from recipe_data_surql_ddl import RecipeDataSurqlDDL
+from helpers import Helpers
+from extraction_ref_data_helpers import RefDataHelper
+from surrealDB_embedding_model.surql_embedding_model import SurqlEmbeddingModel
 
-out_folder = THIS_FOLDER + "/embeddings_{0}".format(time.strftime("%Y%m%d-%H%M%S"))
+
+
+out_folder = THIS_FOLDER + "/logging/sql_ing_act_{0}".format(time.strftime("%Y%m%d-%H%M%S"))
 db_constants = DatabaseConstants()
 embed_constants = EmbeddingModelConstants()
 recipe_constants = RecipeDataConstants()
-args_loader = RecipeArgsLoader("Process master ingredients and actions import",db_constants,embed_constants,recipe_constants)
+args_loader = RecipeArgsLoader("STEP 2 - Insert reference data to DB ingredients and actions",db_constants,embed_constants,recipe_constants)
 args_loader.LoadArgs()
 
 
-async def process_ingredients_actions(truncated_ingredients):
+Helpers.ensure_folders([out_folder])
 
-
+async def process_ingredients(ingredient_list,ingredient_match_list):
     async with AsyncSurrealDB(db_constants.DB_PARAMS.url) as db:
         auth_token = await db.sign_in(db_constants.DB_PARAMS.username,db_constants.DB_PARAMS.password)
         await db.use(db_constants.DB_PARAMS.namespace, db_constants.DB_PARAMS.database)
 
 
-        cooking_actions_with_parent =  SurqlReferenceData.extract_cooking_actions_with_parent()
-        
-        print("Inserting {0} cooking actions".format(len(cooking_actions_with_parent)) )
-        #embeddingModel = EmbeddingModel(db_constants.MODEL_PATH)
+        embedDataProcessor = SurqlEmbeddingModel(db)
+        embed_dimensions = await embedDataProcessor.get_model_dimensions()
+
+        out = await db.query(RecipeDataSurqlDDL.DDL_INGREDIENT.format(embed_dimensions=embed_dimensions))
+        print(f"Inserting {len(ingredient_list)} ingredients {len(ingredient_match_list)} substitutes")
 
         refDataProcessor = SurqlReferenceData(db)
-        out = await db.query(RecipeDataSurqlDDL.DDL_ACTION)
-        out = await refDataProcessor.insert_cooking_actions()
-
-        print("Inserting {0} ingredients".format(len(truncated_ingredients)) )
-        out = await db.query(RecipeDataSurqlDDL.DDL_INGREDIENT)
-        for ingredient in truncated_ingredients:
-            print("ingredient {0}".format(ingredient)) 
-            out = await refDataProcessor.insert_ingredient(ingredient)
-       
+        for ingredient in ingredient_list:
+            out = await refDataProcessor.insert_ingredient(
+                ingredient["ingredient"],ingredient["flavor"]
+            )
+        for ingredient_match in ingredient_match_list:
+            out = await refDataProcessor.insert_ingredient_substitute(
+                ingredient_match["entity"],
+                ingredient_match["sub"],
+                ingredient_match["rationale"],
+                ingredient_match["confidence"]
+            )
     print(
-        """ 
+            """ 
 
-        
-        Step 2 -- Insert ingredients and cooking actions    
-        Complete 
+            
+            Step 2 -- Insert ingredients   
+            Complete 
         """)
+    
+async def process_actions(action_list,action_match_list):
 
+
+
+    low_confidence_list = [d for d in action_match_list if int(d['confidence']) <= 5]
+
+    if len(low_confidence_list) > 0:
+        print(f"Warning the following are matches are low confidence and will be removed")
+        for item in low_confidence_list:
+            print(item)
+        
+
+    action_match_list = [d for d in action_match_list if int(d['confidence']) > 5]
+
+    parent_entities_that_dont_exist = RefDataHelper.find_unmatched_items(
+        action_match_list,action_list,"parent",None
+    )
+
+    if len(parent_entities_that_dont_exist) > 0:
+        print(f"Warning the following are parents that are missing from the list of actions. These will be added to the action list")
+        for item in parent_entities_that_dont_exist:
+            print(item)
+
+
+        for match in parent_entities_that_dont_exist:
+            action_list.append(match["parent"])
+
+    
+
+    
+
+
+
+    
+    async with AsyncSurrealDB(db_constants.DB_PARAMS.url) as db:
+        auth_token = await db.sign_in(db_constants.DB_PARAMS.username,db_constants.DB_PARAMS.password)
+        await db.use(db_constants.DB_PARAMS.namespace, db_constants.DB_PARAMS.database)
+
+
+        embedDataProcessor = SurqlEmbeddingModel(db)
+        embed_dimensions = await embedDataProcessor.get_model_dimensions()
+
+        out = await db.query(RecipeDataSurqlDDL.DDL_ACTION.format(embed_dimensions=embed_dimensions))
+        print(f"Inserting {len(action_match_list)} actions")
+
+
+        refDataProcessor = SurqlReferenceData(db)
+        for action_match in action_match_list:
+            out = await refDataProcessor.insert_cooking_action(
+                action_match["entity"],action_match["parent"],action_match["rationale"],action_match["confidence"]
+            )
+
+    print(
+            """ 
+
+            
+            Step 2 -- Insert actions   
+            Complete 
+        """)
 
 async def main():
 
     
     
-    print("""
-          STEP 2
-          DB_PARAMS {URL} N: {NS} DB: {DB} USER: {DB_USER}
+    args_loader.print()
 
-          DB_USER_ENV_VAR {DB_USER_ENV_VAR}
-          DB_PASS_ENV_VAR {DB_PASS_ENV_VAR}
+    debug_file = out_folder + "/gemini_debug.txt"
+    ingredient_list = RefDataHelper.convert_file_to_list(recipe_constants.EXTRACTED_INGREDIENTS_FILE)
+    ingredient_match_list = RefDataHelper.convert_file_to_list(recipe_constants.MATCHED_INGREDIENTS_FILE)
+    action_list = RefDataHelper.convert_file_to_list(recipe_constants.EXTRACTED_COOKING_ACTIONS_FILE)
+    action_match_list = RefDataHelper.convert_file_to_list(recipe_constants.MATCHED_COOKING_ACTIONS_FILE)
 
-          MODEL_PATH {MODEL_PATH}
-
-          RECIPE_FILE {RECIPE_FILE}
-          REVIEW_FILE {REVIEW_FILE}
-
-          PREV_EXTRACTED_INGREDIENTS_FILE {PREV_EXTRACTED_INGREDIENTS_FILE}
-
-          RECIPE_SAMPLE_RATIO {RECIPE_SAMPLE_RATIO}
-          REVIEW_SAMPLE_RATIO {REVIEW_SAMPLE_RATIO}
-
-          """.format(
-              URL = db_constants.DB_PARAMS.url,
-              DB_USER = db_constants.DB_PARAMS.username,
-              NS = db_constants.DB_PARAMS.namespace,
-              DB = db_constants.DB_PARAMS.database,
-              DB_USER_ENV_VAR = db_constants.DB_USER_ENV_VAR,
-              DB_PASS_ENV_VAR = db_constants.DB_PASS_ENV_VAR,
-              MODEL_PATH = embed_constants.MODEL_PATH,
-              RECIPE_FILE = recipe_constants.RECIPE_FILE,
-              REVIEW_FILE = recipe_constants.REVIEW_FILE,
-              PREV_EXTRACTED_INGREDIENTS_FILE = recipe_constants.PREV_EXTRACTED_INGREDIENTS_FILE,
-              RECIPE_SAMPLE_RATIO = recipe_constants.RECIPE_SAMPLE_RATIO,
-              REVIEW_SAMPLE_RATIO = recipe_constants.REVIEW_SAMPLE_RATIO
-
-          )
-          )
-    
-
-    truncated_ingredients = []
-    try:
-        with open(recipe_constants.PREV_EXTRACTED_INGREDIENTS_FILE, 'r') as file:
-            truncated_ingredients = file.read().splitlines()
-    except:
-        truncated_ingredients = []
-
-
-    await process_ingredients_actions(truncated_ingredients)
+    await process_ingredients(ingredient_list,ingredient_match_list)
+    await process_actions(action_list,action_match_list)
 
 
 

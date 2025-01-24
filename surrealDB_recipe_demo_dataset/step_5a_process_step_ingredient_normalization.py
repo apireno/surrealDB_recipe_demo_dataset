@@ -8,15 +8,15 @@ from helpers import Helpers
 from collections import defaultdict
 from surrealdb import AsyncSurrealDB
 from surrealDB_embedding_model.embedding_model_constants import EmbeddingModelConstants,DatabaseConstants,THIS_FOLDER
-from recipe_data_constants import RecipeDataConstants, RecipeArgsLoader
+from recipe_data_constants import RecipeDataConstants, RecipeArgsLoader,DATA_FOLDER
 from surql_recipes_steps import SurqlRecipesAndSteps
 from surql_ref_data import SurqlReferenceData
 
-out_folder = THIS_FOLDER + "/step_ingred_extraction_normal_{0}".format(time.strftime("%Y%m%d-%H%M%S"))
+out_folder = THIS_FOLDER + "/logging/step_ingred_extraction_normal_{0}".format(time.strftime("%Y%m%d-%H%M%S"))
 db_constants = DatabaseConstants()
 embed_constants = EmbeddingModelConstants()
 recipe_constants = RecipeDataConstants()
-args_loader = RecipeArgsLoader("Step ingredient normalization",db_constants,embed_constants,recipe_constants)
+args_loader = RecipeArgsLoader("STEP 5a - Step ingredient normalization",db_constants,embed_constants,recipe_constants)
 args_loader.LoadArgs()
 
 
@@ -88,7 +88,7 @@ async def process_recipe_ingredient_normalization():
 
             print(i,end="\r", flush=True)
 
-            # print("coll_ingr-{counter}/{total_count}\t{percent}\test_remaining\t{est_time_remaining}\telapsed\t{elapsed_duration}\tlast_duration\t{this_method_duration}\tlast_sql_duration\t{ingredient_sql_duration}\tlast_parse_duration\t{ingredient_parsing_duration}\tavg_duration\t{average_duration}\t-{row}\t\t\t\t\t\t\t\t\t\t\t\t".format(
+            # print("coll_ingr-{counter}/{total_count}:{percent}\t\test_remaining:{est_time_remaining}\t\telapsed:{elapsed_duration}\t\tlast_duration:{this_method_duration}\t\tlast_sql_duration:{ingredient_sql_duration}\t\tlast_parse_duration:{ingredient_parsing_duration}\t\tavg_duration:{average_duration}\t\t-{row}\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t".format(
             #             counter = i,
             #             total_count = total_ingredients,
             #             percent = f"{percentage:.2%}",
@@ -119,7 +119,7 @@ async def process_recipe_ingredient_normalization():
                 outcome = await recipeDataProcessor.update_step_normalized_ingredients(key,value)  
             
             except Exception as e:
-                 Helpers.logError(
+                 await Helpers.logError(
                      [key,value],"update_step_norm_ing",e,out_folder
                  )
             
@@ -139,7 +139,8 @@ async def process_recipe_ingredient_normalization():
             est_time_remaining = average_duration * (N - i)
             est_time_remaining_minutes = est_time_remaining / 60
 
-            print("updating_steps-\t\t{counter}/{total_count}\t\t{percent}\test_remaining\t\t{est_time_remaining}\t\telapsed\t{elapsed_duration}\tlast_duration\t{this_method_duration}\tavg_duration\t{average_duration}\t-{row}\t-{value}\t\t\t\t\t\t\t\t\t\t\t\t".format(
+            str_to_format = "updating_steps-:{counter}/{total_count}:{percent}\t\test_remaining:{est_time_remaining}\t\ttelapsed:{elapsed_duration}\t\tlast_duration:{this_method_duration}\t\tavg_duration:{average_duration}\t\t-{row}\t\t-{value}"
+            Helpers.print_update(str_to_format.format(
                         counter = i,
                         total_count = N,
                         percent = f"{percentage:.2%}",
@@ -149,7 +150,7 @@ async def process_recipe_ingredient_normalization():
                         est_time_remaining = f"{est_time_remaining_minutes:.1f} min",
                         row = key,
                         value = len(value)
-                        ), end="\r", flush=True) 
+                        )) 
             
     
     current_time = time.time() 
@@ -212,44 +213,7 @@ async def process_recipe_ingredient_normalization():
 
 async def main():
 
-    
-    print("""
-          
-
-          
-          STEP 5a extract step ingredients
-          DB_PARAMS {URL} N: {NS} DB: {DB} USER: {DB_USER}
-
-          DB_USER_ENV_VAR {DB_USER_ENV_VAR}
-          DB_PASS_ENV_VAR {DB_PASS_ENV_VAR}
-
-          MODEL_PATH {MODEL_PATH}
-
-          RECIPE_FILE {RECIPE_FILE}
-          REVIEW_FILE {REVIEW_FILE}
-
-          PREV_EXTRACTED_INGREDIENTS_FILE {PREV_EXTRACTED_INGREDIENTS_FILE}
-
-          RECIPE_SAMPLE_RATIO {RECIPE_SAMPLE_RATIO}
-          REVIEW_SAMPLE_RATIO {REVIEW_SAMPLE_RATIO}
-
-          """.format(
-              URL = db_constants.DB_PARAMS.url,
-              DB_USER = db_constants.DB_PARAMS.username,
-              NS = db_constants.DB_PARAMS.namespace,
-              DB = db_constants.DB_PARAMS.database,
-              DB_USER_ENV_VAR = db_constants.DB_USER_ENV_VAR,
-              DB_PASS_ENV_VAR = db_constants.DB_PASS_ENV_VAR,
-              MODEL_PATH = embed_constants.MODEL_PATH,
-              RECIPE_FILE = recipe_constants.RECIPE_FILE,
-              REVIEW_FILE = recipe_constants.REVIEW_FILE,
-              PREV_EXTRACTED_INGREDIENTS_FILE = recipe_constants.PREV_EXTRACTED_INGREDIENTS_FILE,
-              RECIPE_SAMPLE_RATIO = recipe_constants.RECIPE_SAMPLE_RATIO,
-              REVIEW_SAMPLE_RATIO = recipe_constants.REVIEW_SAMPLE_RATIO
-
-          )
-          )
-    
+    args_loader.print()
     await process_recipe_ingredient_normalization()
 
 

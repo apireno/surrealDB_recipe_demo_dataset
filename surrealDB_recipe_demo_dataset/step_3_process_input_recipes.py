@@ -9,24 +9,27 @@ from helpers import Helpers
 from datetime import datetime,timedelta
 from surrealdb import AsyncSurrealDB
 from surrealDB_embedding_model.embedding_model_constants import EmbeddingModelConstants,DatabaseConstants,THIS_FOLDER
-from recipe_data_constants import RecipeDataConstants, RecipeArgsLoader
+from recipe_data_constants import RecipeDataConstants, RecipeArgsLoader,DATA_FOLDER
 from surql_recipes_steps import SurqlRecipesAndSteps
 from recipe_data_surql_ddl import RecipeDataSurqlDDL
 from surrealDB_embedding_model.surql_embedding_model import SurqlEmbeddingModel
+from helpers import Helpers
 
-out_folder = THIS_FOLDER + "/process_recipes_{0}".format(time.strftime("%Y%m%d-%H%M%S"))
+out_folder = THIS_FOLDER + "/logging/process_recipes_{0}".format(time.strftime("%Y%m%d-%H%M%S"))
 db_constants = DatabaseConstants()
 embed_constants = EmbeddingModelConstants()
 recipe_constants = RecipeDataConstants()
-args_loader = RecipeArgsLoader("Input recipes and steps",db_constants,embed_constants,recipe_constants)
+args_loader = RecipeArgsLoader("STEP 3 Input recipes and steps into DB",db_constants,embed_constants,recipe_constants)
 args_loader.LoadArgs()
+
+Helpers.ensure_folders([out_folder])
 
 
 step_insert_durations = []
 recipe_insert_durations = []
 recipe_full_transation_method_durations = []
 
-async def process_recipe(dataProcessor:SurqlRecipesAndSteps,row,counter,total_count,start_time):
+async def process_recipe(dataProcessor:SurqlRecipesAndSteps,row,counter,total_count,start_time,log_file):
     percentage = counter/total_count
     method_start_time = time.time() 
     recipe_insert_duration = 0
@@ -86,7 +89,30 @@ async def process_recipe(dataProcessor:SurqlRecipesAndSteps,row,counter,total_co
     avg_step_insertion_duration_ms = avg_step_insertion_duration * 1000
     recipe_insert_duration_ms = recipe_insert_duration * 1000
 
-    print("process_recipe-{counter}/{total_count}\t{percent}\test_remaining\t{est_time_remaining}\telapsed\t{elapsed_duration}\tlast_duration\t{this_method_duration}\tavg_duration\t{average_duration}\tavg_step_ins_duration\t{avg_step_insertion_duration}\trec_ins_duration\t{recipe_insert_duration}\t-{row}-|".format(
+
+    log_file.write(
+                        "{counter},{total_count},{percent},{est_time_remaining},{elapsed_duration},{this_method_duration},{average_duration},{avg_step_insertion_duration},{recipe_insert_duration},{row},{num_steps}\n".format(
+                            counter = counter,
+                            total_count = total_count,
+                            percent = f"{percentage:.2%}",
+                            elapsed_duration = f"{elapsed_duration_minutes:.1f} min",
+                            average_duration = f"{average_duration_ms:.3f} ms",
+                            this_method_duration = f"{this_method_duration_ms:.3f} ms",
+                            est_time_remaining = f"{est_time_remaining_minutes:.1f} min",
+                            avg_step_insertion_duration = f"{avg_step_insertion_duration_ms:.3f} ms",
+                            recipe_insert_duration = f"{recipe_insert_duration_ms:.3f} ms",
+                            row = row.id,
+                            num_steps = len(step_ids)
+
+                        )
+
+                )
+    
+
+
+    str_to_format = "process_recipe-{counter}/{total_count}\t{percent}\test_remaining:{est_time_remaining}\telapsed:{elapsed_duration}\tlast:{this_method_duration}\tavg:{average_duration}\tavg_step_ins:{avg_step_insertion_duration}\trec_ins:{recipe_insert_duration}\t-{row}\t-{num_steps}"
+    Helpers.print_update(
+        str_to_format.format(
                 counter = counter,
                 total_count = total_count,
                 percent = f"{percentage:.2%}",
@@ -96,9 +122,14 @@ async def process_recipe(dataProcessor:SurqlRecipesAndSteps,row,counter,total_co
                 est_time_remaining = f"{est_time_remaining_minutes:.1f} min",
                 avg_step_insertion_duration = f"{avg_step_insertion_duration_ms:.3f} ms",
                 recipe_insert_duration = f"{recipe_insert_duration_ms:.3f} ms",
-                row = row.id
-                ), end="\r", flush=True) 
+                row = row.id,
+                num_steps = len(step_ids)
+                )
+
+    )
     
+
+
 
 
 async def process_recipes(recipe_df,batch_size=1,total_records=0,offset=0):
@@ -108,6 +139,8 @@ async def process_recipes(recipe_df,batch_size=1,total_records=0,offset=0):
     if total_records==0 :
         total_records = len(recipe_df)
     start_time = time.time()
+
+
     async with AsyncSurrealDB(db_constants.DB_PARAMS.url) as db:
 
         auth_token = await db.sign_in(db_constants.DB_PARAMS.username,db_constants.DB_PARAMS.password)
@@ -118,49 +151,55 @@ async def process_recipes(recipe_df,batch_size=1,total_records=0,offset=0):
         embedDataProcessor = SurqlEmbeddingModel(db)
         embed_dimensions = await embedDataProcessor.get_model_dimensions()
         
-
-        out = await db.query(RecipeDataSurqlDDL.DDL_STEP.format(embed_dimensions=embed_dimensions))
-        out = await db.query(RecipeDataSurqlDDL.DDL_RECIPE.format(embed_dimensions=embed_dimensions))
+        if offset == 0:
+            #only recreate the tables if not picking up from a prev run...
+            out = await db.query(RecipeDataSurqlDDL.DDL_STEP.format(embed_dimensions=embed_dimensions))
+            out = await db.query(RecipeDataSurqlDDL.DDL_RECIPE.format(embed_dimensions=embed_dimensions))
 
         #dataProcessor = SurqlRecipesAndSteps(db,embeddingModel)
         dataProcessor = SurqlRecipesAndSteps(db)
         
-        for i in range(offset, total_records, batch_size):
-            batch = recipe_df[i : i + batch_size].itertuples()
-            tasks = [process_recipe(dataProcessor,row,i,total_records,start_time) for row in batch]
-            await asyncio.gather(*tasks)
+        benchmark_log = out_folder + "/log.csv"
+        with open(benchmark_log,"w") as log_file:
+            log_file.write(
+                    "counter,total_count,percent,est_time_remaining,elapsed,last_duration,avg_duration,avg_step_ins_duration,rec_ins_duration,row_id,num_steps\n"
+            )
+            for i in range(offset, total_records, batch_size):
+                batch = recipe_df[i : i + batch_size].itertuples()
+                tasks = [process_recipe(dataProcessor,row,i,total_records,start_time,log_file) for row in batch]
+                await asyncio.gather(*tasks)
 
-    
-    current_time = time.time() 
-    elapsed_duration = current_time - start_time
-    elapsed_duration_minutes = elapsed_duration/60
-    average_duration = elapsed_duration / total_records if total_records else 0
-    average_duration_ms = average_duration * 1000
-    
-    min_recipe_full_transation_method_duration = np.min(recipe_full_transation_method_durations)
-    min_recipe_full_transation_method_duration_ms = min_recipe_full_transation_method_duration * 1000
+        
+        current_time = time.time() 
+        elapsed_duration = current_time - start_time
+        elapsed_duration_minutes = elapsed_duration/60
+        average_duration = elapsed_duration / total_records if total_records else 0
+        average_duration_ms = average_duration * 1000
+        
+        min_recipe_full_transation_method_duration = np.min(recipe_full_transation_method_durations)
+        min_recipe_full_transation_method_duration_ms = min_recipe_full_transation_method_duration * 1000
 
-    max_recipe_full_transation_method_duration = np.max(recipe_full_transation_method_durations)
-    max_recipe_full_transation_method_duration_ms = max_recipe_full_transation_method_duration * 1000
+        max_recipe_full_transation_method_duration = np.max(recipe_full_transation_method_durations)
+        max_recipe_full_transation_method_duration_ms = max_recipe_full_transation_method_duration * 1000
 
 
-    avg_step_insertion_duration = np.mean(step_insert_durations)
-    avg_step_insertion_duration_ms = avg_step_insertion_duration * 1000
+        avg_step_insertion_duration = np.mean(step_insert_durations)
+        avg_step_insertion_duration_ms = avg_step_insertion_duration * 1000
 
-    min_step_insertion_duration = np.min(step_insert_durations)
-    min_step_insertion_duration_ms = min_step_insertion_duration * 1000
+        min_step_insertion_duration = np.min(step_insert_durations)
+        min_step_insertion_duration_ms = min_step_insertion_duration * 1000
 
-    max_step_insertion_duration = np.max(step_insert_durations)
-    max_step_insertion_duration_ms = max_step_insertion_duration * 1000
+        max_step_insertion_duration = np.max(step_insert_durations)
+        max_step_insertion_duration_ms = max_step_insertion_duration * 1000
 
-    avg_recipe_insertion_duration = np.mean(recipe_insert_durations)
-    avg_recipe_insertion_duration_ms = avg_recipe_insertion_duration * 1000
+        avg_recipe_insertion_duration = np.mean(recipe_insert_durations)
+        avg_recipe_insertion_duration_ms = avg_recipe_insertion_duration * 1000
 
-    min_recipe_insertion_duration = np.min(recipe_insert_durations)
-    min_recipe_insertion_duration_ms = min_recipe_insertion_duration * 1000
+        min_recipe_insertion_duration = np.min(recipe_insert_durations)
+        min_recipe_insertion_duration_ms = min_recipe_insertion_duration * 1000
 
-    max_recipe_insertion_duration = np.max(recipe_insert_durations)
-    max_recipe_insertion_duration_ms = max_recipe_insertion_duration * 1000
+        max_recipe_insertion_duration = np.max(recipe_insert_durations)
+        max_recipe_insertion_duration_ms = max_recipe_insertion_duration * 1000
 
     print(
         """
@@ -192,43 +231,16 @@ async def main():
 
 
     
-    print("""
-          STEP 3 recipes
-          DB_PARAMS {URL} N: {NS} DB: {DB} USER: {DB_USER}
-
-          DB_USER_ENV_VAR {DB_USER_ENV_VAR}
-          DB_PASS_ENV_VAR {DB_PASS_ENV_VAR}
-
-          MODEL_PATH {MODEL_PATH}
-
-          RECIPE_FILE {RECIPE_FILE}
-          REVIEW_FILE {REVIEW_FILE}
-
-          PREV_EXTRACTED_INGREDIENTS_FILE {PREV_EXTRACTED_INGREDIENTS_FILE}
-
-          RECIPE_SAMPLE_RATIO {RECIPE_SAMPLE_RATIO}
-          REVIEW_SAMPLE_RATIO {REVIEW_SAMPLE_RATIO}
-
-          """.format(
-              URL = db_constants.DB_PARAMS.url,
-              DB_USER = db_constants.DB_PARAMS.username,
-              NS = db_constants.DB_PARAMS.namespace,
-              DB = db_constants.DB_PARAMS.database,
-              DB_USER_ENV_VAR = db_constants.DB_USER_ENV_VAR,
-              DB_PASS_ENV_VAR = db_constants.DB_PASS_ENV_VAR,
-              MODEL_PATH = embed_constants.MODEL_PATH,
-              RECIPE_FILE = recipe_constants.RECIPE_FILE,
-              REVIEW_FILE = recipe_constants.REVIEW_FILE,
-              PREV_EXTRACTED_INGREDIENTS_FILE = recipe_constants.PREV_EXTRACTED_INGREDIENTS_FILE,
-              RECIPE_SAMPLE_RATIO = recipe_constants.RECIPE_SAMPLE_RATIO,
-              REVIEW_SAMPLE_RATIO = recipe_constants.REVIEW_SAMPLE_RATIO
-
-          )
-          )
+    
+    args_loader.print()
     
     recipe_df = pd.read_csv(recipe_constants.RECIPE_FILE)
 
     recipe_df = recipe_df.sample(frac=recipe_constants.RECIPE_SAMPLE_RATIO, random_state=1)
+
+
+
+
 
     print(recipe_df.describe())
     print(recipe_df.head())

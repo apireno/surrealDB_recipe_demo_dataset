@@ -8,15 +8,15 @@ from helpers import Helpers
 from collections import defaultdict
 from surrealdb import AsyncSurrealDB
 from surrealDB_embedding_model.embedding_model_constants import EmbeddingModelConstants,DatabaseConstants,THIS_FOLDER
-from recipe_data_constants import RecipeDataConstants, RecipeArgsLoader
+from recipe_data_constants import RecipeDataConstants, RecipeArgsLoader,DATA_FOLDER
 from surql_recipes_steps import SurqlRecipesAndSteps
 from surql_ref_data import SurqlReferenceData
 
-out_folder = THIS_FOLDER + "/step_action_extraction_{0}".format(time.strftime("%Y%m%d-%H%M%S"))
+out_folder = THIS_FOLDER + "/logging/step_action_extraction_{0}".format(time.strftime("%Y%m%d-%H%M%S"))
 db_constants = DatabaseConstants()
 embed_constants = EmbeddingModelConstants()
 recipe_constants = RecipeDataConstants()
-args_loader = RecipeArgsLoader("Step action extraction",db_constants,embed_constants,recipe_constants)
+args_loader = RecipeArgsLoader("STEP 5b - Step action extraction",db_constants,embed_constants,recipe_constants)
 args_loader.LoadArgs()
 
 
@@ -85,7 +85,9 @@ async def process_step_action_extraction():
             est_time_remaining_minutes = est_time_remaining / 60
 
 
-            print("parsing_action-{counter}/{total_count}\t{percent}\test_remaining\t{est_time_remaining}\telapsed\t{elapsed_duration}\tlast_duration\t{this_method_duration}\tavg_duration\t{average_duration}\tthis_sql_duration\t{action_sql_duration}\t-{row}\t\t\t\t\t\t\t\t\t\t\t".format(
+
+            str_to_format = "parsing_action-{counter}/{total_count}:{percent}\t\test_remaining:{est_time_remaining}\t\telapsed:{elapsed_duration}\t\tlast_duration:{this_method_duration}\t\tavg_duration:{average_duration}\t\tthis_sql_duration:{action_sql_duration}\t\t-{row}"
+            Helpers.print_update(str_to_format.format(
                         counter = i,
                         total_count = total_actions,
                         percent = f"{percentage:.2%}",
@@ -95,7 +97,7 @@ async def process_step_action_extraction():
                         action_sql_duration = f"{action_sql_duration_ms:.3f} ms",
                         est_time_remaining = f"{est_time_remaining_minutes:.1f} min",
                         row = action["id"]
-                        ), end="\r", flush=True) 
+                        )) 
 
 
 
@@ -127,7 +129,7 @@ async def process_step_action_extraction():
             est_time_remaining_minutes = est_time_remaining / 60
 
 
-            print("updating_step_actions-{counter}/{total_count}\t{percent}\test_remaining\t{est_time_remaining}\telapsed\t{elapsed_duration}\tlast_duration\t{this_method_duration}\tavg_duration\t{average_duration}\t-{row}\t-{icnt}\t\t\t\t\t\t\t\t\t\t\t".format(
+            print("updating_step_actions-{counter}/{total_count}:{percent}\t\test_remaining:{est_time_remaining}\t\telapsed:{elapsed_duration}\t\tlast_duration:{this_method_duration}\t\tavg_duration:{average_duration}\t\t-{row}\t\t-{icnt}\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t".format(
                         counter = i,
                         total_count = N,
                         percent = f"{percentage:.2%}",
@@ -199,44 +201,7 @@ async def process_step_action_extraction():
 
 async def main():
 
-
-    print("""
-          
-
-
-          
-          STEP 5b extract actions from steps
-          DB_PARAMS {URL} N: {NS} DB: {DB} USER: {DB_USER}
-
-          DB_USER_ENV_VAR {DB_USER_ENV_VAR}
-          DB_PASS_ENV_VAR {DB_PASS_ENV_VAR}
-
-          MODEL_PATH {MODEL_PATH}
-
-          RECIPE_FILE {RECIPE_FILE}
-          REVIEW_FILE {REVIEW_FILE}
-
-          PREV_EXTRACTED_INGREDIENTS_FILE {PREV_EXTRACTED_INGREDIENTS_FILE}
-
-          RECIPE_SAMPLE_RATIO {RECIPE_SAMPLE_RATIO}
-          REVIEW_SAMPLE_RATIO {REVIEW_SAMPLE_RATIO}
-
-          """.format(
-              URL = db_constants.DB_PARAMS.url,
-              DB_USER = db_constants.DB_PARAMS.username,
-              NS = db_constants.DB_PARAMS.namespace,
-              DB = db_constants.DB_PARAMS.database,
-              DB_USER_ENV_VAR = db_constants.DB_USER_ENV_VAR,
-              DB_PASS_ENV_VAR = db_constants.DB_PASS_ENV_VAR,
-              MODEL_PATH = embed_constants.MODEL_PATH,
-              RECIPE_FILE = recipe_constants.RECIPE_FILE,
-              REVIEW_FILE = recipe_constants.REVIEW_FILE,
-              PREV_EXTRACTED_INGREDIENTS_FILE = recipe_constants.PREV_EXTRACTED_INGREDIENTS_FILE,
-              RECIPE_SAMPLE_RATIO = recipe_constants.RECIPE_SAMPLE_RATIO,
-              REVIEW_SAMPLE_RATIO = recipe_constants.REVIEW_SAMPLE_RATIO
-
-          )
-          )
+    args_loader.print()
     await process_step_action_extraction()
 
 

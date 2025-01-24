@@ -9,7 +9,7 @@ class SurqlReviewsAndReviewers:
     LET $this_object = type::thing("reviewer",$reviewer_id);
     UPSERT $this_object CONTENT {{
         name : $name
-        }} RETRUN NONE;
+        }} RETURN NONE;
     """
 
     INSERT_REVIEW = """
@@ -24,30 +24,11 @@ class SurqlReviewsAndReviewers:
             updated : <datetime>$time_updated
         }},
         rating : $rating,
-        review_text : $review_text,
-        review_text_embedding : $review_text_embedding
+        review_text : $review_text
         }} RETURN NONE;
     """
 
 
-
-    INSERT_REVIEW_CALC_EMBEDDING = """
-    LET $reviewer_object = type::thing("reviewer",$reviewer_id);
-    LET $recipe_object = type::thing("recipe",$recipe_id);
-    LET $review_text_embedding = fn::sentence_to_vector($review_text);
-
-
-    RELATE $reviewer_object -> review -> $recipe_object
-    CONTENT {{
-        time :{{
-            submitted : <datetime>$time_submitted,
-            updated : <datetime>$time_updated
-        }},
-        rating : $rating,
-        review_text : $review_text,
-        review_text_embedding : $review_text_embedding
-        }} RETURN NONE;
-    """
 
 
 
@@ -68,29 +49,17 @@ class SurqlReviewsAndReviewers:
 
     async def insert_review(self,reviewer_id,recipe_id,
                             time_submitted,time_updated,
-                            rating,review_text,useDBEmbedding = True):
+                            rating,review_text):
         
 
-        if useDBEmbedding==False:
-            review_text_embedding = self.embeddingModel.sentence_to_vec(review_text)
-            params = {"reviewer_id": reviewer_id,
-                "recipe_id": recipe_id,
-                "time_submitted": time_submitted,
-                "time_updated": time_updated,
-                "rating": rating,
-                "review_text": str(review_text),
-                "review_text_embedding":review_text_embedding
-                }
-            outcome = await self.db.query(SurqlReviewsAndReviewers.INSERT_REVIEW, params)
-        else:
-            params = {"reviewer_id": reviewer_id,
-                "recipe_id": recipe_id,
-                "time_submitted": time_submitted,
-                "time_updated": time_updated,
-                "rating": rating,
-                "review_text": str(review_text)
-                }
-            outcome = await self.db.query(SurqlReviewsAndReviewers.INSERT_REVIEW_CALC_EMBEDDING, params)
+        params = {"reviewer_id": reviewer_id,
+            "recipe_id": recipe_id,
+            "time_submitted": time_submitted,
+            "time_updated": time_updated,
+            "rating": rating,
+            "review_text": str(review_text)
+            }
+        outcome = await self.db.query(SurqlReviewsAndReviewers.INSERT_REVIEW, params)
             
         for item in outcome:
             if item["status"]=="ERR":
