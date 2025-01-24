@@ -88,7 +88,7 @@ async def process_recipe_ingredient_normalization():
 
             print(i,end="\r", flush=True)
 
-            # print("coll_ingr-{counter}/{total_count}\t{percent}\test_remaining\t{est_time_remaining}\telapsed\t{elapsed_duration}\tlast_duration\t{this_method_duration}\tlast_sql_duration\t{ingredient_sql_duration}\tlast_parse_duration\t{ingredient_parsing_duration}\tavg_duration\t{average_duration}\t-{row}\t\t\t\t\t\t\t\t\t\t\t\t".format(
+            # print("coll_ingr-{counter}/{total_count}:{percent}\t\test_remaining:{est_time_remaining}\t\telapsed:{elapsed_duration}\t\tlast_duration:{this_method_duration}\t\tlast_sql_duration:{ingredient_sql_duration}\t\tlast_parse_duration:{ingredient_parsing_duration}\t\tavg_duration:{average_duration}\t\t-{row}\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t".format(
             #             counter = i,
             #             total_count = total_ingredients,
             #             percent = f"{percentage:.2%}",
@@ -119,7 +119,7 @@ async def process_recipe_ingredient_normalization():
                 outcome = await recipeDataProcessor.update_step_normalized_ingredients(key,value)  
             
             except Exception as e:
-                 Helpers.logError(
+                 await Helpers.logError(
                      [key,value],"update_step_norm_ing",e,out_folder
                  )
             
@@ -139,7 +139,8 @@ async def process_recipe_ingredient_normalization():
             est_time_remaining = average_duration * (N - i)
             est_time_remaining_minutes = est_time_remaining / 60
 
-            print("updating_steps-\t\t{counter}/{total_count}\t\t{percent}\test_remaining\t\t{est_time_remaining}\t\telapsed\t{elapsed_duration}\tlast_duration\t{this_method_duration}\tavg_duration\t{average_duration}\t-{row}\t-{value}\t\t\t\t\t\t\t\t\t\t\t\t".format(
+            str_to_format = "updating_steps-:{counter}/{total_count}:{percent}\t\test_remaining:{est_time_remaining}\t\ttelapsed:{elapsed_duration}\t\tlast_duration:{this_method_duration}\t\tavg_duration:{average_duration}\t\t-{row}\t\t-{value}"
+            Helpers.print_update(str_to_format.format(
                         counter = i,
                         total_count = N,
                         percent = f"{percentage:.2%}",
@@ -149,7 +150,7 @@ async def process_recipe_ingredient_normalization():
                         est_time_remaining = f"{est_time_remaining_minutes:.1f} min",
                         row = key,
                         value = len(value)
-                        ), end="\r", flush=True) 
+                        )) 
             
     
     current_time = time.time() 

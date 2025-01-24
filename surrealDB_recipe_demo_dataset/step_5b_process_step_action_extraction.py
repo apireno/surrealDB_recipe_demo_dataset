@@ -85,7 +85,9 @@ async def process_step_action_extraction():
             est_time_remaining_minutes = est_time_remaining / 60
 
 
-            print("parsing_action-{counter}/{total_count}\t{percent}\test_remaining\t{est_time_remaining}\telapsed\t{elapsed_duration}\tlast_duration\t{this_method_duration}\tavg_duration\t{average_duration}\tthis_sql_duration\t{action_sql_duration}\t-{row}\t\t\t\t\t\t\t\t\t\t\t".format(
+
+            str_to_format = "parsing_action-{counter}/{total_count}:{percent}\t\test_remaining:{est_time_remaining}\t\telapsed:{elapsed_duration}\t\tlast_duration:{this_method_duration}\t\tavg_duration:{average_duration}\t\tthis_sql_duration:{action_sql_duration}\t\t-{row}"
+            Helpers.print_update(str_to_format.format(
                         counter = i,
                         total_count = total_actions,
                         percent = f"{percentage:.2%}",
@@ -95,7 +97,7 @@ async def process_step_action_extraction():
                         action_sql_duration = f"{action_sql_duration_ms:.3f} ms",
                         est_time_remaining = f"{est_time_remaining_minutes:.1f} min",
                         row = action["id"]
-                        ), end="\r", flush=True) 
+                        )) 
 
 
 
@@ -127,7 +129,7 @@ async def process_step_action_extraction():
             est_time_remaining_minutes = est_time_remaining / 60
 
 
-            print("updating_step_actions-{counter}/{total_count}\t{percent}\test_remaining\t{est_time_remaining}\telapsed\t{elapsed_duration}\tlast_duration\t{this_method_duration}\tavg_duration\t{average_duration}\t-{row}\t-{icnt}\t\t\t\t\t\t\t\t\t\t\t".format(
+            print("updating_step_actions-{counter}/{total_count}:{percent}\t\test_remaining:{est_time_remaining}\t\telapsed:{elapsed_duration}\t\tlast_duration:{this_method_duration}\t\tavg_duration:{average_duration}\t\t-{row}\t\t-{icnt}\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t".format(
                         counter = i,
                         total_count = N,
                         percent = f"{percentage:.2%}",

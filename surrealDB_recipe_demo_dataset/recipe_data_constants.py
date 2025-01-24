@@ -99,18 +99,12 @@ class RecipeArgsLoader(ArgsLoader):
             self.gemini_data_constants.SetArgs(self.args)
 
         
-        #for developing edit the settings here to avoid using CLI
-        self.db_constants.DB_PARAMS.url = "ws://0.0.0.0:8080"
-        self.db_constants.DB_PARAMS.namespace = "embedding_example"
-        self.db_constants.DB_PARAMS.database = "embedding_example"
-        self.recipe_data_constants.RECIPE_SAMPLE_RATIO = 0.001
-
 
 
 
     def print(self):
         # self.gemini_data_constants.GOOGLE_GENAI_API_KEY_ENV_VAR = "GOOGLE_GENAI_API_KEY"
-        # self.gemini_data_constants.GEMINI_LLM_MODEL = "gemini-1.5-flash"
+        # self.gemini_data_constants.GEMINI_LLM_MODEL = "gemini-1.5-flash"x
         # self.gemini_data_constants.API_SLEEP = 4
         # self.gemini_data_constants.RETRY_COUNT = 10
         # self.gemini_data_constants.COMPLETION_DELEMITER = "#XXXXXXCOMPLETEXXXXXX" 

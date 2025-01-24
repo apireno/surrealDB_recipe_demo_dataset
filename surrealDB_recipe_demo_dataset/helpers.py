@@ -4,6 +4,7 @@ import json
 import ast
 import re
 import os
+import math
 
 class Helpers:
 
@@ -15,6 +16,11 @@ class Helpers:
                 os.makedirs(path)
             
 
+    @staticmethod
+    def print_update(string_to_print):
+        print(" " * math.ceil(len(string_to_print)*1.2) , end="\r", flush=True)
+        print( string_to_print, end="\r", flush=True) 
+            
 
     @staticmethod
     async def logError(

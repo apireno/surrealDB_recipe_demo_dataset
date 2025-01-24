@@ -18,6 +18,7 @@ recipe_constants = RecipeDataConstants()
 args_loader = RecipeArgsLoader("STEP 4 - Recipe ingredient normalization",db_constants,embed_constants,recipe_constants)
 args_loader.LoadArgs()
 
+Helpers.ensure_folders([out_folder])
 
 ingredient_processing_durations = []
 ingredient_sql_durations = []
@@ -84,7 +85,9 @@ async def process_recipe_ingredient_normalization():
             est_time_remaining = average_duration * (total_ingredients - i)
             est_time_remaining_minutes = est_time_remaining / 60
 
-            print("collecting_ingredients-{counter}/{total_count}\t{percent}\test_remaining\t{est_time_remaining}\telapsed\t{elapsed_duration}\tlast_duration\t{this_method_duration}\tlast_sql_duration\t{ingredient_sql_duration}\tlast_parse_duration\t{ingredient_parsing_duration}\tavg_duration\t{average_duration}\t-{row}\t\t\t\t\t\t\t\t\t\t\t\t".format(
+
+            str_to_format = "collecting_ingredients-{counter}/{total_count}:{percent}\t\test_remaining:{est_time_remaining}\t\telapsed:{elapsed_duration}\t\tlast_duration:{this_method_duration}\t\tlast_sql_duration:{ingredient_sql_duration}\t\tlast_parse_duration:{ingredient_parsing_duration}\t\tavg_duration:{average_duration}\t\t-{row}"
+            Helpers.print_update(str_to_format.format(
                         counter = i,
                         total_count = total_ingredients,
                         percent = f"{percentage:.2%}",
@@ -95,7 +98,7 @@ async def process_recipe_ingredient_normalization():
                         ingredient_parsing_duration = f"{ingredient_parsing_duration_ms:.3f} ms",
                         est_time_remaining = f"{est_time_remaining_minutes:.1f} min",
                         row = ingredient["name"]
-                        ), end="\r", flush=True) 
+                        )) 
 
 
 
@@ -106,44 +109,65 @@ async def process_recipe_ingredient_normalization():
         await db.use(db_constants.DB_PARAMS.namespace, db_constants.DB_PARAMS.database)
         recipeDataProcessor = SurqlRecipesAndSteps(db)
 
-        for key, value in recipe_normalized_ingredients.items():
-            i += 1
-            recipe_start_time = time.time()
-            try:
-                outcome = await recipeDataProcessor.update_recipe_normalized_ingredients(key,value)  
-            
-            except Exception as e:
-                 Helpers.logError(
-                     [key,value],"update_rec_norm_ing",e,out_folder
-                 )
-            
-            current_time = time.time() 
-            percentage = i/N
 
-            elapsed_duration = current_time - start_time
-            elapsed_duration_minutes = elapsed_duration/60
-            average_duration = elapsed_duration / i if i else 0
-            average_duration_ms = average_duration * 1000
+        benchmark_log = out_folder + "/log.csv"
+        with open(benchmark_log,"w") as log_file:
+            log_file.write(
+                    "counter,total_count,percent,est_time_remaining,elapsed,last_duration,avg_duration,row,val\n"
+            )
 
-            recipe_update_duration = current_time - recipe_start_time
-            recipe_update_durations.append(recipe_update_duration)
-            recipe_update_duration_ms = recipe_update_duration*1000
+                
+            for key, value in recipe_normalized_ingredients.items():
+                i += 1
+                recipe_start_time = time.time()
+                try:
+                    outcome = await recipeDataProcessor.update_recipe_normalized_ingredients(key,value)  
+                
+                except Exception as e:
+                    await Helpers.logError(
+                        [key,value],"update_rec_norm_ing",e,out_folder
+                    )
+                
+                current_time = time.time() 
+                percentage = i/N
+
+                elapsed_duration = current_time - start_time
+                elapsed_duration_minutes = elapsed_duration/60
+                average_duration = elapsed_duration / i if i else 0
+                average_duration_ms = average_duration * 1000
+
+                recipe_update_duration = current_time - recipe_start_time
+                recipe_update_durations.append(recipe_update_duration)
+                recipe_update_duration_ms = recipe_update_duration*1000
 
 
-            est_time_remaining = recipe_update_duration * (N - i)
-            est_time_remaining_minutes = est_time_remaining / 60
+                est_time_remaining = recipe_update_duration * (N - i)
+                est_time_remaining_minutes = est_time_remaining / 60
 
-            print("updating_recipes-{counter}/{total_count}\t{percent}\test_remaining\t{est_time_remaining}\telapsed\t{elapsed_duration}\tlast_duration\t{this_method_duration}\tavg_duration\t{average_duration}\t-{row}\t-{value}\t\t\t\t\t\t\t\t\t\t\t\t".format(
-                        counter = i,
-                        total_count = N,
-                        percent = f"{percentage:.2%}",
-                        elapsed_duration = f"{elapsed_duration_minutes:.1f} min",
-                        average_duration = f"{average_duration_ms:.3f} ms",
-                        this_method_duration = f"{recipe_update_duration_ms:.3f} ms",
-                        est_time_remaining = f"{est_time_remaining_minutes:.1f} min",
-                        row = key,
-                        value = len(value)
-                        ), end="\r", flush=True) 
+                log_file.write(
+                    "{counter},{total_count},{percent},{est_time_remaining},{elapsed_duration},{this_method_duration},{average_duration},{row},{value}\n".format(
+                            counter = i,
+                            total_count = N,
+                            percent = f"{percentage:.2%}",
+                            elapsed_duration = f"{elapsed_duration_minutes:.1f} min",
+                            average_duration = f"{average_duration_ms:.3f} ms",
+                            this_method_duration = f"{recipe_update_duration_ms:.3f} ms",
+                            est_time_remaining = f"{est_time_remaining_minutes:.1f} min",
+                            row = key,
+                            value = len(value)
+                            )
+                )
+                print("updating_recipes-{counter}/{total_count}:{percent}\t\test_remaining:{est_time_remaining}\t\telapsed:{elapsed_duration}\t\tlast_duration:{this_method_duration}\t\tavg_duration:{average_duration}\t\t-{row}\t\t-{value}\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t".format(
+                            counter = i,
+                            total_count = N,
+                            percent = f"{percentage:.2%}",
+                            elapsed_duration = f"{elapsed_duration_minutes:.1f} min",
+                            average_duration = f"{average_duration_ms:.3f} ms",
+                            this_method_duration = f"{recipe_update_duration_ms:.3f} ms",
+                            est_time_remaining = f"{est_time_remaining_minutes:.1f} min",
+                            row = key,
+                            value = len(value)
+                            ), end="\r", flush=True) 
             
     
     current_time = time.time() 

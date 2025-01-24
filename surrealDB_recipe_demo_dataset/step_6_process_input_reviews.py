@@ -13,6 +13,7 @@ from surql_recipes_steps import SurqlRecipesAndSteps
 from surql_reviews import SurqlReviewsAndReviewers
 from recipe_data_surql_ddl import RecipeDataSurqlDDL
 from surrealDB_embedding_model.surql_embedding_model import SurqlEmbeddingModel
+from helpers import Helpers
 
 
 
@@ -23,6 +24,7 @@ recipe_constants = RecipeDataConstants()
 args_loader = RecipeArgsLoader("STEP 6 - Input reviews and reviewers",db_constants,embed_constants,recipe_constants)
 args_loader.LoadArgs()
 
+Helpers.ensure_folders([out_folder])
 
 reviewer_insert_durations = []
 review_insert_durations = []
@@ -33,45 +35,71 @@ async def process_reviewers(dataProcessor:SurqlReviewsAndReviewers,reviewer_ids)
     start_time = time.time()
 
     i = 0
-    total_reviews = len(reviewer_ids)
-    for reviewer_id in reviewer_ids:
-        i += 1
-        percentage = i/total_reviews
-        reviewer_insert_start_time =  time.time()
-        review_name = names.get_full_name()
-        out = await dataProcessor.insert_reviewer(reviewer_id,review_name)
+    total_reviewers = len(reviewer_ids)
 
 
-        current_time = time.time()
-        elapsed_duration = current_time - start_time
-        elapsed_duration_minutes = elapsed_duration/60
-        average_duration = elapsed_duration / i if i else 0
-        average_duration_ms = average_duration * 1000
+    benchmark_log = out_folder + "/reviewers_log.csv"
+    with open(benchmark_log,"w") as log_file:
+        log_file.write(
+                "counter,total_count,percent,est_time_remaining,elapsed,last_duration,avg_duration,reviewer_id\n"
+        )
 
 
-        reviewer_insert_duration = current_time - reviewer_insert_start_time
-        reviewer_insert_duration_ms = reviewer_insert_duration * 1000
+        for reviewer_id in reviewer_ids:
+            i += 1
+            percentage = i/total_reviewers
+            reviewer_insert_start_time =  time.time()
+            reviewer_name = names.get_full_name()
+            out = await dataProcessor.insert_reviewer(reviewer_id,reviewer_name)
 
-        reviewer_insert_durations.append(reviewer_insert_duration)
 
-        est_time_remaining = average_duration * (total_reviews - i)
-        est_time_remaining_minutes = est_time_remaining / 60
-            
-        print("inserting_reviewers-{counter}/{total_count}\t{percent}\test_remaining\t{est_time_remaining}\telapsed\t{elapsed_duration}\tlast_duration\t{this_method_duration}\tavg_duration\t{average_duration}\t-{row}-\t{name}\t\t\t\t\t\t\t\t\t\t\t".format(
-                    counter = i,
-                    total_count = total_reviews,
-                    percent = f"{percentage:.2%}",
-                    elapsed_duration = f"{elapsed_duration_minutes:.1f} min",
-                    average_duration = f"{average_duration_ms:.3f} ms",
-                    this_method_duration = f"{reviewer_insert_duration_ms:.3f} ms",
-                    est_time_remaining = f"{est_time_remaining_minutes:.1f} min",
-                    row = reviewer_id,
-                    name = review_name
-                    ), end="\r", flush=True) 
+            current_time = time.time()
+            elapsed_duration = current_time - start_time
+            elapsed_duration_minutes = elapsed_duration/60
+            average_duration = elapsed_duration / i if i else 0
+            average_duration_ms = average_duration * 1000
+
+
+            reviewer_insert_duration = current_time - reviewer_insert_start_time
+            reviewer_insert_duration_ms = reviewer_insert_duration * 1000
+
+            reviewer_insert_durations.append(reviewer_insert_duration)
+
+            est_time_remaining = average_duration * (total_reviewers - i)
+            est_time_remaining_minutes = est_time_remaining / 60
+
+
+                    
+            log_file.write(
+                                "{counter},{total_count},{percent},{est_time_remaining},{elapsed_duration},{this_method_duration},{average_duration},{row}\n".format(
+                                    counter = i,
+                                    total_count = total_reviewers,
+                                    percent = f"{percentage:.2%}",
+                                    elapsed_duration = f"{elapsed_duration_minutes:.1f} min",
+                                    average_duration = f"{average_duration_ms:.3f} ms",
+                                    this_method_duration = f"{reviewer_insert_duration_ms:.3f} ms",
+                                    est_time_remaining = f"{est_time_remaining_minutes:.1f} min",
+                                    row = reviewer_id
+                                )
+
+                        )
+        
+            str_to_format = "inserting_reviewers-{counter}/{total_count}:{percent}\t\test_remaining:{est_time_remaining}\t\telapsed:{elapsed_duration}\t\tlast_duration:{this_method_duration}\t\tavg_duration:{average_duration}\t\t-{row}-:{name}\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"
+            Helpers.print_update(str_to_format.format(
+                        counter = i,
+                        total_count = total_reviewers,
+                        percent = f"{percentage:.2%}",
+                        elapsed_duration = f"{elapsed_duration_minutes:.1f} min",
+                        average_duration = f"{average_duration_ms:.3f} ms",
+                        this_method_duration = f"{reviewer_insert_duration_ms:.3f} ms",
+                        est_time_remaining = f"{est_time_remaining_minutes:.1f} min",
+                        row = reviewer_id,
+                        name = reviewer_name
+                        )) 
         
         
 
-async def process_review(dataProcessor:SurqlReviewsAndReviewers,row,counter,total_count,start_time):
+async def process_review(dataProcessor:SurqlReviewsAndReviewers,row,counter,total_count,start_time,log_file):
     percentage = counter/total_count
 
     review_insert_start_time =  time.time()
@@ -101,7 +129,24 @@ async def process_review(dataProcessor:SurqlReviewsAndReviewers,row,counter,tota
     est_time_remaining = average_duration * (total_count - counter)
     est_time_remaining_minutes = est_time_remaining / 60
 
-    print("inserting_review-{counter}/{total_count}\t{percent}\test_remaining\t{est_time_remaining}\telapsed\t{elapsed_duration}\tlast_duration\t{this_method_duration}\tavg_duration\t{average_duration}\t-{row}-\t{name}\t\t\t\t\t\t\t\t\t\t\t".format(
+          
+    log_file.write(
+                        "{counter},{total_count},{percent},{est_time_remaining},{elapsed_duration},{this_method_duration},{average_duration},{row},{user}\n".format(
+                            counter = counter,
+                            total_count = total_count,
+                            percent = f"{percentage:.2%}",
+                            elapsed_duration = f"{elapsed_duration_minutes:.1f} min",
+                            average_duration = f"{average_duration_ms:.3f} ms",
+                            this_method_duration = f"{review_insert_duration_ms:.3f} ms",
+                            est_time_remaining = f"{est_time_remaining_minutes:.1f} min",
+                            row = row.recipe_id,
+                            user = row.user_id
+                        )
+
+                )
+
+    str_to_format = "inserting_review-{counter}/{total_count}:{percent}\t\test_remaining:{est_time_remaining}\t\telapsed:{elapsed_duration}\t\tlast_duration:{this_method_duration}\t\tavg_duration:{average_duration}\t\t-{row}-:{name}\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"
+    Helpers.print_update(str_to_format.format(
                 counter = counter,
                 total_count = total_count,
                 percent = f"{percentage:.2%}",
@@ -111,7 +156,7 @@ async def process_review(dataProcessor:SurqlReviewsAndReviewers,row,counter,tota
                 est_time_remaining = f"{est_time_remaining_minutes:.1f} min",
                 row = row.recipe_id,
                 name = row.user_id
-                ), end="\r", flush=True)
+                ))
     
 
     # except Exception as e:
@@ -138,9 +183,15 @@ async def process_reviews(review_df):
 
         dataProcessor = SurqlReviewsAndReviewers(db)
         i = 0
-        for row in review_df.itertuples():
-            i += 1
-            await process_review(dataProcessor,row,i,total_records,start_time) 
+
+        benchmark_log = out_folder + "/reviews_log.csv"
+        with open(benchmark_log,"w") as log_file:           
+            log_file.write(
+                    "counter,total_count,percent,est_time_remaining,elapsed,last_duration,avg_duration,rec_id,user_id\n"
+            )
+            for row in review_df.itertuples():
+                i += 1
+                await process_review(dataProcessor,row,i,total_records,start_time,log_file) 
 
             
 
