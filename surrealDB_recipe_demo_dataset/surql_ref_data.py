@@ -1,4 +1,5 @@
-from surrealdb import AsyncSurrealDB
+from surrealdb import AsyncSurreal
+from surrealDB_embedding_model.database import Database
 
 class SurqlReferenceData:
   
@@ -96,7 +97,7 @@ class SurqlReferenceData:
   """
 
 
-  def __init__(self,db: AsyncSurrealDB):
+  def __init__(self,db: AsyncSurreal):
       self.db = db
 
 
@@ -125,11 +126,7 @@ class SurqlReferenceData:
   async def insert_cooking_action(self,action,parent,rationale,confidence):
       
       params = {"action": action, "parent": parent,"rationale":rationale,"confidence":confidence }
-      outcome = await self.db.query(SurqlReferenceData.INSERT_COOKING_ACTION, params)
-
-      for item in outcome:
-          if item["status"]=="ERR":
-              raise SystemError("Step action error: {0}".format(item["result"])) 
+      outcome = Database.ParseResponseForErrors(await self.db.query_raw(SurqlReferenceData.INSERT_COOKING_ACTION, params))
       return outcome
 
 
@@ -140,11 +137,7 @@ class SurqlReferenceData:
                 "substitute": substitute,
                 "rationale": rationale,
                 "confidence": confidence}
-      outcome = await self.db.query(SurqlReferenceData.INSERT_INGREDIENT_SUBSTITUTE, params)
-         
-      for item in outcome:
-          if item["status"]=="ERR":
-              raise SystemError("Step ingredient error: {0}".format(item["result"]))
+      outcome = Database.ParseResponseForErrors(await self.db.query_raw(SurqlReferenceData.INSERT_INGREDIENT_SUBSTITUTE, params))
       return outcome
   
 
@@ -152,11 +145,7 @@ class SurqlReferenceData:
       
       params = {"ingredient": ingredient,
                 "flavor": flavor}
-      outcome = await self.db.query(SurqlReferenceData.INSERT_INGREDIENT, params)
-         
-      for item in outcome:
-          if item["status"]=="ERR":
-              raise SystemError("Step ingredient error: {0}".format(item["result"]))
+      outcome = Database.ParseResponseForErrors(await self.db.query_raw(SurqlReferenceData.INSERT_INGREDIENT, params))
       return outcome
   
   

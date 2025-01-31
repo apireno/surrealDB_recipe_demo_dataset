@@ -61,6 +61,8 @@ class Helpers:
             
 
 
+
+
     @staticmethod
     def time_str_to_seconds(time_str):
         """Converts a string representing time with various units to seconds.
@@ -105,3 +107,7 @@ class Helpers:
         except (ValueError, IndexError) as e:
             print(f"Invalid input format. Provide a string like '50.677µs', '10ms', etc. Error: {e}")
             return None
+
+    @staticmethod
+    def time_result_to_seconds(result,result_index):
+        return Helpers.time_str_to_seconds(result["result"][result_index]["time"])

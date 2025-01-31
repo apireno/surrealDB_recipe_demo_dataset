@@ -2,19 +2,16 @@ import asyncio
 import time
 import ast
 import os
-from surrealDB_embedding_model.embedding_model_constants import EmbeddingModelConstants,DatabaseConstants,THIS_FOLDER
-from recipe_data_constants import RecipeDataConstants, RecipeArgsLoader,GeminiConstants,DATA_FOLDER
+from surrealDB_embedding_model.embedding_model_constants import DatabaseConstants,THIS_FOLDER
+from recipe_data_constants import RecipeDataConstants, ArgsLoader,GeminiConstants,DATA_FOLDER
 from gemini import GeminiHelper
 from extraction_ref_data_helpers import RefDataHelper
 from helpers import Helpers
 
 out_folder = THIS_FOLDER + "/logging/ing_sim_{0}".format(time.strftime("%Y%m%d-%H%M%S"))
 db_constants = DatabaseConstants()
-embed_constants = EmbeddingModelConstants()
 recipe_constants = RecipeDataConstants()
 gemini_constants = GeminiConstants()
-args_loader = RecipeArgsLoader("STEP 0.2 - LLM Extract ingredients similarities",db_constants,embed_constants,recipe_constants,gemini_constants)
-args_loader.LoadArgs()
 
 Helpers.ensure_folders([out_folder,DATA_FOLDER])
 
@@ -320,7 +317,8 @@ def process_ingredient_matching(ingredient_list,ingredient_match_list=[],loop_co
 
 async def main():
 
-    
+    args_loader = ArgsLoader("STEP 0.2 - LLM Extract ingredients similarities",db_constants,recipe_constants,gemini_constants)
+    args_loader.LoadArgs()
     args_loader.print()
 
     debug_file = out_folder + "/gemini_debug.txt"
