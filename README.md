@@ -32,9 +32,9 @@ Follow these steps to load the data into your SurrealDB instance:
 3.  **Set up your SurrealDB database**: Either install a local instance of SurrealDB or use Surreal Cloud.
 4.  **Environment Variables**: Ensure your SurrealDB credentials are set as environment variables.
 5.  **Ensure the embedding module depedency is installed**: 
-    * execute `pip install -r reqirements.txt` in the root of where you downloaded this repo
-    * it should create a folder `src/surrealdb-embedding-model` and download the dependant module code there
-    * you can run `test_dependencies.py` to confirm
+    * execute `bash setup.sh` in the root of where you downloaded this repo which will set up your venv and execute `pip install -r reqirements.txt` 
+    * you can run `test_dependencies.py` to confirm all dependencies were properly installed
+    * remeber to activate your venv before running scripts
 5.  **CLI args and constants file `surrealDB_recipe_demo_dataset/recipe_data_constants.py`**:
     * CLI options:
       * -h, --help            show this help message and exit
@@ -63,8 +63,8 @@ Follow these steps to load the data into your SurrealDB instance:
                         The sampling ratio for the reviews from 0-1 (Default: 1.0)
     *   If you are running from an IDE, edit the `recipe_data_constants.py` file to alter any settings there if more convenient.
 6.  **Run the embedding script**: If your target database doesn't have the embedding model loaded already run `src/surrealdb-embedding-model/upload_model.py`
-
-7.  **Run the scripts in order**: Execute the Python scripts sequentially, from step 1 through 6
+7.  **Optional**: The enriched relationships between ingredients and cooking actions are already provided in the data folder. If you want to re-generate them using Gemini execute the Python scripts sequentially, from step 0_1 through 0_4
+8.  **Run the scripts in order**: Execute the Python scripts sequentially, from step 1 through 6
     *   `step_1_process_ddl.py`: Creates all the database schema definitions for all the data to be ingested.
     *   `step_2_process_input_ingredients_and_actions.py`: Ingests the ingredient data into SurrealDB.
     *   `step_3_process_input_recipes.py`: Ingests the recipe data into SurrealDB.
@@ -73,6 +73,7 @@ Follow these steps to load the data into your SurrealDB instance:
     *   `step_5b_process_step_action_extraction.py`: Creates an array of cooking actions that are records of type cooking_action loaded in step 2 using text-search.
     *   `step_6_process_input_reviews.py`: Ingests the reviewers and review data into SurrealDB.
     * Each of these is implemented as a python script which can be run separately.
+
 
 ## Dataset and Research Citation
 
