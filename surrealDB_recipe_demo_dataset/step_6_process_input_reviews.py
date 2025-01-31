@@ -1,28 +1,26 @@
 
 import asyncio
-from surrealdb import AsyncSurrealDB
+from surrealdb import AsyncSurreal
 import pandas as pd
 import numpy as np
 import time
 import names
 from datetime import datetime,timedelta
-from surrealdb import AsyncSurrealDB
-from surrealDB_embedding_model.embedding_model_constants import EmbeddingModelConstants,DatabaseConstants,THIS_FOLDER
-from recipe_data_constants import RecipeDataConstants, RecipeArgsLoader,DATA_FOLDER
+from surrealdb import AsyncSurreal
+from surrealDB_embedding_model.embedding_model_constants import DatabaseConstants,THIS_FOLDER
+from recipe_data_constants import RecipeDataConstants, ArgsLoader,DATA_FOLDER
 from surql_recipes_steps import SurqlRecipesAndSteps
 from surql_reviews import SurqlReviewsAndReviewers
 from recipe_data_surql_ddl import RecipeDataSurqlDDL
 from surrealDB_embedding_model.surql_embedding_model import SurqlEmbeddingModel
 from helpers import Helpers
+from surrealDB_embedding_model.database import Database
 
 
 
 out_folder = THIS_FOLDER + "/logging/process_reviews_{0}".format(time.strftime("%Y%m%d-%H%M%S"))
 db_constants = DatabaseConstants()
-embed_constants = EmbeddingModelConstants()
 recipe_constants = RecipeDataConstants()
-args_loader = RecipeArgsLoader("STEP 6 - Input reviews and reviewers",db_constants,embed_constants,recipe_constants)
-args_loader.LoadArgs()
 
 Helpers.ensure_folders([out_folder])
 
@@ -50,7 +48,7 @@ async def process_reviewers(dataProcessor:SurqlReviewsAndReviewers,reviewer_ids)
             percentage = i/total_reviewers
             reviewer_insert_start_time =  time.time()
             reviewer_name = names.get_full_name()
-            out = await dataProcessor.insert_reviewer(reviewer_id,reviewer_name)
+            outcome = await dataProcessor.insert_reviewer(reviewer_id,reviewer_name)
 
 
             current_time = time.time()
@@ -84,7 +82,7 @@ async def process_reviewers(dataProcessor:SurqlReviewsAndReviewers,reviewer_ids)
 
                         )
         
-            str_to_format = "inserting_reviewers-{counter}/{total_count}:{percent}\t\test_remaining:{est_time_remaining}\t\telapsed:{elapsed_duration}\t\tlast_duration:{this_method_duration}\t\tavg_duration:{average_duration}\t\t-{row}-:{name}\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"
+            str_to_format = "inserting_reviewer-{counter}/{total_count}:{percent}\t\test_remaining:{est_time_remaining}\t\telapsed:{elapsed_duration}\t\tlast_duration:{this_method_duration}\t\tavg_duration:{average_duration}\t\t-{row}-:{name}\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"
             Helpers.print_update(str_to_format.format(
                         counter = i,
                         total_count = total_reviewers,
@@ -105,7 +103,7 @@ async def process_review(dataProcessor:SurqlReviewsAndReviewers,row,counter,tota
     review_insert_start_time =  time.time()
 
     #try:
-    out = await dataProcessor.insert_review(
+    outcome = await dataProcessor.insert_review(
                         row.user_id,
                         row.recipe_id,
                             (datetime.strptime(row.date, "%Y-%m-%d") + timedelta(seconds=1)).strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
@@ -175,9 +173,9 @@ async def process_reviews(review_df):
 
 
 
-    async with AsyncSurrealDB(db_constants.DB_PARAMS.url) as db:
+    async with AsyncSurreal(db_constants.DB_PARAMS.url) as db:
 
-        auth_token = await db.sign_in(db_constants.DB_PARAMS.username,db_constants.DB_PARAMS.password)
+        auth_token = await db.signin({"username":db_constants.DB_PARAMS.username,"password":db_constants.DB_PARAMS.password})
         await db.use(db_constants.DB_PARAMS.namespace, db_constants.DB_PARAMS.database)
 
 
@@ -203,13 +201,15 @@ async def process_reviews(review_df):
 
 async def main():
 
+    args_loader = ArgsLoader("STEP 6 - Input reviews and reviewers",db_constants,recipe_constants)
+    args_loader.LoadArgs()
     args_loader.print()
 
     review_df = pd.read_csv(recipe_constants.REVIEW_FILE)
 
 
-    async with AsyncSurrealDB(db_constants.DB_PARAMS.url) as db:
-        auth_token = await db.sign_in(db_constants.DB_PARAMS.username,db_constants.DB_PARAMS.password)
+    async with AsyncSurreal(db_constants.DB_PARAMS.url) as db:
+        auth_token = await db.signin({"username":db_constants.DB_PARAMS.username,"password":db_constants.DB_PARAMS.password})
         await db.use(db_constants.DB_PARAMS.namespace, db_constants.DB_PARAMS.database)
 
 
@@ -219,21 +219,23 @@ async def main():
         embed_dimensions = await embedDataProcessor.get_model_dimensions()
         
 
-        out = await db.query(RecipeDataSurqlDDL.DDL_REVIEWER)
-        out = await db.query(RecipeDataSurqlDDL.DDL_REVIEW.format(embed_dimensions=embed_dimensions))
+        outcome = Database.ParseResponseForErrors(await db.query_raw(RecipeDataSurqlDDL.DDL_REVIEWER))
+        outcome = Database.ParseResponseForErrors(await db.query_raw(RecipeDataSurqlDDL.DDL_REVIEW.format(embed_dimensions=embed_dimensions)))
 
         
         recipeDataProcessor = SurqlRecipesAndSteps(db)
         reviewDataProcessor = SurqlReviewsAndReviewers(db)
 
-        list_recipe_result = await recipeDataProcessor.select_all_recipe_ids()
-        recipes = list_recipe_result[0]["result"]
+        #get all the recipe id's that were actually inserted we may have sampled
+        recipes = await recipeDataProcessor.select_all_recipe_ids()
         recipe_ids = [recipe["id"].id for recipe in recipes]
+        #filter the reviews to only the recipe id's that were sampled
         review_df = review_df[review_df['recipe_id'].isin(recipe_ids)]
+        #only insert the unique reviewers from the sampled data
         reviewer_ids = review_df['user_id'].unique().tolist() 
         await process_reviewers(reviewDataProcessor,reviewer_ids)
     
-    #sample 
+    #From the already sampled data further sample if needed
     review_df = review_df.sample(frac=recipe_constants.REVIEW_SAMPLE_RATIO, random_state=1)
     print(review_df.describe())
     print(review_df.head())

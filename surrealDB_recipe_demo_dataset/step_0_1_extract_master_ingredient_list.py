@@ -4,19 +4,16 @@ import math
 import ast
 import os
 import pandas as pd
-from surrealDB_embedding_model.embedding_model_constants import EmbeddingModelConstants,DatabaseConstants,THIS_FOLDER
-from recipe_data_constants import RecipeDataConstants, RecipeArgsLoader,GeminiConstants,DATA_FOLDER
+from surrealDB_embedding_model.embedding_model_constants import DatabaseConstants,THIS_FOLDER
+from recipe_data_constants import RecipeDataConstants, ArgsLoader,GeminiConstants,DATA_FOLDER
 from gemini import GeminiHelper
 from extraction_ref_data_helpers import RefDataHelper
 from helpers import Helpers
 
 out_folder = THIS_FOLDER + "/logging/ing_extract_{0}".format(time.strftime("%Y%m%d-%H%M%S"))
 db_constants = DatabaseConstants()
-embed_constants = EmbeddingModelConstants()
 recipe_constants = RecipeDataConstants()
 gemini_constants = GeminiConstants()
-args_loader = RecipeArgsLoader("STEP 0.1 - LLM Extract ingredients from data",db_constants,embed_constants,recipe_constants,gemini_constants)
-args_loader.LoadArgs()
 
 Helpers.ensure_folders([out_folder,DATA_FOLDER])
 
@@ -306,8 +303,9 @@ def process_ingredient_reduction(ingredient_list,loop_counter=0,debug_file=None)
 
 
 async def main():
-
     
+    args_loader = ArgsLoader("STEP 0.1 - LLM Extract ingredients from data",db_constants,recipe_constants,gemini_constants)
+    args_loader.LoadArgs()
     args_loader.print()
     
     use_original_file = True

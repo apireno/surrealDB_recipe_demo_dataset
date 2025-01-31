@@ -19,3 +19,5 @@ data/extracted_cooking_actions_list copy 2.txt
 data/extracted_ingredients_match_list copy.txt
 data/extracted_ingredients_list copy 2.txt
 data/extracted_cooking_actions_match_list copy.txt
+.venv/
+data/extracted_ingredients_match_list_old.txt

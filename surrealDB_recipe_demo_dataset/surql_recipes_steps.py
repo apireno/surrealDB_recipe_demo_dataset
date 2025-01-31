@@ -1,5 +1,5 @@
-from surrealdb import AsyncSurrealDB
-
+from surrealdb import AsyncSurreal
+from surrealDB_embedding_model.database import Database
 
 class SurqlRecipesAndSteps:
 
@@ -97,7 +97,7 @@ class SurqlRecipesAndSteps:
     """
 
 
-    def __init__(self,db: AsyncSurrealDB):
+    def __init__(self,db: AsyncSurreal):
         self.db = db
 
 
@@ -112,13 +112,9 @@ class SurqlRecipesAndSteps:
                 "normalized_ingredients": normalized_ingredients,
                 "actions": actions
                 }
-        outcome = await self.db.query(SurqlRecipesAndSteps.INSERT_STEP, params)
-
-        for item in outcome:
-            if item["status"]=="ERR":
-                raise SystemError("Step insert error: {0}".format(item["result"])) 
+        outcome = Database.ParseResponseForErrors(await self.db.query_raw(SurqlRecipesAndSteps.INSERT_STEP, params))
         return outcome
-
+       
 
 
 
@@ -152,24 +148,7 @@ class SurqlRecipesAndSteps:
             "time_submitted": time_submitted,
             "time_updated": time_updated
             }
-        outcome = await self.db.query(SurqlRecipesAndSteps.INSERT_RECIPE, params)
-
-        
-        
-
-        for item in outcome:
-            if item["status"]=="ERR":
-
-
-                for i, (key, value) in enumerate(params.items()):
-                    print(f"LET ${key} = {value};")
-                print(SurqlRecipesAndSteps.INSERT_RECIPE)
-                
-                raise SystemError("Recipe insert error: {0}".format(item["result"])) 
-            
-
-
-
+        outcome = Database.ParseResponseForErrors(await self.db.query_raw(SurqlRecipesAndSteps.INSERT_RECIPE, params))
         return outcome
 
 
@@ -198,10 +177,7 @@ class SurqlRecipesAndSteps:
                 "normalized_ingredients": normalized_ingredients
                 }
         
-        outcome = await self.db.query(SurqlRecipesAndSteps.UPDATE_RECIPE_NORMALIZED_INGREDIENTS, params)
-        for item in outcome:
-            if item["status"]=="ERR":
-                raise SystemError("Recipe update recipe norm ingredients error: {0}".format(item["result"])) 
+        outcome = Database.ParseResponseForErrors(await self.db.query_raw(SurqlRecipesAndSteps.UPDATE_RECIPE_NORMALIZED_INGREDIENTS, params))
         return outcome
 
 
@@ -216,10 +192,7 @@ class SurqlRecipesAndSteps:
                 "normalized_ingredients": normalized_ingredients
                 }
         
-        outcome = await self.db.query(SurqlRecipesAndSteps.UPDATE_STEP_NORMALIZED_INGREDIENTS, params)
-        for item in outcome:
-            if item["status"]=="ERR":
-                raise SystemError("Recipe update step norm ingredients error: {0}".format(item["result"])) 
+        outcome = Database.ParseResponseForErrors(await self.db.query_raw(SurqlRecipesAndSteps.UPDATE_STEP_NORMALIZED_INGREDIENTS, params))    
         return outcome
 
 
@@ -233,10 +206,7 @@ class SurqlRecipesAndSteps:
                 "actions": actions
                 }
         
-        outcome = await self.db.query(SurqlRecipesAndSteps.UPDATE_STEP_ACTIONS, params)
-        for item in outcome:
-            if item["status"]=="ERR":
-                raise SystemError("Recipe update step actions error: {0}".format(item["result"])) 
+        outcome = Database.ParseResponseForErrors(await self.db.query_raw(SurqlRecipesAndSteps.UPDATE_STEP_ACTIONS, params))
         return outcome
 
 
@@ -271,9 +241,6 @@ class SurqlRecipesAndSteps:
                 }
         
         outcome = await self.db.query(SurqlRecipesAndSteps.SELECT_STEPS_THAT_USE_ACTION, params)
-        for item in outcome:
-            if item["status"]=="ERR":
-                raise SystemError("Recipe select steps for action error: {0}".format(item["result"])) 
         return outcome
 
 
@@ -287,9 +254,6 @@ class SurqlRecipesAndSteps:
                 }
         
         outcome = await self.db.query(SurqlRecipesAndSteps.SELECT_STEPS_THAT_USE_ACTION_FROM_RECIPE, params)
-        for item in outcome:
-            if item["status"]=="ERR":
-                raise SystemError("Recipe select steps for action error: {0}".format(item["result"])) 
         return outcome
 
 
@@ -305,8 +269,4 @@ class SurqlRecipesAndSteps:
                 }
         
         outcome = await self.db.query(SurqlRecipesAndSteps.SELECT_STEPS_THAT_USE_INGREDIENT_FROM_RECIPE, params)
-        
-        for item in outcome:
-            if item["status"]=="ERR":
-                raise SystemError("Recipe select steps for ingredients error: {0}".format(item["result"])) 
         return outcome

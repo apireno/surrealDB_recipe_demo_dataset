@@ -1,5 +1,6 @@
 from surrealDB_embedding_model.embeddings import EmbeddingModel
-from surrealdb import AsyncSurrealDB
+from surrealdb import AsyncSurreal
+from surrealDB_embedding_model.database import Database
 
 class SurqlReviewsAndReviewers:
 
@@ -32,7 +33,7 @@ class SurqlReviewsAndReviewers:
 
 
 
-    def __init__(self,db: AsyncSurrealDB,embeddingModel: EmbeddingModel = None):
+    def __init__(self,db: AsyncSurreal,embeddingModel: EmbeddingModel = None):
         self.db = db
         self.embeddingModel = embeddingModel
 
@@ -41,7 +42,7 @@ class SurqlReviewsAndReviewers:
         params = {"reviewer_id": reviewer_id,
                 "name": str(name)
                 }
-        outcome = await self.db.query(SurqlReviewsAndReviewers.INSERT_REVIEWER, params)
+        outcome = Database.ParseResponseForErrors(await self.db.query_raw(SurqlReviewsAndReviewers.INSERT_REVIEWER, params))
         return outcome
         
 
@@ -59,11 +60,7 @@ class SurqlReviewsAndReviewers:
             "rating": rating,
             "review_text": str(review_text)
             }
-        outcome = await self.db.query(SurqlReviewsAndReviewers.INSERT_REVIEW, params)
-            
-        for item in outcome:
-            if item["status"]=="ERR":
-                raise SystemError("Review error: {0}".format(item["result"]))
+        outcome = Database.ParseResponseForErrors(await self.db.query_raw(SurqlReviewsAndReviewers.INSERT_REVIEW, params))
         return outcome
   
     

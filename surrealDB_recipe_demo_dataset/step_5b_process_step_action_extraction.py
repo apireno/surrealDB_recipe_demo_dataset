@@ -1,29 +1,25 @@
 
 
 import asyncio
-from surrealdb import AsyncSurrealDB
+from surrealdb import AsyncSurreal
 import numpy as np
 import time
 from helpers import Helpers
 from collections import defaultdict
-from surrealdb import AsyncSurrealDB
-from surrealDB_embedding_model.embedding_model_constants import EmbeddingModelConstants,DatabaseConstants,THIS_FOLDER
-from recipe_data_constants import RecipeDataConstants, RecipeArgsLoader,DATA_FOLDER
+from surrealdb import AsyncSurreal
+from surrealDB_embedding_model.embedding_model_constants import DatabaseConstants,THIS_FOLDER
+from recipe_data_constants import RecipeDataConstants, ArgsLoader,DATA_FOLDER
 from surql_recipes_steps import SurqlRecipesAndSteps
 from surql_ref_data import SurqlReferenceData
 
 out_folder = THIS_FOLDER + "/logging/step_action_extraction_{0}".format(time.strftime("%Y%m%d-%H%M%S"))
 db_constants = DatabaseConstants()
-embed_constants = EmbeddingModelConstants()
 recipe_constants = RecipeDataConstants()
-args_loader = RecipeArgsLoader("STEP 5b - Step action extraction",db_constants,embed_constants,recipe_constants)
-args_loader.LoadArgs()
 
 
 
 
 action_processing_durations = []
-action_sql_durations = []
 step_update_durations = []
 
 async def process_step_action_extraction():
@@ -34,15 +30,15 @@ async def process_step_action_extraction():
 
 
 
-    async with AsyncSurrealDB(db_constants.DB_PARAMS.url) as db:
-        auth_token = await db.sign_in(db_constants.DB_PARAMS.username,db_constants.DB_PARAMS.password)
+    async with AsyncSurreal(db_constants.DB_PARAMS.url) as db:
+        auth_token = await db.signin({"username":db_constants.DB_PARAMS.username,"password":db_constants.DB_PARAMS.password})
         await db.use(db_constants.DB_PARAMS.namespace, db_constants.DB_PARAMS.database)
         
         refDataProcessor =  SurqlReferenceData(db)
         stepDataProcessor = SurqlRecipesAndSteps(db)
 
         list_actions_result = await refDataProcessor.select_all_actions()
-        actions = list_actions_result[0]["result"]
+        actions = list_actions_result
         step_normalized_actions = defaultdict(list)
         i = 0
         total_actions = len(actions)
@@ -52,16 +48,7 @@ async def process_step_action_extraction():
 
             step_results = await stepDataProcessor.select_steps_that_use_action(action["id"])
 
-            action_sql_duration = Helpers.time_str_to_seconds(step_results[0]["time"])
-            action_sql_durations.append(action_sql_duration)
-
-            steps = step_results[0]["result"]
-
-            
-            
-
-
-            for step in steps:
+            for step in step_results:
                 step_id = str(step["id"])
                 step_normalized_actions[step_id].append(action["id"])
 
@@ -79,14 +66,13 @@ async def process_step_action_extraction():
             action_processing_durations.append(action_processing_duration)
             action_processing_durations_ms = action_processing_duration*1000
 
-            action_sql_duration_ms = action_sql_duration*1000
 
             est_time_remaining = average_duration * (total_actions - i)
             est_time_remaining_minutes = est_time_remaining / 60
 
 
 
-            str_to_format = "parsing_action-{counter}/{total_count}:{percent}\t\test_remaining:{est_time_remaining}\t\telapsed:{elapsed_duration}\t\tlast_duration:{this_method_duration}\t\tavg_duration:{average_duration}\t\tthis_sql_duration:{action_sql_duration}\t\t-{row}"
+            str_to_format = "parsing_action-{counter}/{total_count}:{percent}\t\test_remaining:{est_time_remaining}\t\telapsed:{elapsed_duration}\t\tlast_duration:{this_method_duration}\t\tavg_duration:{average_duration}\t\t-{row}"
             Helpers.print_update(str_to_format.format(
                         counter = i,
                         total_count = total_actions,
@@ -94,7 +80,6 @@ async def process_step_action_extraction():
                         elapsed_duration = f"{elapsed_duration_minutes:.1f} min",
                         average_duration = f"{average_duration_ms:.3f} ms",
                         this_method_duration = f"{action_processing_durations_ms:.3f} ms",
-                        action_sql_duration = f"{action_sql_duration_ms:.3f} ms",
                         est_time_remaining = f"{est_time_remaining_minutes:.1f} min",
                         row = action["id"]
                         )) 
@@ -157,14 +142,6 @@ async def process_step_action_extraction():
     max_action_processing_duration = np.max(action_processing_durations)
     max_action_processing_duration_ms = max_action_processing_duration * 1000
 
-    avg_action_sql_duration = np.mean(action_sql_durations)
-    avg_action_sql_duration_ms = avg_action_sql_duration * 1000
-
-    min_action_sql_duration = np.min(action_sql_durations)
-    min_action_sql_duration_ms = min_action_sql_duration * 1000
-
-    max_action_sql_duration = np.max(action_sql_durations)
-    max_action_sql_duration_ms = max_action_sql_duration * 1000
 
     avg_step_update_duration = np.mean(step_update_durations)
     avg_step_update_duration_ms = avg_step_update_duration * 1000
@@ -181,16 +158,12 @@ async def process_step_action_extraction():
         step 5b process step actions                                                                                                     
         total elapsed {elapsed_duration}                                                                                                         
         {Na} action search (avg,min,max) ({avg_action_processing_duration},{min_action_processing_duration},{max_action_processing_duration}) 
-        {Na} action search sql (avg,min,max) ({avg_action_sql_duration},{min_action_sql_duration},{max_action_sql_duration}) 
         {Ns} step update (avg,min,max) ({avg_step_update_duration},{min_step_update_duration},{max_step_update_duration})                                                       
         """.format(
         elapsed_duration = f"{elapsed_duration_minutes:.1f} min",
         avg_action_processing_duration = f"{avg_action_processing_duration_ms:.3f} ms",
         min_action_processing_duration = f"{min_action_processing_duration_ms:.3f} ms",
         max_action_processing_duration = f"{max_action_processing_duration_ms:.3f} ms",
-        avg_action_sql_duration = f"{avg_action_sql_duration_ms:.3f} ms",
-        min_action_sql_duration = f"{min_action_sql_duration_ms:.3f} ms",
-        max_action_sql_duration = f"{max_action_sql_duration_ms:.3f} ms",
         avg_step_update_duration = f"{avg_step_update_duration_ms:.3f} ms",
         min_step_update_duration = f"{min_step_update_duration_ms:.3f} ms",
         max_step_update_duration = f"{max_step_update_duration_ms:.3f} ms",
@@ -201,6 +174,8 @@ async def process_step_action_extraction():
 
 async def main():
 
+    args_loader = ArgsLoader("STEP 5b - Step action extraction",db_constants,recipe_constants)
+    args_loader.LoadArgs()
     args_loader.print()
     await process_step_action_extraction()
 

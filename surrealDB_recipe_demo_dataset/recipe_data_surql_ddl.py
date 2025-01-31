@@ -4,16 +4,14 @@ class RecipeDataSurqlDDL:
     
     DDL_CREATE_NS = """
         DEFINE NAMESPACE IF NOT EXISTS {ns};
-        DEFINE DATABASE IF NOT EXISTS {db};
-        
         USE NAMESPACE {ns};
+        DEFINE DATABASE IF NOT EXISTS {db};
         USE DATABASE {db};
     """
     DDL_OVERWRITE_NS = """
         DEFINE NAMESPACE OVERWRITE {ns};
-        DEFINE DATABASE OVERWRITE {db};
-
         USE NAMESPACE {ns};
+        DEFINE DATABASE OVERWRITE {db};
         USE DATABASE {db};
     """
     DDL_ANALYZER = """
@@ -77,7 +75,7 @@ class RecipeDataSurqlDDL:
             SELECT id, vector::distance::knn() as distance
             FROM step
             WHERE id[0]==record::id($recipe)
-            AND step_description_embedding <|10,50|> $ingredient.ingredient_vector
+            AND step_description_embedding <|10,{embed_dimensions}|> $ingredient.ingredient_vector
             ORDER BY distance
         );
         RETURN $semantic_results;
@@ -148,7 +146,7 @@ class RecipeDataSurqlDDL:
             SELECT id, vector::distance::knn() as distance
             FROM step
             WHERE id[0]==record::id($recipe) 
-            AND step_description_embedding <|10,50|> $action.action_vector
+            AND step_description_embedding <|10,{embed_dimensions}|> $action.action_vector
             ORDER BY distance
         );
         RETURN $semantic_results;
@@ -256,11 +254,6 @@ class RecipeDataSurqlDDL:
     REMOVE INDEX IF EXISTS step_ingredient_index ON TABLE step;
     DEFINE INDEX step_ingredient_index ON TABLE step
     FIELDS normalized_ingredients[*].name SEARCH ANALYZER snowball_analyzer BM25;
-
-    REMOVE INDEX IF EXISTS unnormalized_step_ingredient_index ON TABLE step;
-    DEFINE INDEX unnormalized_step_ingredient_index ON TABLE step
-    FIELDS ingredients[*] SEARCH ANALYZER snowball_analyzer BM25;
-    
     
     REMOVE INDEX IF EXISTS idx_step_description ON TABLE step;
     DEFINE INDEX idx_step_description ON TABLE step FIELDS step_description_embedding HNSW DIMENSION {embed_dimensions} M 32 EFC 300;

@@ -1,26 +1,24 @@
 
 import asyncio
-from surrealdb import AsyncSurrealDB
+from surrealdb import AsyncSurreal
 import pandas as pd
 import numpy as np
 import ast
 import time
 from helpers import Helpers
 from datetime import datetime,timedelta
-from surrealdb import AsyncSurrealDB
-from surrealDB_embedding_model.embedding_model_constants import EmbeddingModelConstants,DatabaseConstants,THIS_FOLDER
-from recipe_data_constants import RecipeDataConstants, RecipeArgsLoader,DATA_FOLDER
+from surrealdb import AsyncSurreal
+from surrealDB_embedding_model.embedding_model_constants import DatabaseConstants,THIS_FOLDER
+from recipe_data_constants import RecipeDataConstants, ArgsLoader,DATA_FOLDER
 from surql_recipes_steps import SurqlRecipesAndSteps
 from recipe_data_surql_ddl import RecipeDataSurqlDDL
 from surrealDB_embedding_model.surql_embedding_model import SurqlEmbeddingModel
 from helpers import Helpers
+from surrealDB_embedding_model.database import Database
 
 out_folder = THIS_FOLDER + "/logging/process_recipes_{0}".format(time.strftime("%Y%m%d-%H%M%S"))
 db_constants = DatabaseConstants()
-embed_constants = EmbeddingModelConstants()
 recipe_constants = RecipeDataConstants()
-args_loader = RecipeArgsLoader("STEP 3 Input recipes and steps into DB",db_constants,embed_constants,recipe_constants)
-args_loader.LoadArgs()
 
 Helpers.ensure_folders([out_folder])
 
@@ -38,7 +36,7 @@ async def process_recipe(dataProcessor:SurqlRecipesAndSteps,row,counter,total_co
     step_ids = []
     for index, step in enumerate(steps):
         step_start_time = time.time()
-        out = await dataProcessor.insert_step(
+        outcome = await dataProcessor.insert_step(
             row.id,index,step
         )
         step_insert_durations.append(
@@ -52,7 +50,7 @@ async def process_recipe(dataProcessor:SurqlRecipesAndSteps,row,counter,total_co
         )
         
     recipe_start_time = time.time()
-    out = await dataProcessor.insert_recipe(
+    outcome = await dataProcessor.insert_recipe(
                         row.id,
                         row.name,
                         row.contributor_id,
@@ -90,23 +88,12 @@ async def process_recipe(dataProcessor:SurqlRecipesAndSteps,row,counter,total_co
     recipe_insert_duration_ms = recipe_insert_duration * 1000
 
 
+
+
     log_file.write(
-                        "{counter},{total_count},{percent},{est_time_remaining},{elapsed_duration},{this_method_duration},{average_duration},{avg_step_insertion_duration},{recipe_insert_duration},{row},{num_steps}\n".format(
-                            counter = counter,
-                            total_count = total_count,
-                            percent = f"{percentage:.2%}",
-                            elapsed_duration = f"{elapsed_duration_minutes:.1f} min",
-                            average_duration = f"{average_duration_ms:.3f} ms",
-                            this_method_duration = f"{this_method_duration_ms:.3f} ms",
-                            est_time_remaining = f"{est_time_remaining_minutes:.1f} min",
-                            avg_step_insertion_duration = f"{avg_step_insertion_duration_ms:.3f} ms",
-                            recipe_insert_duration = f"{recipe_insert_duration_ms:.3f} ms",
-                            row = row.id,
-                            num_steps = len(step_ids)
+            f"{counter},{percentage:.2%},{row.id},{len(step_ids)},{elapsed_duration_minutes:.1f},{est_time_remaining_minutes:.1f},{(est_time_remaining_minutes+elapsed_duration_minutes):.1f},{this_method_duration_ms:.3f},{average_duration_ms:.3f},{recipe_insert_duration_ms:.3f},{(len(step_ids)*avg_step_insertion_duration_ms):.3f},{avg_step_insertion_duration_ms:.3f}\n"
+    )
 
-                        )
-
-                )
     
 
 
@@ -141,9 +128,9 @@ async def process_recipes(recipe_df,batch_size=1,total_records=0,offset=0):
     start_time = time.time()
 
 
-    async with AsyncSurrealDB(db_constants.DB_PARAMS.url) as db:
+    async with AsyncSurreal(db_constants.DB_PARAMS.url) as db:
 
-        auth_token = await db.sign_in(db_constants.DB_PARAMS.username,db_constants.DB_PARAMS.password)
+        auth_token = await db.signin({"username":db_constants.DB_PARAMS.username,"password":db_constants.DB_PARAMS.password})
         await db.use(db_constants.DB_PARAMS.namespace, db_constants.DB_PARAMS.database)
 
 
@@ -153,20 +140,34 @@ async def process_recipes(recipe_df,batch_size=1,total_records=0,offset=0):
         
         if offset == 0:
             #only recreate the tables if not picking up from a prev run...
-            out = await db.query(RecipeDataSurqlDDL.DDL_STEP.format(embed_dimensions=embed_dimensions))
-            out = await db.query(RecipeDataSurqlDDL.DDL_RECIPE.format(embed_dimensions=embed_dimensions))
+            outcome = Database.ParseResponseForErrors(await db.query_raw(RecipeDataSurqlDDL.DDL_STEP.format(embed_dimensions=embed_dimensions)))
+            outcome = Database.ParseResponseForErrors(await db.query_raw(RecipeDataSurqlDDL.DDL_RECIPE.format(embed_dimensions=embed_dimensions)))
 
         #dataProcessor = SurqlRecipesAndSteps(db,embeddingModel)
         dataProcessor = SurqlRecipesAndSteps(db)
         
         benchmark_log = out_folder + "/log.csv"
         with open(benchmark_log,"w") as log_file:
+            log_header = f"""
+                total_count: {total_records} recipes (var steps per recipe)
+                batch_size: {batch_size}
+                url: {db_constants.DB_PARAMS.url}
+                ns: {db_constants.DB_PARAMS.namespace}
+                db: {db_constants.DB_PARAMS.database}
+                now: {time.strftime("%Y%m%d-%H%M%S")}\n"""
+
+
+            log_file.write(log_header)
+
             log_file.write(
-                    "counter,total_count,percent,est_time_remaining,elapsed,last_duration,avg_duration,avg_step_ins_duration,rec_ins_duration,row_id,num_steps\n"
+                    "counter,percent,row_id,num_steps,elapsed[m],est_time_remaining[m],total_est[m],rec_and_steps[ms],avg[ms],rec_ins[ms],step_ins[ms],avg_step_ins[ms]\n"
             )
+            log_file.flush()
+
             for i in range(offset, total_records, batch_size):
                 batch = recipe_df[i : i + batch_size].itertuples()
                 tasks = [process_recipe(dataProcessor,row,i,total_records,start_time,log_file) for row in batch]
+                
                 await asyncio.gather(*tasks)
 
         
@@ -231,7 +232,9 @@ async def main():
 
 
     
-    
+        
+    args_loader = ArgsLoader("STEP 3 Input recipes and steps into DB",db_constants,recipe_constants)
+    args_loader.LoadArgs()
     args_loader.print()
     
     recipe_df = pd.read_csv(recipe_constants.RECIPE_FILE)

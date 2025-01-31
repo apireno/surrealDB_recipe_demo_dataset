@@ -1,27 +1,23 @@
 
 import asyncio
-from surrealdb import AsyncSurrealDB
+from surrealdb import AsyncSurreal
 import numpy as np
 import time
 from helpers import Helpers
 from collections import defaultdict
-from surrealdb import AsyncSurrealDB
-from surrealDB_embedding_model.embedding_model_constants import EmbeddingModelConstants,DatabaseConstants,THIS_FOLDER
-from recipe_data_constants import RecipeDataConstants, RecipeArgsLoader,DATA_FOLDER
+from surrealdb import AsyncSurreal
+from surrealDB_embedding_model.embedding_model_constants import DatabaseConstants,THIS_FOLDER
+from recipe_data_constants import RecipeDataConstants, ArgsLoader,DATA_FOLDER
 from surql_recipes_steps import SurqlRecipesAndSteps
 from surql_ref_data import SurqlReferenceData
 
 out_folder = THIS_FOLDER + "/logging/rec_ing_normal_{0}".format(time.strftime("%Y%m%d-%H%M%S"))
 db_constants = DatabaseConstants()
-embed_constants = EmbeddingModelConstants()
 recipe_constants = RecipeDataConstants()
-args_loader = RecipeArgsLoader("STEP 4 - Recipe ingredient normalization",db_constants,embed_constants,recipe_constants)
-args_loader.LoadArgs()
 
 Helpers.ensure_folders([out_folder])
 
 ingredient_processing_durations = []
-ingredient_sql_durations = []
 ingredient_parsing_durations = []
 recipe_update_durations = []
 
@@ -31,20 +27,20 @@ async def process_recipe_ingredient_normalization():
 
 
     start_time = time.time()
-    async with AsyncSurrealDB(db_constants.DB_PARAMS.url) as db:
-        auth_token = await db.sign_in(db_constants.DB_PARAMS.username,db_constants.DB_PARAMS.password)
+    async with AsyncSurreal(db_constants.DB_PARAMS.url) as db:
+        auth_token = await db.signin({"username":db_constants.DB_PARAMS.username,"password":db_constants.DB_PARAMS.password})
         await db.use(db_constants.DB_PARAMS.namespace, db_constants.DB_PARAMS.database)
         
         refDataProcessor =  SurqlReferenceData(db)
         list_ingredient_result = await refDataProcessor.select_all_ingredients()
 
-        total_ingredients = len(list_ingredient_result[0]["result"])
+        total_ingredients = len(list_ingredient_result)
         
 
         recipe_normalized_ingredients = defaultdict(list)
         #recipe_normalized_ingredients = {}
         i = 0
-        for ingredient in list_ingredient_result[0]["result"]:
+        for ingredient in list_ingredient_result:
             i += 1
 
             ingredient_start_time = time.time()
@@ -52,13 +48,11 @@ async def process_recipe_ingredient_normalization():
             recipeDataProcessor = SurqlRecipesAndSteps(db)
 
             outcome = await recipeDataProcessor.select_recipes_that_use_ingredient(ingredient["name"])
-            ingredient_sql_duration = Helpers.time_str_to_seconds(outcome[0]["time"])
-            ingredient_sql_durations.append(ingredient_sql_duration)
-
+           
 
             ingredient_parsing_start_time = time.time()
             
-            for recipe in outcome[0]["result"]:
+            for recipe in outcome:
                 recipe_id =  str(recipe["id"])
                 recipe_normalized_ingredients[recipe_id].append(ingredient["id"])
 
@@ -79,14 +73,13 @@ async def process_recipe_ingredient_normalization():
             ingredient_parsing_duration = current_time - ingredient_parsing_start_time
             ingredient_parsing_duration_ms = ingredient_parsing_duration*1000
 
-            ingredient_sql_duration_ms = ingredient_sql_duration*1000
-
+            
 
             est_time_remaining = average_duration * (total_ingredients - i)
             est_time_remaining_minutes = est_time_remaining / 60
 
 
-            str_to_format = "collecting_ingredients-{counter}/{total_count}:{percent}\t\test_remaining:{est_time_remaining}\t\telapsed:{elapsed_duration}\t\tlast_duration:{this_method_duration}\t\tlast_sql_duration:{ingredient_sql_duration}\t\tlast_parse_duration:{ingredient_parsing_duration}\t\tavg_duration:{average_duration}\t\t-{row}"
+            str_to_format = "collecting_ingredients-{counter}/{total_count}:{percent}\t\test_remaining:{est_time_remaining}\t\telapsed:{elapsed_duration}\t\tlast_duration:{this_method_duration}\t\tlast_parse_duration:{ingredient_parsing_duration}\t\tavg_duration:{average_duration}\t\t-{row}"
             Helpers.print_update(str_to_format.format(
                         counter = i,
                         total_count = total_ingredients,
@@ -94,18 +87,18 @@ async def process_recipe_ingredient_normalization():
                         elapsed_duration = f"{elapsed_duration_minutes:.1f} min",
                         average_duration = f"{average_duration_ms:.3f} ms",
                         this_method_duration = f"{ingredient_processing_duration_ms:.3f} ms",
-                        ingredient_sql_duration = f"{ingredient_sql_duration_ms:.3f} ms",
                         ingredient_parsing_duration = f"{ingredient_parsing_duration_ms:.3f} ms",
                         est_time_remaining = f"{est_time_remaining_minutes:.1f} min",
                         row = ingredient["name"]
                         )) 
 
 
+    print("\n")
 
     i = 0
     N = len(recipe_normalized_ingredients)
-    async with AsyncSurrealDB(db_constants.DB_PARAMS.url) as db:
-        auth_token = await db.sign_in(db_constants.DB_PARAMS.username,db_constants.DB_PARAMS.password)
+    async with AsyncSurreal(db_constants.DB_PARAMS.url) as db:
+        auth_token = await db.signin({"username":db_constants.DB_PARAMS.username,"password":db_constants.DB_PARAMS.password})
         await db.use(db_constants.DB_PARAMS.namespace, db_constants.DB_PARAMS.database)
         recipeDataProcessor = SurqlRecipesAndSteps(db)
 
@@ -121,7 +114,7 @@ async def process_recipe_ingredient_normalization():
                 i += 1
                 recipe_start_time = time.time()
                 try:
-                    outcome = await recipeDataProcessor.update_recipe_normalized_ingredients(key,value)  
+                    outcome =  await recipeDataProcessor.update_recipe_normalized_ingredients(key,value) 
                 
                 except Exception as e:
                     await Helpers.logError(
@@ -194,14 +187,6 @@ async def process_recipe_ingredient_normalization():
     max_recipe_update_duration_ms = max_recipe_update_duration * 1000
 
 
-    avg_ingredient_sql_duration = np.mean(ingredient_sql_durations)
-    avg_ingredient_sql_duration_ms = avg_ingredient_sql_duration * 1000
-
-    min_ingredient_sql_duration = np.min(ingredient_sql_durations)
-    min_ingredient_sql_duration_ms = min_ingredient_sql_duration * 1000
-
-    max_ingredient_sql_duration = np.max(ingredient_sql_durations)
-    max_ingredient_sql_duration_ms = max_ingredient_sql_duration * 1000
 
     
 
@@ -211,8 +196,7 @@ async def process_recipe_ingredient_normalization():
         step 4 Recipe ingredient normalization                                                                                                    
         total elapsed {elapsed_duration}                                                                                                         
         ingredient_processing (avg,min,max) ({avg_ingredient_processing_duration},{min_ingredient_processing_duration},{max_ingredient_processing_duration})
-        recipe_update (avg,min,max) ({avg_recipe_update_duration},{min_recipe_update_duration},{max_recipe_update_duration}) 
-        ingredient_sql (avg,min,max) ({avg_ingredient_sql_duration},{min_ingredient_sql_duration},{max_ingredient_sql_duration})                                                                                    
+        recipe_update (avg,min,max) ({avg_recipe_update_duration},{min_recipe_update_duration},{max_recipe_update_duration})                                                                                  
         """.format(
         elapsed_duration = f"{elapsed_duration_minutes:.1f} min",
         avg_ingredient_processing_duration = f"{avg_ingredient_processing_duration_ms:.3f} ms",
@@ -220,16 +204,15 @@ async def process_recipe_ingredient_normalization():
         max_ingredient_processing_duration = f"{max_ingredient_processing_duration_ms:.3f} ms",
         avg_recipe_update_duration = f"{avg_recipe_update_duration_ms:.3f} ms",
         min_recipe_update_duration = f"{min_recipe_update_duration_ms:.3f} ms",
-        max_recipe_update_duration = f"{max_recipe_update_duration_ms:.3f} ms",
-        avg_ingredient_sql_duration = f"{avg_ingredient_sql_duration_ms:.3f} ms",
-        min_ingredient_sql_duration = f"{min_ingredient_sql_duration_ms:.3f} ms",
-        max_ingredient_sql_duration = f"{max_ingredient_sql_duration_ms:.3f} ms",
+        max_recipe_update_duration = f"{max_recipe_update_duration_ms:.3f} ms"
         )) 
 
 
 
 async def main():
 
+    args_loader = ArgsLoader("STEP 4 - Recipe ingredient normalization",db_constants,recipe_constants)
+    args_loader.LoadArgs()
     args_loader.print()
     await process_recipe_ingredient_normalization()
 

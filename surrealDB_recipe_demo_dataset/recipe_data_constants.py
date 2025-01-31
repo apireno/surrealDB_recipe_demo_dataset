@@ -1,6 +1,6 @@
 
 import argparse
-from surrealDB_embedding_model.embedding_model_constants import EmbeddingModelConstants,DatabaseConstants,THIS_FOLDER,ArgsLoader
+from surrealDB_embedding_model.embedding_model_constants import DatabaseConstants,THIS_FOLDER
 
 DATA_FOLDER = THIS_FOLDER + "data/"
 
@@ -74,15 +74,19 @@ class RecipeDataConstants():
             self.REVIEW_SAMPLE_RATIO = args.review_sample_ratio
 
 
-class RecipeArgsLoader(ArgsLoader):
-        
+
+
+class ArgsLoader():
+
     def __init__(self,description,
             db_constants: DatabaseConstants,
-            embed_constants: EmbeddingModelConstants,
             recipe_data_constants: RecipeDataConstants,
             gemini_data_constants: GeminiConstants = None):
         
-        super().__init__(description,db_constants,embed_constants)
+
+        self.parser = argparse.ArgumentParser(description=description)
+        self.db_constants = db_constants
+        self.db_constants.AddArgs(self.parser)
         self.recipe_data_constants = recipe_data_constants
         self.recipe_data_constants.AddArgs(self.parser)
         self.gemini_data_constants = gemini_data_constants
@@ -90,16 +94,18 @@ class RecipeArgsLoader(ArgsLoader):
             self.gemini_data_constants.AddArgs(self.parser)
 
 
-    def LoadArgs(self):
         
-        super().LoadArgs()
+
+
+    def LoadArgs(self):
+        self.args = self.parser.parse_args()
+        self.db_constants.SetArgs(self.args)
 
         self.recipe_data_constants.SetArgs(self.args)
         if self.gemini_data_constants != None:
             self.gemini_data_constants.SetArgs(self.args)
 
         
-
 
 
     def print(self):
@@ -117,8 +123,6 @@ class RecipeArgsLoader(ArgsLoader):
 
           DB_USER_ENV_VAR {DB_USER_ENV_VAR}
           DB_PASS_ENV_VAR {DB_PASS_ENV_VAR}
-
-          MODEL_PATH {MODEL_PATH}
 
           RECIPE_FILE {RECIPE_FILE}
           REVIEW_FILE {REVIEW_FILE}
@@ -139,7 +143,6 @@ class RecipeArgsLoader(ArgsLoader):
               DB = self.db_constants.DB_PARAMS.database,
               DB_USER_ENV_VAR = self.db_constants.DB_USER_ENV_VAR,
               DB_PASS_ENV_VAR = self.db_constants.DB_PASS_ENV_VAR,
-              MODEL_PATH = self.embed_constants.MODEL_PATH,
               RECIPE_FILE = self.recipe_data_constants.RECIPE_FILE,
               REVIEW_FILE = self.recipe_data_constants.REVIEW_FILE,
               EXTRACTED_INGREDIENTS_FILE = self.recipe_data_constants.EXTRACTED_INGREDIENTS_FILE,
