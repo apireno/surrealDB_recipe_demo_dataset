@@ -105,14 +105,7 @@ class ArgsLoader():
         if self.gemini_data_constants != None:
             self.gemini_data_constants.SetArgs(self.args)
 
-        #self.db_constants.DB_PARAMS.url = "wss://test-med-069pe77i4lv4j3mhm6bc7t5u9g.aws-use1.surreal.cloud"
-        #self.db_constants.DB_PARAMS.url = "ws://0.0.0.0:8080"
-
-
-        self.db_constants.DB_PARAMS.database = "idx_test2"
-        self.db_constants.DB_PARAMS.namespace = "idx_test2"
-
-        self.recipe_data_constants.RECIPE_SAMPLE_RATIO = 0.001
+        
 
     def print(self):
         # self.gemini_data_constants.GOOGLE_GENAI_API_KEY_ENV_VAR = "GOOGLE_GENAI_API_KEY"
