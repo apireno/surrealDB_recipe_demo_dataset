@@ -34,17 +34,31 @@ class RecipeDataSurqlDDL:
         DEFINE FIELD review_text ON review TYPE string;
         DEFINE FIELD review_text_embedding ON review TYPE option<array<float>> DEFAULT fn::sentence_to_vector(review_text);
 
+    """
+
+    DDL_REVIEW_INDEX_REMOVE = """
 
 
         REMOVE INDEX IF EXISTS review_text_index ON TABLE review;
-        DEFINE INDEX review_text_index ON TABLE review
-        FIELDS review_text SEARCH ANALYZER snowball_analyzer BM25;
-
-        REMOVE INDEX IF EXISTS idx_review_text ON TABLE review;
-        DEFINE INDEX idx_review_text ON TABLE review FIELDS review_text_embedding HNSW DIMENSION {embed_dimensions} M 32 EFC 300;
+        
+        REMOVE INDEX IF EXISTS vector_index_review_text ON TABLE review;
+        
 
     """
+    DDL_REVIEW_INDEX_DEFINE = """
+        DEFINE INDEX review_text_index ON TABLE review
+            FIELDS review_text SEARCH ANALYZER snowball_analyzer BM25;
+        DEFINE INDEX vector_index_review_text ON TABLE review FIELDS review_text_embedding 
+            HNSW DIMENSION {embed_dimensions} M 32 EFC 300;
 
+    """
+    DDL_REVIEW_INDEX_DEFINE_CONCURRENTLY = """
+        DEFINE INDEX review_text_index ON TABLE review
+            FIELDS review_text SEARCH ANALYZER snowball_analyzer BM25 CONCURRENTLY;
+        DEFINE INDEX vector_index_review_text ON TABLE review FIELDS review_text_embedding 
+            HNSW DIMENSION {embed_dimensions} M 32 EFC 300 CONCURRENTLY;
+
+    """
 
     DDL_REVIEWER = """
        
@@ -195,11 +209,11 @@ class RecipeDataSurqlDDL:
     DEFINE FIELD flavor_embedding ON ingredient TYPE option<array<float>>  
         DEFAULT fn::sentence_to_vector(flavor);
 
-    REMOVE INDEX IF EXISTS idx_ingredient_flavor_description_embedding ON TABLE ingredient;
-    DEFINE INDEX idx_ingredient_flavor_description_embedding ON TABLE ingredient FIELDS flavor_embedding HNSW DIMENSION {embed_dimensions} M 32 EFC 300;
+    REMOVE INDEX IF EXISTS vector_index_ingredient_flavor_description_embedding ON TABLE ingredient;
+    DEFINE INDEX vector_index_ingredient_flavor_description_embedding ON TABLE ingredient FIELDS flavor_embedding HNSW DIMENSION {embed_dimensions} M 32 EFC 300;
     
-    REMOVE INDEX IF EXISTS idx_ingredient_embedding ON TABLE ingredient;
-    DEFINE INDEX idx_ingredient_embedding ON TABLE ingredient FIELDS ingredient_embedding HNSW DIMENSION {embed_dimensions} M 32 EFC 300;
+    REMOVE INDEX IF EXISTS vector_index_ingredient_embedding ON TABLE ingredient;
+    DEFINE INDEX vector_index_ingredient_embedding ON TABLE ingredient FIELDS ingredient_embedding HNSW DIMENSION {embed_dimensions} M 32 EFC 300;
     
 
     REMOVE TABLE IF EXISTS is_similar_to;
@@ -209,8 +223,8 @@ class RecipeDataSurqlDDL:
     DEFINE FIELD rationale_embedding ON TABLE is_similar_to TYPE option<array<float>> 
         DEFAULT fn::sentence_to_vector(rationale);
 
-    REMOVE INDEX IF EXISTS idx_is_similar_to_rationale_embedding ON TABLE is_similar_to;
-    DEFINE INDEX idx_is_similar_to_rationale_embedding ON TABLE is_similar_to FIELDS rationale_embedding HNSW DIMENSION {embed_dimensions} M 32 EFC 300;
+    REMOVE INDEX IF EXISTS vector_index_is_similar_to_rationale_embedding ON TABLE is_similar_to;
+    DEFINE INDEX vector_index_is_similar_to_rationale_embedding ON TABLE is_similar_to FIELDS rationale_embedding HNSW DIMENSION {embed_dimensions} M 32 EFC 300;
     """
 
     DDL_ACTION = """
@@ -229,8 +243,8 @@ class RecipeDataSurqlDDL:
     DEFINE FIELD rationale_embedding ON TABLE is_type_of TYPE option<array<float>> 
         DEFAULT fn::sentence_to_vector(rationale);
 
-    REMOVE INDEX IF EXISTS idx_is_type_of_rationale_embedding ON TABLE is_type_of;
-    DEFINE INDEX idx_is_type_of_rationale_embedding ON TABLE is_type_of FIELDS rationale_embedding HNSW DIMENSION {embed_dimensions} M 32 EFC 300;
+    REMOVE INDEX IF EXISTS vector_index_is_type_of_rationale_embedding ON TABLE is_type_of;
+    DEFINE INDEX vector_index_is_type_of_rationale_embedding ON TABLE is_type_of FIELDS rationale_embedding HNSW DIMENSION {embed_dimensions} M 32 EFC 300;
 
     """
    
@@ -244,21 +258,35 @@ class RecipeDataSurqlDDL:
      DEFAULT fn::sentence_to_vector(step_description);
     DEFINE FIELD normalized_ingredients ON step TYPE option<array<record<ingredient>>>;
     DEFINE FIELD actions ON step TYPE option<array<record<cooking_action>>>;
+    """
 
-
-
-    REMOVE INDEX IF EXISTS step_desc_index ON TABLE step;
-    DEFINE INDEX step_desc_index ON TABLE step
+    DDL_STEP_INDEX_REMOVE = """
+    REMOVE INDEX IF EXISTS text_index_step_desccription ON TABLE step;
+    REMOVE INDEX IF EXISTS text_index_step_ingredient ON TABLE step;
+    REMOVE INDEX IF EXISTS vector_index_step_description ON TABLE step;
+    """
+    DDL_STEP_INDEX_DEFINE = """
+    DEFINE INDEX text_index_step_desccription ON TABLE step
         FIELDS step_description SEARCH ANALYZER snowball_analyzer BM25;
         
-    REMOVE INDEX IF EXISTS step_ingredient_index ON TABLE step;
-    DEFINE INDEX step_ingredient_index ON TABLE step
+    DEFINE INDEX text_index_step_ingredient ON TABLE step
     FIELDS normalized_ingredients[*].name SEARCH ANALYZER snowball_analyzer BM25;
     
-    REMOVE INDEX IF EXISTS idx_step_description ON TABLE step;
-    DEFINE INDEX idx_step_description ON TABLE step FIELDS step_description_embedding HNSW DIMENSION {embed_dimensions} M 32 EFC 300;
+    DEFINE INDEX vector_index_step_description ON TABLE step FIELDS step_description_embedding HNSW DIMENSION {embed_dimensions} M 32 EFC 300;
     """
     
+
+    DDL_STEP_INDEX_DEFINE_CONCURRENTLY = """
+    DEFINE INDEX text_index_step_desccription ON TABLE step
+        FIELDS step_description SEARCH ANALYZER snowball_analyzer BM25 CONCURRENTLY;
+        
+    DEFINE INDEX text_index_step_ingredient ON TABLE step
+    FIELDS normalized_ingredients[*].name SEARCH ANALYZER snowball_analyzer BM25 CONCURRENTLY;
+    
+    DEFINE INDEX vector_index_step_description ON TABLE step FIELDS step_description_embedding HNSW DIMENSION {embed_dimensions} M 32 EFC 300 CONCURRENTLY;
+    """
+    
+    STEP_INDEX_NAMES = ["text_index_step_desccription","text_index_step_ingredient","vector_index_step_description"]
 
     DDL_RECIPE = """
     REMOVE TABLE IF EXISTS recipe;
@@ -278,39 +306,50 @@ class RecipeDataSurqlDDL:
     DEFINE FIELD time ON recipe TYPE object;
     DEFINE FIELD time.submitted ON recipe TYPE datetime DEFAULT time::now();
     DEFINE FIELD time.updated ON recipe TYPE datetime VALUE time::now();
+    """
 
+    DDL_RECIPE_INDEX_REMOVE = """
+    REMOVE INDEX IF EXISTS text_index_recipe_description ON TABLE recipe;
+    REMOVE INDEX IF EXISTS text_index_recipe_ingredient ON TABLE recipe;
+    REMOVE INDEX IF EXISTS text_index_recipe_unnormalized_ingredient ON TABLE recipe;
+    REMOVE INDEX IF EXISTS vector_index_step_description ON TABLE recipe;
+    """
 
-
-
-    REMOVE INDEX IF EXISTS recipe_desc_index ON TABLE recipe;
-    DEFINE INDEX recipe_desc_index ON TABLE recipe
-    FIELDS description SEARCH ANALYZER snowball_analyzer BM25;
+    DDL_RECIPE_INDEX_DEFINE = """
+    DEFINE INDEX text_index_recipe_description ON TABLE recipe
+        FIELDS description SEARCH ANALYZER snowball_analyzer BM25;
     
-    REMOVE INDEX IF EXISTS recipe_ingredient_index ON TABLE recipe;
-    DEFINE INDEX recipe_ingredient_index ON TABLE recipe
+    DEFINE INDEX text_index_recipe_ingredient ON TABLE recipe
     FIELDS normalized_ingredients[*].name SEARCH ANALYZER snowball_analyzer BM25;
 
-
-    REMOVE INDEX IF EXISTS unnormalized_recipe_ingredient_index ON TABLE recipe;
-    DEFINE INDEX unnormalized_recipe_ingredient_index ON TABLE recipe
+    DEFINE INDEX text_index_recipe_unnormalized_ingredient ON TABLE recipe
     FIELDS ingredients[*] SEARCH ANALYZER snowball_analyzer BM25;
 
-
-    REMOVE INDEX IF EXISTS idx_step_description ON TABLE recipe;
-    DEFINE INDEX idx_recipe_description ON TABLE recipe FIELDS description_embedding HNSW DIMENSION {embed_dimensions} M 32 EFC 300;
-
-
-
+    DEFINE INDEX vector_index_recipe_description ON TABLE recipe FIELDS description_embedding HNSW DIMENSION {embed_dimensions} M 32 EFC 300;
     """
    
 
+    DDL_RECIPE_INDEX_DEFINE_CONCURRENTLY = """
+    DEFINE INDEX text_index_recipe_description ON TABLE recipe
+        FIELDS description SEARCH ANALYZER snowball_analyzer BM25 CONCURRENTLY;
+    
+    DEFINE INDEX text_index_recipe_ingredient ON TABLE recipe
+    FIELDS normalized_ingredients[*].name SEARCH ANALYZER snowball_analyzer BM25 CONCURRENTLY;
+
+    DEFINE INDEX text_index_recipe_unnormalized_ingredient ON TABLE recipe
+    FIELDS ingredients[*] SEARCH ANALYZER snowball_analyzer BM25 CONCURRENTLY;
+
+    DEFINE INDEX vector_index_recipe_description ON TABLE recipe FIELDS description_embedding HNSW DIMENSION {embed_dimensions} M 32 EFC 300 CONCURRENTLY;
+    """
+   
+    RECIPE_INDEX_NAMES = ["text_index_recipe_description","text_index_recipe_ingredient","text_index_recipe_unnormalized_ingredient","vector_index_recipe_description"]
 
     DDL = (DDL_ANALYZER + DDL_ACTION + 
                         DDL_INGREDIENT + 
-                        DDL_STEP + 
-                        DDL_RECIPE + 
+                        DDL_STEP + DDL_STEP_INDEX_REMOVE + DDL_STEP_INDEX_DEFINE +
+                        DDL_RECIPE + DDL_RECIPE_INDEX_REMOVE + DDL_RECIPE_INDEX_DEFINE +
                         DDL_REVIEWER +
-                        DDL_REVIEW +
+                        DDL_REVIEW + DDL_REVIEW_INDEX_REMOVE + DDL_REVIEW_INDEX_DEFINE +
                         DDL_SEARCH_FUNCTIONS)
     
 

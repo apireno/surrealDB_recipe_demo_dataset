@@ -8,9 +8,13 @@ from helpers import Helpers
 from collections import defaultdict
 from surrealdb import AsyncSurreal
 from surrealDB_embedding_model.embedding_model_constants import DatabaseConstants,THIS_FOLDER
+from surrealDB_embedding_model.database import Database
+from surrealDB_embedding_model.surql_embedding_model import SurqlEmbeddingModel
 from recipe_data_constants import RecipeDataConstants, ArgsLoader,DATA_FOLDER
+from recipe_data_surql_ddl import RecipeDataSurqlDDL
 from surql_recipes_steps import SurqlRecipesAndSteps
 from surql_ref_data import SurqlReferenceData
+
 
 out_folder = THIS_FOLDER + "/logging/step_action_extraction_{0}".format(time.strftime("%Y%m%d-%H%M%S"))
 db_constants = DatabaseConstants()
@@ -36,6 +40,12 @@ async def process_step_action_extraction():
         
         refDataProcessor =  SurqlReferenceData(db)
         stepDataProcessor = SurqlRecipesAndSteps(db)
+
+        refDataProcessor =  SurqlReferenceData(db)
+        embedDataProcessor = SurqlEmbeddingModel(db)
+        embed_dimensions = await embedDataProcessor.get_model_dimensions() 
+        outcome = Database.ParseResponseForErrors(await db.query_raw(RecipeDataSurqlDDL.DDL_SEARCH_FUNCTIONS.format(embed_dimensions=embed_dimensions)))
+
 
         list_actions_result = await refDataProcessor.select_all_actions()
         actions = list_actions_result

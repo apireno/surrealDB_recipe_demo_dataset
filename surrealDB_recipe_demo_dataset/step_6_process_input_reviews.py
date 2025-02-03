@@ -220,7 +220,8 @@ async def main():
         
 
         outcome = Database.ParseResponseForErrors(await db.query_raw(RecipeDataSurqlDDL.DDL_REVIEWER))
-        outcome = Database.ParseResponseForErrors(await db.query_raw(RecipeDataSurqlDDL.DDL_REVIEW.format(embed_dimensions=embed_dimensions)))
+        outcome = Database.ParseResponseForErrors(await db.query_raw(RecipeDataSurqlDDL.DDL_REVIEW))
+        outcome = Database.ParseResponseForErrors(await db.query_raw(RecipeDataSurqlDDL.DDL_REVIEW_INDEX_DEFINE.format(embed_dimensions=embed_dimensions)))
 
         
         recipeDataProcessor = SurqlRecipesAndSteps(db)

@@ -101,6 +101,27 @@ class SurqlRecipesAndSteps:
         self.db = db
 
 
+
+    async def check_index_status(self,table_name,index_name):
+        outcome = await self.db.query(f"INFO FOR INDEX {index_name} ON TABLE {table_name}")
+        return outcome
+
+    async def check_index_statuses(self,table_name):
+        outcome = await SurqlRecipesAndSteps.check_table_status(self,table_name)
+        index_statuses = []
+        for index_name in outcome["indexes"]:
+            index_status = await SurqlRecipesAndSteps.check_index_status(self,table_name,index_name)
+            index_statuses.append({"index":index_name,"status":index_status})
+        return index_statuses
+        
+
+
+    async def check_table_status(self,table_name):
+        outcome = await self.db.query(f"INFO FOR TABLE {table_name}")
+        return outcome
+    
+
+
     async def insert_step(self,recipe_id,
                         step_order,step_description,
                         normalized_ingredients = [],actions = []):

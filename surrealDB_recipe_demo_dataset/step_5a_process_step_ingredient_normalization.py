@@ -8,7 +8,10 @@ from helpers import Helpers
 from collections import defaultdict
 from surrealdb import AsyncSurreal
 from surrealDB_embedding_model.embedding_model_constants import DatabaseConstants,THIS_FOLDER
+from surrealDB_embedding_model.database import Database
+from surrealDB_embedding_model.surql_embedding_model import SurqlEmbeddingModel
 from recipe_data_constants import RecipeDataConstants, ArgsLoader,DATA_FOLDER
+from recipe_data_surql_ddl import RecipeDataSurqlDDL
 from surql_recipes_steps import SurqlRecipesAndSteps
 from surql_ref_data import SurqlReferenceData
 
@@ -31,7 +34,14 @@ async def process_recipe_ingredient_normalization():
         auth_token = await db.signin({"username":db_constants.DB_PARAMS.username,"password":db_constants.DB_PARAMS.password})
         await db.use(db_constants.DB_PARAMS.namespace, db_constants.DB_PARAMS.database)
         
+
         refDataProcessor =  SurqlReferenceData(db)
+        embedDataProcessor = SurqlEmbeddingModel(db)
+        embed_dimensions = await embedDataProcessor.get_model_dimensions() 
+        outcome = Database.ParseResponseForErrors(await db.query_raw(RecipeDataSurqlDDL.DDL_SEARCH_FUNCTIONS.format(embed_dimensions=embed_dimensions)))
+
+        
+
         list_ingredient_result = await refDataProcessor.select_all_ingredients()
 
         total_ingredients = len(list_ingredient_result)
